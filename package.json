@@ -8,6 +8,6 @@
     "mocha": "^5.1.1"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --delay magic.test.vectors.js"
+    "test": "./node_modules/.bin/mocha --delay magic.test.js magic.test.vectors.js"
   }
 }

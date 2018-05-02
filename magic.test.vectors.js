@@ -1,4 +1,4 @@
-const magic    = require('./magic');
+const magic = require('./magic');
 
 const fs       = require('fs');
 const readline = require('readline');
@@ -28,7 +28,7 @@ function sign(cont) {
     const m = Buffer.from(sec[2], 'hex');
 
     it('magic.sign - Test Vector #' + c, (done) => {
-      magic.sign(m, sk, (err, out) => {
+      magic.auth.sign(m, sk, (err, out) => {
         if (err) { return done(err); }
 
         const s = out.signature;
@@ -79,7 +79,7 @@ function mac(cont) {
     const m = Buffer.from(sec[1], 'hex');
 
     it('magic.mac - Test Vector #' + c, (done) => {
-      magic.mac(m, k, (err, out) => {
+      magic.auth.mac(m, k, (err, out) => {
         if (err) { return done(err); }
 
         const t = out.mac;

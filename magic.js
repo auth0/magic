@@ -10,102 +10,144 @@ const sodium = require('libsodium-wrappers-sumo');
 
 
 exports = module.exports = new Object();
+module.exports.auth      = new Object();
+module.exports.verify    = new Object();
+module.exports.encrypt   = new Object();
+module.exports.decrypt   = new Object();
 
 
 /***
- * sign
+ * auth.sign
  *
  * sign a payload
  *
  * @function
  * @api public
  *
- * @param {String|Buffer|Object} message
+ * @param {String|Buffer} message
  * @param {String|Buffer} key
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.sign = sign;
+module.exports.auth.sign = sign;
 function sign(message, key, cb) {
   if (typeof key === 'function') {
     cb  = key;
     key = null;
   }
+  const done = ret(cb);
 
-  prep(message, cb, (err, done, payload) => {
-    if (err) { return done(err); }
+  let payload, ikey;
+  [ payload ] = iparse(message);
+  [ key ]     = cparse(key);
 
-    let ikey;
-    key = kparse(key);
+  switch (Buffer.byteLength(key)) {
+    case sodium.crypto_sign_SECRETKEYBYTES:
+      ikey = key;
+      break;
+    case sodium.crypto_sign_SEEDBYTES:
+      ikey = sodium.crypto_sign_seed_keypair(key).privateKey;
+      break;
+    default:
+      ikey = sodium.crypto_sign_keypair().privateKey;
+      key  = sodium.crypto_sign_ed25519_sk_to_seed(ikey);
+  }
 
-    switch (Buffer.byteLength(key)) {
-      case sodium.crypto_sign_SECRETKEYBYTES:
-        ikey = key;
-        break;
-      case sodium.crypto_sign_SEEDBYTES:
-        ikey = sodium.crypto_sign_seed_keypair(key).privateKey;
-        break;
-      default:
-        ikey = sodium.crypto_sign_keypair().privateKey;
-        key  = sodium.crypto_sign_ed25519_sk_to_seed(ikey);
-    }
+  let signature;
+  try {
+    signature = sodium.crypto_sign_detached(payload, ikey);
+  } catch(ex) {
+    return done(new Error('Libsodium error: ' + ex));
+  }
 
-    let signature;
-    try {
-      signature = sodium.crypto_sign_detached(payload, ikey);
-    } catch(ex) {
-      return done(new Error('Libsodium error: ' + ex));
-    }
-
-    return done(null, convert({
-      alg:       'ed25519',
-      sk:        key,
-      payload:   payload,
-      signature: signature
-    }));
-  });
+  return done(null, convert({
+    alg:       'ed25519',
+    sk:        key,
+    payload:   payload,
+    signature: signature
+  }));
 }
 
 
 /***
- * mac
+ * auth.mac
  *
  * mac a payload
  *
  * @function
  * @api public
  *
- * @param {String|Buffer|Object} message
+ * @param {String|Buffer} message
  * @param {String|Buffer} key
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.mac = mac;
+module.exports.auth.mac = mac;
 function mac(message, key, cb) {
   if (typeof key === 'function') {
     cb  = key;
     key = null;
   }
+  const done = ret(cb);
 
-  prep(message, cb, (err, done, payload) => {
-    if (err) { return done(err); }
+  if (!key) { key = crypto.randomBytes(48); }
 
-    const ikey = kparse(key);
+  let payload, ikey;
+  [ payload ] = iparse(message);
+  [ key ]     = cparse(key);
 
-    let mac;
-    try {
-      mac = crypto.createHmac('sha384', ikey).update(message).digest();
-    } catch(ex) {
-      return done(new Error('Crypto error: ' + ex));
-    }
+  ikey = key;
 
-    return done(null, convert({
-      alg:     'hmac-sha384',
-      sk:      key,
-      payload: payload,
-      mac:     mac
-    }));
-  });
+  let mac;
+  try {
+    mac = crypto.createHmac('sha384', ikey).update(message).digest();
+  } catch(ex) {
+    return done(new Error('Crypto error: ' + ex));
+  }
+
+  return done(null, convert({
+    alg:     'hmac-sha384',
+    sk:      key,
+    payload: payload,
+    mac:     mac
+  }));
+}
+
+
+/***
+ * verify.mac
+ *
+ * verify a mac
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.verify.mac = vmac;
+function vmac(message, key, tag, cb) {
+  const done = ret(cb);
+
+  if (!key) { return done(new Error('Cannot verify without a key')); }
+
+  let payload, ikey;
+  [ payload ]       = iparse(message);
+  [ key, received ] = cparse(key, tag);
+
+  ikey = key;
+
+  let mac;
+  try {
+    mac = crypto.createHmac('sha384', ikey).update(message).digest();
+  } catch(ex) {
+    return done(new Error('Crypto error: ' + ex));
+  }
+
+  return done(null, cnstcomp(mac, received));
 }
 
 
@@ -149,62 +191,40 @@ function cnstcomp(a, b) {
 }
 
 
-/***
- * prep
- *
- * preparations for cryptographic operations
- *
- * @function
- * @api private
- *
- * @param {String|Buffer|Object} message
- * @param {Function} _cb
- * @param {Function} cb
- *
- * @returns {Callback}
- */
-function prep(message, _cb, cb) {
-  const done = ret(_cb);
-
-  try {
-    return cb(null, done, iparse(message));
-  } catch(ex) {
-    return cb(ex, done);
-  }
-}
-
 
 /***
  * iparse
  *
- * parse input strings as utf-8 into buffer
+ * parse input strings as utf-8 into buffers
  *
  * @function
  * @api private
  *
- * @param {String|Buffer} inp
  * @returns {Buffer}
  */
-function iparse(inp) {
-  if (!inp) { return Buffer.from(''); }
-  return (inp instanceof Buffer) ? inp : Buffer.from(inp, 'utf-8');
+function iparse() {
+  return [ ...arguments ].map((inp) => {
+    if (!inp) { return Buffer.from(''); }
+    return (inp instanceof Buffer) ? inp : Buffer.from(inp, 'utf-8');
+  });
 }
 
 
 /***
- * kparse
+ * cparse
  *
- * parse key material into buffer
+ * parse keying and other cryptographic material into buffers
  *
  * @function
  * @api private
  *
- * @param {String|Buffer} key
  * @returns {Buffer}
  */
-function kparse(inp) {
-  if (!inp) { return; }
-  return (inp instanceof Buffer) ? inp : Buffer.from(inp, 'hex');
+function cparse() {
+  return [ ...arguments ].map((inp) => {
+    if (!inp) { return; }
+    return (inp instanceof Buffer) ? inp : Buffer.from(inp, 'hex');
+  });
 }
 
 
