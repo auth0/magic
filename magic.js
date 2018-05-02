@@ -1,5 +1,5 @@
-const crypto = require('crypto');
-const sodium = require('libsodium-wrappers');
+const crypto  = require('crypto');
+const sodium = require('libsodium-wrappers-sumo');
 
 
 exports = module.exports = new Object();
@@ -20,30 +20,42 @@ exports = module.exports = new Object();
  */
 module.exports.sign = sign;
 function sign(message, key, cb) {
+  if (typeof key === 'function') {
+    cb  = key;
+    key = null;
+  }
+
   prep(message, cb, (err, done, payload) => {
     if (err) { return done(err); }
 
+    let ikey;
     key = kparse(key);
+
     switch (Buffer.byteLength(key)) {
       case sodium.crypto_sign_SECRETKEYBYTES:
-        key = key;
+        ikey = key;
+        break;
       case sodium.crypto_sign_SEEDBYTES:
-        key = sodium.crypto_sign_seed_keypair(key).privateKey;
+        ikey = sodium.crypto_sign_seed_keypair(key).privateKey;
+        break;
       default:
-        key = sodium.crypto_sign_keypair().privateKey;
+        ikey = sodium.crypto_sign_keypair().privateKey;
+        key  = sodium.crypto_sign_ed25519_sk_to_seed(ikey);
     }
 
+    let signature;
     try {
-      const signature = sodium.crypto_sign(payload, key);
+      signature = sodium.crypto_sign_detached(payload, ikey);
     } catch(ex) {
       return done(new Error('Libsodium error: ' + ex));
     }
 
-    return done(null, {
+    return done(null, convert({
+      alg:       'ed25519',
       sk:        key,
       payload:   payload,
       signature: signature
-    });
+    }));
   });
 }
 
@@ -111,13 +123,11 @@ function prep(message, _cb, cb) {
  * @function
  * @api private
  *
- * @param {String|Buffer|Object} inp
+ * @param {String|Buffer} inp
  * @returns {Buffer}
  */
 function parse(inp) {
   if (!inp) { return Buffer.from(''); }
-  if (typeof inp === 'object') { return Buffer.from(JSON.stringify(inp), 'utf-8'); }
-
   return (inp instanceof Buffer) ? inp : Buffer.from(inp, 'utf-8');
 }
 
@@ -135,9 +145,26 @@ function parse(inp) {
  */
 function kparse(inp) {
   if (!inp) { return; }
-
   return (inp instanceof Buffer) ? inp : Buffer.from(inp, 'hex');
 }
+
+
+/***
+ * convert
+ *
+ * convert Uint8Array used by sodium into Nodejs buffers
+ *
+ * @function
+ * @api private
+ *
+ * @param {Object} out
+ * @returns {Object}
+ */
+function convert(out) {
+  Object.keys(out).forEach((k) => { if (out[k] instanceof Uint8Array) out[k] = Buffer.from(out[k]); });
+  return out;
+}
+
 
 
 /***
