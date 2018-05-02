@@ -10,7 +10,7 @@ describe('test vectors', () => {
 
   describe('sign', () => {
 
-    const fp = readline.createInterface({ input: fs.createReadStream('./raw/ed25519') })
+    const fp = readline.createInterface({ input: fs.createReadStream('./raw.vectors.ed25519') })
 
     // https://ed25519.cr.yp.to/python/sign.py
     let c = 0;
