@@ -1,5 +1,12 @@
-const crypto  = require('crypto');
+const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
+
+
+
+/************
+ * Core API *
+ ************/
+
 
 
 exports = module.exports = new Object();
@@ -58,6 +65,58 @@ function sign(message, key, cb) {
     }));
   });
 }
+
+
+/***
+ * mac
+ *
+ * mac a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer|Object} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.mac = mac;
+function mac(message, key, cb) {
+  if (typeof key === 'function') {
+    cb  = key;
+    key = null;
+  }
+
+  prep(message, cb, (err, done, payload) => {
+    if (err) { return done(err); }
+
+    const ikey = kparse(key);
+
+    let mac;
+    try {
+      mac = crypto.createHmac('sha384', ikey).update(message).digest();
+    } catch(ex) {
+      return done(new Error('Crypto error: ' + ex));
+    }
+
+    return done(null, convert({
+      alg:     'hmac-sha384',
+      sk:      key,
+      payload: payload,
+      mac:     mac
+    }));
+  });
+}
+
+
+
+/*****************
+ * Alternate API *
+ *****************/
+
+
+
+module.exports.alt = new Object();
 
 
 
@@ -152,7 +211,7 @@ function kparse(inp) {
 /***
  * convert
  *
- * convert Uint8Array used by sodium into Nodejs buffers
+ * convert Uint8Array used by sodium into nodejs buffers
  *
  * @function
  * @api private

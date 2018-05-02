@@ -6,52 +6,139 @@ const assert   = require('assert');
 const sodium   = require('libsodium-wrappers-sumo');
 
 
-describe('test vectors', () => {
+/***
+ * sign
+ *
+ * test vectors for magic.sign()
+ *
+ */
+function sign(cont) {
 
-  describe('sign', () => {
+  const fp = readline.createInterface({ input: fs.createReadStream('./raw.vectors.ed25519') });
 
-    const fp = readline.createInterface({ input: fs.createReadStream('./raw.vectors.ed25519') })
+  // https://ed25519.cr.yp.to/python/sign.py
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
 
-    // https://ed25519.cr.yp.to/python/sign.py
-    let c = 0;
-    fp.on('line', (line) => {
-      c++;
+    const sec = line.split(':');
+    const sk  = Buffer.from(sec[0], 'hex'); // djb implementation doesn't append pk to sk, so parsing is different
+    const pk  = Buffer.from(sodium.crypto_sign_ed25519_sk_to_pk(sk));
 
-      const sec = line.split(':');
-      const sk  = Buffer.from(sec[0], 'hex').slice(0, 64);
-      const pk  = Buffer.from(sodium.crypto_sign_ed25519_sk_to_pk(sk));
+    const m = Buffer.from(sec[2], 'hex');
 
-      const m = Buffer.from(sec[2], 'hex');
+    it('magic.sign - Test Vector #' + c, (done) => {
+      magic.sign(m, sk, (err, out) => {
+        if (err) { return done(err); }
 
-      it('Test Vector #' + c, (done) => {
-        magic.sign(m, sk, (err, out) => {
-          if (err) { return done(err); }
+        const s = out.signature;
+        assert.ok(sodium.crypto_sign_verify_detached(s, m, pk));
 
-          const s = out.signature;
-          assert.ok(sodium.crypto_sign_verify_detached(s, m, pk));
+        try {
+          let fm, fml, fs = 0;
+          if (m.length === 0) {
+            fm = 'x';
+          } else {
+            fml = m.length;
+            for (let i = 0; i < fml; i++) { fm += String.fromCharCode(m[i] + (i === fml - 1));}
+          }
 
-          try {
-            let fm, fml, fs = 0;
-            if (m.length === 0) {
-              fm = 'x';
-            } else {
-              fml = m.length;
-              for (let i = 0; i < fml; i++) { fm += String.fromCharCode(m[i] + (i === fml - 1));}
-            }
+          assert.ok(!sodium.crypto_sign_verify_detached(s, fm, pk));
+        } catch(ex) {}
 
-            assert.ok(!sodium.crypto_sign_verify_detached(s, fm, pk));
-          } catch(ex) {}
+        assert.equal(sec[0], sk.toString('hex')); // djb implementation doesn't append pk to sk, so check is different
+        assert.equal(sec[1], pk.toString('hex'));
+        assert.equal(sec[3], Buffer.concat([ s, m ]).toString('hex'));
 
-          // djb implementation doesn't append pk in sk, so first check is different
-          assert.equal(sec[0], sk.toString('hex'));
-          assert.equal(sec[1], pk.toString('hex'));
-          assert.equal(sec[3], Buffer.concat([ s, m ]).toString('hex'));
-
-          done();
-        });
+        done();
       });
     });
-
-    fp.on('close', () => { run(); });
   });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * mac
+ *
+ * test vectors for magic.mac()
+ *
+ */
+function mac(cont) {
+
+  const fp = readline.createInterface({ input: fs.createReadStream('./raw.vectors.hmacsha384') });
+
+  // https://tools.ietf.org/html/rfc4231
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const k = Buffer.from(sec[0], 'hex');
+    const m = Buffer.from(sec[1], 'hex');
+
+    it('magic.mac - Test Vector #' + c, (done) => {
+      magic.mac(m, k, (err, out) => {
+        if (err) { return done(err); }
+
+        const t = out.mac;
+        assert.equal(sec[2], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * core
+ *
+ * core api test definer
+ *
+ */
+function core() {
+  const fs = [ sign, mac ];
+
+  (function setup() {
+    const f = fs.shift();
+    if (!f) { return alt(); }
+
+    f(setup);
+  })();
+}
+
+
+/***
+ * alt
+ *
+ * alt api test definer
+ *
+ */
+function alt() {
+  const fs = [];
+
+  (function setup() {
+    const f = fs.shift();
+    if (!f) { return run(); }
+
+    f(setup);
+  })();
+}
+
+
+describe('test vectors', () => {
+  const apis = [ core, alt ];
+
+  (function setup() {
+    const api = apis.shift();
+    if (!api) { return run(); }
+
+    api(setup);
+  })();
+
+
 });
