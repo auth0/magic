@@ -108,7 +108,7 @@ function prep(message, _cb, cb) {
   const done = ret(_cb);
 
   try {
-    return cb(null, done, parse(message));
+    return cb(null, done, iparse(message));
   } catch(ex) {
     return cb(ex, done);
   }
@@ -116,9 +116,9 @@ function prep(message, _cb, cb) {
 
 
 /***
- * parse
+ * iparse
  *
- * parse strings as utf-8 into buffer
+ * parse input strings as utf-8 into buffer
  *
  * @function
  * @api private
@@ -126,7 +126,7 @@ function prep(message, _cb, cb) {
  * @param {String|Buffer} inp
  * @returns {Buffer}
  */
-function parse(inp) {
+function iparse(inp) {
   if (!inp) { return Buffer.from(''); }
   return (inp instanceof Buffer) ? inp : Buffer.from(inp, 'utf-8');
 }
@@ -164,7 +164,6 @@ function convert(out) {
   Object.keys(out).forEach((k) => { if (out[k] instanceof Uint8Array) out[k] = Buffer.from(out[k]); });
   return out;
 }
-
 
 
 /***
