@@ -130,6 +130,7 @@ function alt() {
 }
 
 
+// TODO: Figure out why this describe doesn't print
 describe('test vectors', () => {
   const apis = [ core, alt ];
 
@@ -139,6 +140,4 @@ describe('test vectors', () => {
 
     api(setup);
   })();
-
-
 });
