@@ -2,6 +2,120 @@ const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
 
 
+/************************
+ * Variant Constructors *
+ ************************/
+
+
+/***
+ * mac
+ *
+ * mac constructor
+ *
+ * @function
+ * @api private
+ *
+ * @param {String} algorithm
+ * @returns {Function}
+ */
+function mac(algorithm) {
+
+  /***
+   * `lambda`
+   *
+   * mac a payload
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} message
+   * @param {String|Buffer} key
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  return (message, key, cb) => {
+    if (typeof key === 'function') {
+      cb  = key;
+      key = null;
+    }
+    const done = ret(cb);
+
+    if (!key) { key = crypto.randomBytes(48); }
+
+    let payload, ikey;
+    [ payload ] = iparse(message);
+    [ key ]     = cparse(key);
+
+    ikey = key;
+
+    let mac;
+    try {
+      mac = crypto.createHmac(algorithm, ikey).update(message).digest();
+    } catch(ex) {
+      return done(new Error('Crypto error: ' + ex));
+    }
+
+    return done(null, convert({
+      alg:     'hmac' + algorithm,
+      sk:      key,
+      payload: payload,
+      mac:     mac
+    }));
+  }
+}
+
+
+/***
+ * vmac
+ *
+ * mac verifier constructor
+ *
+ * @function
+ * @api private
+ *
+ * @param {String} algorithm
+ * @returns {Function}
+ */
+function vmac(algorithm) {
+
+  /***
+   * `lambda`
+   *
+   * verify a mac
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} message
+   * @param {String|Buffer} key
+   * @param {String|Buffer} mac
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  return (message, key, tag, cb) => {
+    const done = ret(cb);
+
+    if (!key) { return done(new Error('Cannot verify without a key')); }
+
+    let payload, ikey;
+    [ payload ]       = iparse(message);
+    [ key, received ] = cparse(key, tag);
+
+    ikey = key;
+
+    let mac, verified;
+    try {
+      mac      = crypto.createHmac('sha384', ikey).update(message).digest();
+      verified = cnstcomp(mac, received);
+    } catch(ex) {
+      return done(new Error('Crypto error: ' + ex));
+    }
+
+    return done(null, verified);
+  }
+}
+
+
 
 /************
  * Core API *
@@ -124,36 +238,7 @@ function vsign(message, key, signature, iskey, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.auth.mac = mac;
-function mac(message, key, cb) {
-  if (typeof key === 'function') {
-    cb  = key;
-    key = null;
-  }
-  const done = ret(cb);
-
-  if (!key) { key = crypto.randomBytes(48); }
-
-  let payload, ikey;
-  [ payload ] = iparse(message);
-  [ key ]     = cparse(key);
-
-  ikey = key;
-
-  let mac;
-  try {
-    mac = crypto.createHmac('sha384', ikey).update(message).digest();
-  } catch(ex) {
-    return done(new Error('Crypto error: ' + ex));
-  }
-
-  return done(null, convert({
-    alg:     'hmac-sha384',
-    sk:      key,
-    payload: payload,
-    mac:     mac
-  }));
-}
+module.exports.auth.mac = mac('sha384');
 
 
 /***
@@ -170,28 +255,7 @@ function mac(message, key, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.verify.mac = vmac;
-function vmac(message, key, tag, cb) {
-  const done = ret(cb);
-
-  if (!key) { return done(new Error('Cannot verify without a key')); }
-
-  let payload, ikey;
-  [ payload ]       = iparse(message);
-  [ key, received ] = cparse(key, tag);
-
-  ikey = key;
-
-  let mac, verified;
-  try {
-    mac      = crypto.createHmac('sha384', ikey).update(message).digest();
-    verified = cnstcomp(mac, received);
-  } catch(ex) {
-    return done(new Error('Crypto error: ' + ex));
-  }
-
-  return done(null, verified);
-}
+module.exports.verify.mac = vmac('sha384');
 
 
 

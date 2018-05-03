@@ -306,7 +306,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'hmac-sha384');
+            assert.equal(output.alg, 'hmacsha384');
             assert.equal(output.payload.toString('utf-8'), message);
             assert.ok(Buffer.compare(output.sk, key) === 0);
 
@@ -325,7 +325,7 @@ describe('magic tests', () => {
           magic.auth.mac(message, key).then((output) => {
             assert.ok(output);
 
-            assert.equal(output.alg, 'hmac-sha384');
+            assert.equal(output.alg, 'hmacsha384');
             assert.equal(output.payload.toString('utf-8'), message);
             assert.ok(Buffer.compare(output.sk, key) === 0);
 
@@ -346,7 +346,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'hmac-sha384');
+            assert.equal(output.alg, 'hmacsha384');
             assert.equal(output.payload.toString('utf-8'), message);
             assert.ok(Buffer.compare(output.sk, key) === 0);
 
@@ -371,7 +371,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'hmac-sha384');
+            assert.equal(output.alg, 'hmacsha384');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
@@ -390,7 +390,7 @@ describe('magic tests', () => {
           magic.auth.mac(message).then((output) => {
             assert.ok(output);
 
-            assert.equal(output.alg, 'hmac-sha384');
+            assert.equal(output.alg, 'hmacsha384');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
@@ -409,7 +409,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'hmac-sha384');
+            assert.equal(output.alg, 'hmacsha384');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
@@ -436,7 +436,7 @@ describe('magic tests', () => {
           assert.ok(!err);
           assert.ok(output);
 
-          assert.equal(output.alg, 'hmac-sha384');
+          assert.equal(output.alg, 'hmacsha384');
           assert.equal(output.payload.toString('utf-8'), message);
 
           assert.ok(output.sk);
@@ -456,7 +456,7 @@ describe('magic tests', () => {
           assert.ok(!err);
           assert.ok(output);
 
-          assert.equal(output.alg, 'hmac-sha384');
+          assert.equal(output.alg, 'hmacsha384');
           assert.equal(output.payload.toString('utf-8'), message);
 
           assert.ok(output.sk);
@@ -478,7 +478,7 @@ describe('magic tests', () => {
           assert.ok(!err);
           assert.ok(output);
 
-          assert.equal(output.alg, 'hmac-sha384');
+          assert.equal(output.alg, 'hmacsha384');
           assert.equal(output.payload.toString('utf-8'), message);
 
           assert.ok(output.sk);
