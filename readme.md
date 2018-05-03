@@ -8,7 +8,7 @@ All public functions support both callbacks and promises (and therefore async/aw
 
 The core api implements the recommended algorithms for each cryptographic operation. When in doubt, use them.
 
-##### crypto.auth.sign | crypto.verify.sign
+##### magic.auth.sign | magic.verify.sign
 
 Implements `ed25519` signatures using `libsodium.js`. Efficient and without some of the concerns inherent in `ECDSA`, `ed25519` has been accepted and standardized by the [IETF](https://tools.ietf.org/html/rfc8032). By default, the api expects to be given a secret key as a seed, from which the actual keypair is derived (allowing easier, more concise storage). However, it may be used directly with a keypair, requiring only a boolean flag for the `verify` call.
 
@@ -147,7 +147,7 @@ magic.verify.sign(message, pk, signature, true)
 });
 ```
 
-##### crypto.auth.mac | crypto.verify.mac
+##### magic.auth.mac | magic.verify.mac
 
 Implements `HMAC-SHA384` using OpenSSL through `crypto`. The `HMAC` algorithm is the most common message authentication code construction, standardized by the [IETF](https://tools.ietf.org/html/rfc2104) and [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf). The choice of `SHA384` is due to its widespread availability and to provide a consistent hash function throughout `magic`, as `SHA256` may be susceptible to length extension attacks in certain situations. Both `HMAC-SHA256` and `HMAC-SHA512` are available in the alternative api.
 
@@ -158,7 +158,7 @@ Implements `HMAC-SHA384` using OpenSSL through `crypto`. The `HMAC` algorithm is
 magic.auth.mac(message, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
-  // { alg:     'hmac-sha384',
+  // { alg:     'hmacsha384',
   //   sk:      <Buffer 97 9b 18 78 50 6f bf  ... >,
   //   payload: <Buffer 41 20 73 63 72 65 61  ... >,
   //   mac:     <Buffer 2d 15 ab 58 08 9a d7  ... > }
@@ -169,7 +169,7 @@ magic.auth.mac(message)
   .then((output) => {
     if (err) { return cb(err); }
     console.log(output);
-    // { alg:     'hmac-sha384',
+    // { alg:     'hmacsha384',
     //   sk:      <Buffer 97 9b 18 78 50 6f bf  ... >,
     //   payload: <Buffer 41 20 73 63 72 65 61  ... >,
     //   mac:     <Buffer 2d 15 ab 58 08 9a d7  ... > }
@@ -186,7 +186,7 @@ const key = '49d013...';
 magic.auth.mac(message, key, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
-  // { alg:     'hmac-sha384',
+  // { alg:     'hmacsha384',
   //   sk:      <Buffer 49 d0 13 6e 72 15 f4  ... >,
   //   payload: <Buffer 41 20 73 63 72 65 61  ... >,
   //   mac:     <Buffer f1 9d c0 5a ae 8a f1  ... > }
@@ -197,7 +197,7 @@ magic.auth.mac(message, key)
   .then((output) => {
     if (err) { return cb(err); }
     console.log(output);
-    // { alg:     'hmac-sha384',
+    // { alg:     'hmacsha384',
     //   sk:      <Buffer 49 d0 13 6e 72 15 f4  ... >,
     //   payload: <Buffer 41 20 73 63 72 65 61  ... >,
     //   mac:     <Buffer f1 9d c0 5a ae 8a f1  ... > }
@@ -234,3 +234,15 @@ magic.verify.mac(message, key, mac)
   });
 });
 ```
+
+### alt api
+
+The alt api implements alternative algorithms for each cryptographic operation. They should only be used over the core api when required by an external specification or interoperability concerns.
+
+##### magic.alt.auth.hmacsha256 | magic.alt.verify.hmacsha256
+
+Implements `HMAC-SHA256` using OpenSSL through `crypto`. An alterative to `magic.auth.mac`.
+
+##### magic.alt.auth.hmacsha512 | magic.alt.verify.hmacsha512
+
+Implements `HMAC-SHA512` using OpenSSL through `crypto`. An alterative to `magic.auth.mac`.

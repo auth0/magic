@@ -273,7 +273,7 @@ module.exports.alt.decrypt = new Object();
 
 
 /***
- * auth.hmacsha256
+ * alt.auth.hmacsha256
  *
  * mac a payload
  *
@@ -289,7 +289,7 @@ module.exports.alt.auth.hmacsha256 = mac('sha256');
 
 
 /***
- * verify.hmacsha256
+ * alt.verify.hmacsha256
  *
  * verify a mac
  *
@@ -306,7 +306,7 @@ module.exports.alt.verify.hmacsha256 = vmac('sha256');
 
 
 /***
- * auth.hmacsha512
+ * alt.auth.hmacsha512
  *
  * mac a payload
  *
@@ -322,7 +322,7 @@ module.exports.alt.auth.hmacsha512 = mac('sha512');
 
 
 /***
- * verify.hmacsha512
+ * alt.verify.hmacsha512
  *
  * verify a mac
  *

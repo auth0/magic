@@ -28,7 +28,7 @@ function sign(cont) {
 
     const m = Buffer.from(sec[2], 'hex');
 
-    it('magic.sign - Test Vector #' + c, (done) => {
+    it('magic.auth.sign - Test Vector #' + c, (done) => {
       magic.auth.sign(m, sk, (err, out) => {
         if (err) { return done(err); }
 
@@ -80,7 +80,7 @@ function mac(cont) {
     const k = Buffer.from(sec[0], 'hex');
     const m = Buffer.from(sec[1], 'hex');
 
-    it('magic.mac - Test Vector #' + c, (done) => {
+    it('magic.auth.mac - Test Vector #' + c, (done) => {
       magic.auth.mac(m, k, (err, out) => {
         if (err) { return done(err); }
 
@@ -170,7 +170,7 @@ function hmacsha512(cont) {
     const k = Buffer.from(sec[0], 'hex');
     const m = Buffer.from(sec[1], 'hex');
 
-    it('magic.alt.hmacsha512 - Test Vector #' + c, (done) => {
+    it('magic.alt.auth.hmacsha512 - Test Vector #' + c, (done) => {
       magic.alt.auth.hmacsha512(m, k, (err, out) => {
         if (err) { return done(err); }
 
