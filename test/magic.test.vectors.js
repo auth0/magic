@@ -1,4 +1,4 @@
-const magic = require('./magic');
+const magic = require('../magic');
 
 const fs       = require('fs');
 const readline = require('readline');
@@ -9,12 +9,13 @@ const sodium   = require('libsodium-wrappers-sumo');
 /***
  * sign
  *
- * test vectors for magic.sign()
+ * test vectors for magic.auth.sign()
  *
  */
 function sign(cont) {
 
-  const fp = readline.createInterface({ input: fs.createReadStream('./raw.vectors.ed25519') });
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/ed25519.vec') });
 
   // https://ed25519.cr.yp.to/python/sign.py
   let c = 0;
@@ -62,12 +63,13 @@ function sign(cont) {
 /***
  * mac
  *
- * test vectors for magic.mac()
+ * test vectors for magic.auth.mac()
  *
  */
 function mac(cont) {
 
-  const fp = readline.createInterface({ input: fs.createReadStream('./raw.vectors.hmacsha384') });
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/hmacsha384.vec') });
 
   // https://tools.ietf.org/html/rfc4231
   let c = 0;

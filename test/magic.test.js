@@ -1,4 +1,4 @@
-const magic = require('./magic');
+const magic = require('../magic');
 
 const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
