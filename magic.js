@@ -41,7 +41,7 @@ function sign(message, key, cb) {
   [ payload ] = iparse(message);
   [ key ]     = cparse(key);
 
-  switch (Buffer.byteLength(key)) {
+  switch (key && Buffer.byteLength(key)) {
     case sodium.crypto_sign_SECRETKEYBYTES:
       ikey = key;
       break;
@@ -66,6 +66,48 @@ function sign(message, key, cb) {
     payload:   payload,
     signature: signature
   }));
+}
+
+
+/***
+ * verify.sign
+ *
+ * verify a signature
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {String|Buffer} signature
+ * @param {Boolean}       iskey
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.verify.sign = vsign;
+function vsign(message, key, signature, iskey, cb) {
+  if (typeof iskey === 'function') {
+    cb    = iskey;
+    iskey = false;
+  }
+  const done = ret(cb);
+
+  if (!key) { return done(new Error('Cannot verify without a key')); }
+
+  let payload, ikey;
+  [ payload ]       = iparse(message);
+  [ key, received ] = cparse(key, signature);
+
+  ikey = (iskey) ? key : sodium.crypto_sign_seed_keypair(key).publicKey;
+
+  let verified;
+  try {
+    verified = sodium.crypto_sign_verify_detached(received, payload, ikey);
+  } catch(ex) {
+    return done(new Error('Libsodium error: ' + ex));
+  }
+
+  return done(null, verified);
 }
 
 
@@ -140,14 +182,15 @@ function vmac(message, key, tag, cb) {
 
   ikey = key;
 
-  let mac;
+  let mac, verified;
   try {
-    mac = crypto.createHmac('sha384', ikey).update(message).digest();
+    mac      = crypto.createHmac('sha384', ikey).update(message).digest();
+    verified = cnstcomp(mac, received);
   } catch(ex) {
     return done(new Error('Crypto error: ' + ex));
   }
 
-  return done(null, cnstcomp(mac, received));
+  return done(null, verified);
 }
 
 
