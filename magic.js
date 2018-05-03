@@ -105,7 +105,7 @@ function vmac(algorithm) {
 
     let mac, verified;
     try {
-      mac      = crypto.createHmac('sha384', ikey).update(message).digest();
+      mac      = crypto.createHmac(algorithm, ikey).update(message).digest();
       verified = cnstcomp(mac, received);
     } catch(ex) {
       return done(new Error('Crypto error: ' + ex));
@@ -265,7 +265,77 @@ module.exports.verify.mac = vmac('sha384');
 
 
 
-module.exports.alt = new Object();
+module.exports.alt         = new Object();
+module.exports.alt.auth    = new Object();
+module.exports.alt.verify  = new Object();
+module.exports.alt.encrypt = new Object();
+module.exports.alt.decrypt = new Object();
+
+
+/***
+ * auth.hmacsha256
+ *
+ * mac a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.auth.hmacsha256 = mac('sha256');
+
+
+/***
+ * verify.hmacsha256
+ *
+ * verify a mac
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.verify.hmacsha256 = vmac('sha256');
+
+
+/***
+ * auth.hmacsha512
+ *
+ * mac a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.auth.hmacsha512 = mac('sha512');
+
+
+/***
+ * verify.hmacsha512
+ *
+ * verify a mac
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.verify.hmacsha512 = vmac('sha512');
 
 
 

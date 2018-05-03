@@ -115,13 +115,85 @@ function core() {
 
 
 /***
+ * hmacsha256
+ *
+ * test vectors for magic.alt.auth.hmacsha256()
+ *
+ */
+function hmacsha256(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/hmacsha256.vec') });
+
+  // https://tools.ietf.org/html/rfc4231
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const k = Buffer.from(sec[0], 'hex');
+    const m = Buffer.from(sec[1], 'hex');
+
+    it('magic.alt.auth.hmacsha256 - Test Vector #' + c, (done) => {
+      magic.alt.auth.hmacsha256(m, k, (err, out) => {
+        if (err) { return done(err); }
+
+        const t = out.mac;
+        assert.equal(sec[2], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * hmacsha512
+ *
+ * test vectors for magic.alt.auth.hmacsha512()
+ *
+ */
+function hmacsha512(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/hmacsha512.vec') });
+
+  // https://tools.ietf.org/html/rfc4231
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const k = Buffer.from(sec[0], 'hex');
+    const m = Buffer.from(sec[1], 'hex');
+
+    it('magic.alt.hmacsha512 - Test Vector #' + c, (done) => {
+      magic.alt.auth.hmacsha512(m, k, (err, out) => {
+        if (err) { return done(err); }
+
+        const t = out.mac;
+        assert.equal(sec[2], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
  * alt
  *
  * alt api test definer
  *
  */
 function alt() {
-  const fs = [];
+  const fs = [ hmacsha256, hmacsha512 ];
 
   (function setup() {
     const f = fs.shift();
