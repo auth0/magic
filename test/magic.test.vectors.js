@@ -97,13 +97,48 @@ function mac(cont) {
 
 
 /***
+ * hash
+ *
+ * test vectors for magic.util.hash()
+ *
+ */
+function hash(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/sha384.vec') });
+
+  // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/secure-hashing#sha-2
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const m = Buffer.from(sec[0], 'hex');
+
+    it('magic.util.hash - Test Vector #' + c, (done) => {
+      magic.util.hash(m, (err, out) => {
+        if (err) { return done(err); }
+
+        const t = out.hash;
+        assert.equal(sec[1], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
  * core
  *
  * core api test definer
  *
  */
 function core() {
-  const fs = [ sign, mac ];
+  const fs = [ sign, mac, hash ];
 
   (function setup() {
     const f = fs.shift();
@@ -187,13 +222,83 @@ function hmacsha512(cont) {
 
 
 /***
+ * sha256
+ *
+ * test vectors for magic.alt.util.sha256()
+ *
+ */
+function sha256(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/sha256.vec') });
+
+  // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/secure-hashing#sha-2
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const m = Buffer.from(sec[0], 'hex');
+
+    it('magic.alt.util.sha256 - Test Vector #' + c, (done) => {
+      magic.alt.util.sha256(m, (err, out) => {
+        if (err) { return done(err); }
+
+        const t = out.hash;
+        assert.equal(sec[1], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * sha512
+ *
+ * test vectors for magic.alt.util.sha512()
+ *
+ */
+function sha512(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/sha512.vec') });
+
+  // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/secure-hashing#sha-2
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const m = Buffer.from(sec[0], 'hex');
+
+    it('magic.alt.util.sha512 - Test Vector #' + c, (done) => {
+      magic.alt.util.sha512(m, (err, out) => {
+        if (err) { return done(err); }
+
+        const t = out.hash;
+        assert.equal(sec[1], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
  * alt
  *
  * alt api test definer
  *
  */
 function alt() {
-  const fs = [ hmacsha256, hmacsha512 ];
+  const fs = [ hmacsha256, hmacsha512, sha256, sha512 ];
 
   (function setup() {
     const f = fs.shift();

@@ -498,6 +498,38 @@ describe('magic tests', () => {
         });
       });
     });
+
+    describe('hash', () => {
+
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      it('should hash an input - callback api', (done) => {
+        magic.util.hash(message, (err, output) => {
+          assert.ok(!err);
+          assert.ok(output);
+
+          assert.equal(output.alg, 'sha384');
+          assert.equal(output.payload.toString('utf-8'), message);
+
+          assert.equal(output.hash.toString('hex'), '150bf94de32b5a65892ff46a580abef8d9c7af652b3f7d57ce03b51e4268dafafcba6d5ef7fcd8d41a63ff60394184da');
+
+          done();
+        });
+      });
+
+      it('should hash an input - promise api', (done) => {
+        magic.util.hash(message).then((output) => {
+          assert.ok(output);
+
+          assert.equal(output.alg, 'sha384');
+          assert.equal(output.payload.toString('utf-8'), message);
+
+          assert.equal(output.hash.toString('hex'), '150bf94de32b5a65892ff46a580abef8d9c7af652b3f7d57ce03b51e4268dafafcba6d5ef7fcd8d41a63ff60394184da');
+
+          done();
+        }).catch((err) => { assert.ok(false); });
+      });
+    });
   });
 
 
@@ -914,6 +946,70 @@ describe('magic tests', () => {
             });
           });
         });
+      });
+    });
+
+    describe('sha256', () => {
+
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      it('should hash an input - callback api', (done) => {
+        magic.alt.util.sha256(message, (err, output) => {
+          assert.ok(!err);
+          assert.ok(output);
+
+          assert.equal(output.alg, 'sha256');
+          assert.equal(output.payload.toString('utf-8'), message);
+
+          assert.equal(output.hash.toString('hex'), '8da03d5f2fd8e039448e8b33484dbeb074c19876828ebd2249b7f537ea70f116');
+
+          done();
+        });
+      });
+
+      it('should hash an input - promise api', (done) => {
+        magic.alt.util.sha256(message).then((output) => {
+          assert.ok(output);
+
+          assert.equal(output.alg, 'sha256');
+          assert.equal(output.payload.toString('utf-8'), message);
+
+          assert.equal(output.hash.toString('hex'), '8da03d5f2fd8e039448e8b33484dbeb074c19876828ebd2249b7f537ea70f116');
+
+          done();
+        }).catch((err) => { assert.ok(false); });
+      });
+    });
+
+    describe('sha512', () => {
+
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      it('should hash an input - callback api', (done) => {
+        magic.alt.util.sha512(message, (err, output) => {
+          assert.ok(!err);
+          assert.ok(output);
+
+          assert.equal(output.alg, 'sha512');
+          assert.equal(output.payload.toString('utf-8'), message);
+
+          assert.equal(output.hash.toString('hex'), '6bf3bdf9c4ad9658e142a9c27f6f0b20f9ed59cbeab30374ddeb2a7daad9bbd19eae14d679e42c25c8f92570d9c79deef9460c7b8c1070a4c988e7ee0ac1328c');
+
+          done();
+        });
+      });
+
+      it('should hash an input - promise api', (done) => {
+        magic.alt.util.sha512(message).then((output) => {
+          assert.ok(output);
+
+          assert.equal(output.alg, 'sha512');
+          assert.equal(output.payload.toString('utf-8'), message);
+
+          assert.equal(output.hash.toString('hex'), '6bf3bdf9c4ad9658e142a9c27f6f0b20f9ed59cbeab30374ddeb2a7daad9bbd19eae14d679e42c25c8f92570d9c79deef9460c7b8c1070a4c988e7ee0ac1328c');
+
+          done();
+        }).catch((err) => { assert.ok(false); });
       });
     });
   });

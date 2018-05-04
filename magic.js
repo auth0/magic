@@ -128,6 +128,55 @@ function vmac(algorithm) {
 }
 
 
+/***
+ * hash
+ *
+ * hash constructor
+ *
+ * @function
+ * @api private
+ *
+ * @param {String} algorithm
+ * @returns {Function}
+ */
+function hash(algorithm) {
+
+  if (Object.keys(HASHBYTES).indexOf(algorithm) === -1) { throw new Error('Unknown hashing algorithm'); }
+
+  /***
+   * `lambda`
+   *
+   * hash a payload
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} message
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  return (message, cb) => {
+    const done = ret(cb);
+
+    let payload;
+    [ payload ] = iparse(message);
+
+    let hash;
+    try {
+      hash = crypto.createHash(algorithm).update(message).digest();
+    } catch(ex) {
+      return done(new Error('Crypto error: ' + ex));
+    }
+
+    return done(null, convert({
+      alg:     algorithm,
+      payload: payload,
+      hash:    hash
+    }));
+  }
+}
+
+
 
 /************
  * Core API *
@@ -140,6 +189,7 @@ module.exports.auth      = new Object();
 module.exports.verify    = new Object();
 module.exports.encrypt   = new Object();
 module.exports.decrypt   = new Object();
+module.exports.util      = new Object();
 
 
 /***
@@ -270,6 +320,21 @@ module.exports.auth.mac = mac('sha384');
 module.exports.verify.mac = vmac('sha384');
 
 
+/***
+ * util.hash
+ *
+ * hash a payload
+ *
+ * @function
+ * @api private
+ *
+ * @param {String|Buffer} message
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.util.hash = hash('sha384');
+
+
 
 /*****************
  * Alternate API *
@@ -282,6 +347,7 @@ module.exports.alt.auth    = new Object();
 module.exports.alt.verify  = new Object();
 module.exports.alt.encrypt = new Object();
 module.exports.alt.decrypt = new Object();
+module.exports.alt.util    = new Object();
 
 
 /***
@@ -348,6 +414,36 @@ module.exports.alt.auth.hmacsha512 = mac('sha512');
  * @returns {Callback|Promise}
  */
 module.exports.alt.verify.hmacsha512 = vmac('sha512');
+
+
+/***
+ * alt.util.sha256
+ *
+ * hash a payload
+ *
+ * @function
+ * @api private
+ *
+ * @param {String|Buffer} message
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.util.sha256 = hash('sha256');
+
+
+/***
+ * alt.util.sha512
+ *
+ * hash a payload
+ *
+ * @function
+ * @api private
+ *
+ * @param {String|Buffer} message
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.util.sha512 = hash('sha512');
 
 
 
