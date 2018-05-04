@@ -59,7 +59,7 @@ describe('magic tests', () => {
               assert.equal(verified, true);
 
               done();
-            }).catch((err) => { assert.ok(false); });
+            }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
@@ -130,7 +130,7 @@ describe('magic tests', () => {
               assert.equal(verified, true);
 
               done();
-            }).catch((err) => { assert.ok(false); });
+            }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
@@ -195,7 +195,7 @@ describe('magic tests', () => {
               assert.equal(verified, true);
 
               done();
-            }).catch((err) => { assert.ok(false); });
+            }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
@@ -245,7 +245,7 @@ describe('magic tests', () => {
           });
         });
 
-        it('should error if message is altered', (done) => {
+        it('should fail if message is altered', (done) => {
           magic.auth.sign(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
@@ -267,7 +267,7 @@ describe('magic tests', () => {
           });
         });
 
-        it('should error if key is altered', (done) => {
+        it('should fail if key is altered', (done) => {
           magic.auth.sign(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
@@ -338,7 +338,7 @@ describe('magic tests', () => {
               assert.equal(verified, true);
 
               done();
-            }).catch((err) => { assert.ok(false); });
+            }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -403,7 +403,7 @@ describe('magic tests', () => {
               assert.equal(verified, true);
 
               done();
-            }).catch((err) => { assert.ok(false); });
+            }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -453,7 +453,7 @@ describe('magic tests', () => {
           });
         });
 
-        it('should error if message is altered', (done) => {
+        it('should fail if message is altered', (done) => {
           magic.auth.mac(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
@@ -475,7 +475,7 @@ describe('magic tests', () => {
           });
         });
 
-        it('should error if key is altered', (done) => {
+        it('should fail if key is altered', (done) => {
           magic.auth.mac(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
@@ -527,7 +527,7 @@ describe('magic tests', () => {
           assert.equal(output.hash.toString('hex'), '150bf94de32b5a65892ff46a580abef8d9c7af652b3f7d57ce03b51e4268dafafcba6d5ef7fcd8d41a63ff60394184da');
 
           done();
-        }).catch((err) => { assert.ok(false); });
+        }).catch((err) => { assert.ok(!err); });
       });
     });
 
@@ -535,38 +535,62 @@ describe('magic tests', () => {
 
       const password = 'ascreamingcomesacrossthesky';
 
-      it('should verify a hashed password - callback api', (done) => {
-        magic.util.pwhash(password, (err, output) => {
-          assert.ok(!err);
-          assert.ok(output);
-          assert.ok(output.hash);
+      describe('success', () => {
 
-          assert.equal(output.alg, 'argon2id');
-          assert.equal(output.hash.slice(0, 9), '$argon2id');
-
-          magic.util.pwverify(password, output.hash, (err, verified) => {
+        it('should verify a hashed password - callback api', (done) => {
+          magic.util.pwhash(password, (err, output) => {
             assert.ok(!err);
+            assert.ok(output);
+            assert.ok(output.hash);
+
+            assert.equal(output.alg, 'argon2id');
+            assert.equal(output.hash.slice(0, 9), '$argon2id');
+
+            magic.util.pwverify(password, output.hash, (err, verified) => {
+              assert.ok(!err);
+              assert.equal(verified, true);
+
+              done();
+            });
+          });
+        });
+
+        it('should verify a hashed password - promise api', (done) => {
+          magic.util.pwhash(password).then((output) => {
+            assert.ok(output);
+            assert.ok(output.hash);
+
+            assert.equal(output.alg, 'argon2id');
+            assert.equal(output.hash.slice(0, 9), '$argon2id');
+
+            return magic.util.pwverify(password, output.hash);
+          }).then((verified) => {
             assert.equal(verified, true);
 
             done();
-          });
+          }).catch((err) => { assert.ok(!err); });
         });
       });
 
-      it('should hash an input - promise api', (done) => {
-        magic.util.pwhash(password).then((output) => {
-          assert.ok(output);
-          assert.ok(output.hash);
+      describe('failure', () => {
 
-          assert.equal(output.alg, 'argon2id');
-          assert.equal(output.hash.slice(0, 9), '$argon2id');
+        it('should fail to verify the wrong password', (done) => {
+          magic.util.pwhash(password, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+            assert.ok(output.hash);
 
-          return magic.util.pwverify(password, output.hash);
-        }).then((verified) => {
-          assert.equal(verified, true);
+            assert.equal(output.alg, 'argon2id');
+            assert.equal(output.hash.slice(0, 9), '$argon2id');
 
-          done();
-        }).catch((err) => { assert.ok(false); });
+            magic.util.pwverify('someotherpassword', output.hash, (err, verified) => {
+              assert.ok(!err);
+              assert.equal(verified, false);
+
+              done();
+            });
+          });
+        });
       });
     });
   });
@@ -620,7 +644,7 @@ describe('magic tests', () => {
               assert.equal(verified, true);
 
               done();
-            }).catch((err) => { assert.ok(false); });
+            }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -685,7 +709,7 @@ describe('magic tests', () => {
               assert.equal(verified, true);
 
               done();
-            }).catch((err) => { assert.ok(false); });
+            }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -735,7 +759,7 @@ describe('magic tests', () => {
           });
         });
 
-        it('should error if message is altered', (done) => {
+        it('should fail if message is altered', (done) => {
           magic.alt.auth.hmacsha256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
@@ -757,7 +781,7 @@ describe('magic tests', () => {
           });
         });
 
-        it('should error if key is altered', (done) => {
+        it('should fail if key is altered', (done) => {
           magic.alt.auth.hmacsha256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
@@ -827,7 +851,7 @@ describe('magic tests', () => {
               assert.equal(verified, true);
 
               done();
-            }).catch((err) => { assert.ok(false); });
+            }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -892,7 +916,7 @@ describe('magic tests', () => {
               assert.equal(verified, true);
 
               done();
-            }).catch((err) => { assert.ok(false); });
+            }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -942,7 +966,7 @@ describe('magic tests', () => {
           });
         });
 
-        it('should error if message is altered', (done) => {
+        it('should fail if message is altered', (done) => {
           magic.alt.auth.hmacsha512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
@@ -964,7 +988,7 @@ describe('magic tests', () => {
           });
         });
 
-        it('should error if key is altered', (done) => {
+        it('should fail if key is altered', (done) => {
           magic.alt.auth.hmacsha512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
@@ -1016,7 +1040,7 @@ describe('magic tests', () => {
           assert.equal(output.hash.toString('hex'), '8da03d5f2fd8e039448e8b33484dbeb074c19876828ebd2249b7f537ea70f116');
 
           done();
-        }).catch((err) => { assert.ok(false); });
+        }).catch((err) => { assert.ok(!err); });
       });
     });
 
@@ -1048,7 +1072,7 @@ describe('magic tests', () => {
           assert.equal(output.hash.toString('hex'), '6bf3bdf9c4ad9658e142a9c27f6f0b20f9ed59cbeab30374ddeb2a7daad9bbd19eae14d679e42c25c8f92570d9c79deef9460c7b8c1070a4c988e7ee0ac1328c');
 
           done();
-        }).catch((err) => { assert.ok(false); });
+        }).catch((err) => { assert.ok(!err); });
       });
     });
   });
