@@ -28,7 +28,6 @@ magic.auth.sign(message, (err, output) => {
 // promise
 magic.auth.sign(message)
   .then((output) => {
-    if (err) { return cb(err); }
     console.log(output);
     // { alg:       'ed25519',
     //   sk:        <Buffer af b4 b8 a8 2f 59 cb  ... >,
@@ -56,7 +55,6 @@ magic.auth.sign(message, seed, (err, output) => {
 // promise
 magic.auth.sign(message, seed)
   .then((output) => {
-    if (err) { return cb(err); }
     console.log(output);
     // { alg:       'ed25519',
     //   sk:        <Buffer 0d 05 d0 99 d3 2d 00  ... >,
@@ -84,7 +82,6 @@ magic.auth.sign(message, sk, (err, output) => {
 // promise
 magic.auth.sign(message, sk)
   .then((output) => {
-    if (err) { return cb(err); }
     console.log(output);
    // { alg:       'ed25519',
    //   sk:        <Buffer bf 28 8a 58 28 36 37  ... >,
@@ -114,7 +111,6 @@ magic.verify.sign(message, seed, signature, (err, verified) => {
 // promise
 magic.verify.sign(message, seed, signature)
   .then((verified) => {
-    if (err) { return cb(err); }
     console.log(verified);
     // true
   })
@@ -137,9 +133,8 @@ magic.verify.sign(message, pk, signature, true, (err, verified) => {
 // promise
 magic.verify.sign(message, pk, signature, true)
   .then((verified) => {
-    if (err) { return cb(err); }
     console.log(verified);
-   // true
+    // true
   })
   .catch((err) => {
     return reject(err);
@@ -167,7 +162,6 @@ magic.auth.mac(message, (err, output) => {
 // promise
 magic.auth.mac(message)
   .then((output) => {
-    if (err) { return cb(err); }
     console.log(output);
     // { alg:     'hmacsha384',
     //   sk:      <Buffer 97 9b 18 78 50 6f bf  ... >,
@@ -195,7 +189,6 @@ magic.auth.mac(message, key, (err, output) => {
 // promise
 magic.auth.mac(message, key)
   .then((output) => {
-    if (err) { return cb(err); }
     console.log(output);
     // { alg:     'hmacsha384',
     //   sk:      <Buffer 49 d0 13 6e 72 15 f4  ... >,
@@ -225,8 +218,88 @@ magic.verify.mac(message, key, mac, (err, output) => {
 // promise
 magic.verify.mac(message, key, mac)
   .then((output) => {
-    if (err) { return cb(err); }
     console.log(output);
+    // true
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+##### magic.util.hash
+
+Implements `SHA2-384` (henceforth just `SHA384`) using OpenSSL through `crypto`. Unlike `SHA256` and `SHA512` - which are available through the alternative api - `SHA384` is resistant to length extension attacks, a capability which may be relevant in some circumstances. The `SHA2` family is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf), and the most commonly used fast, cryptographically secure hash function.
+
+```js
+// callback
+magic.util.hash(message, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:     'sha384',
+  //   payload: <Buffer 41 20 73 63 72 65 61  ... >,
+  //   hash:    <Buffer 15 0b f9 4d e3 2b 5a  ... > }
+});
+
+// promise
+magic.util.hash(message)
+  .then((output) => {
+    console.log(output);
+    // { alg:     'sha384',
+    //   payload: <Buffer 41 20 73 63 72 65 61  ... >,
+    //   hash:    <Buffer 15 0b f9 4d e3 2b 5a  ... > }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+##### magic.util.pwhash | magic.util.pwverify
+
+Implements `argon2id` password hashing using `libsodium.js`. The winner of the [Password Hashing Competition](https://password-hashing.net/) and now the [OWASP recommendation](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet#Leverage_an_adaptive_one-way_function), `argon2id` is robust against both memory tradeoff and side-channel attacks. The output of the `argon2id` function is encoded with a prefix and other metadata, and so `output.hash` is encoded as a string, not a raw binary buffer as is normal for the rest of the `magic` api. Nor is the raw password itself returned.
+
+```js
+const pw = 'ascream...';
+
+// callback
+magic.util.pwhash(password, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:  'argon2id',
+  //   hash: '$argon2id$v=19$m=65536,t=2,p=1$yLZ6CoF5exPHbHjvbZ3esQ$yAM5pHM9KnTYDg/9Nr9rgDdQqRpAe8JVky4mJ7escHM' }
+});
+
+// promise
+magic.util.pwhash(password)
+  .then((output) => {
+    console.log(output);
+    // { alg:  'argon2id',
+    //   hash: '$argon2id$v=19$m=65536,t=2,p=1$yLZ6CoF5exPHbHjvbZ3esQ$yAM5pHM9KnTYDg/9Nr9rgDdQqRpAe8JVky4mJ7escHM' }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+Due to the metadata in the hash output, it must be provided in the same encoded format for verification.
+
+```js
+const pw   = 'ascream...';
+const hash = '$argon2id$v=19$m=65536,t=2,p=1$yLZ6CoF5exPHbHjvbZ3esQ$yAM5pHM9KnTYDg/9Nr9rgDdQqRpAe8JVky4mJ7escHM';
+
+// callback
+magic.util.pwverify(password, hash, (err, verified) => {
+  if (err) { return cb(err); }
+  console.log(verified);
+  // true
+});
+
+// promise
+magic.util.pwverify(password, hash)
+  .then((verified) => {
+    console.log(verified);
     // true
   })
   .catch((err) => {
@@ -246,3 +319,11 @@ Implements `HMAC-SHA256` using OpenSSL through `crypto`. An alterative to `magic
 ##### magic.alt.auth.hmacsha512 | magic.alt.verify.hmacsha512
 
 Implements `HMAC-SHA512` using OpenSSL through `crypto`. An alterative to `magic.auth.mac`.
+
+##### magic.alt.util.sha256
+
+Implements `SHA256` using OpenSSL through `crypto`. An alterative to `magic.util.hash`.
+
+##### magic.alt.util.sha512
+
+Implements `SHA512` using OpenSSL through `crypto`. An alterative to `magic.util.hash`.
