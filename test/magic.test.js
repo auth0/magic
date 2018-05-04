@@ -593,6 +593,45 @@ describe('magic tests', () => {
         });
       });
     });
+
+    describe('rand', () => {
+
+      describe('success', () => {
+
+        const length = 64;
+
+        it('should return a random buffer of the requested byte length - callback api', (done) => {
+          magic.util.rand(length, (err, bytes) => {
+            assert.ok(!err);
+            assert.ok(bytes);
+            assert.equal(Buffer.byteLength(bytes), length);
+
+            done();
+          });
+        });
+
+        it('should return a random buffer of the requested byte length - promise api', (done) => {
+          magic.util.rand(length).then((bytes) => {
+            assert.ok(bytes);
+            assert.equal(Buffer.byteLength(bytes), length);
+
+            done();
+          }).catch((err) => { assert.ok(!err); });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should fail with invalid byte length', (done) => {
+          magic.util.rand(-1, (err, bytes) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Invalid length');
+
+            done();
+          });
+        });
+      });
+    });
   });
 
 

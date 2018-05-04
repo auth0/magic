@@ -308,6 +308,29 @@ magic.util.pwverify(password, hash)
 });
 ```
 
+##### magic.util.rand
+
+Employs OpenSSL through `crypto` to return the requested number of random bytes, generated in a cryptographically secure manner.
+
+```js
+// callback
+magic.util.rand(length, (err, bytes) => {
+  if (err) { return done(err); }
+  console.log(bytes);
+  // <Buffer d3 12 78 83 3a f3 32 ... >
+});
+
+// promise
+magic.util.rand(length)
+  .then((bytes) => {
+    console.log(bytes);
+    // <Buffer d3 12 78 83 3a f3 32 ... >
+  })
+  .catch((err) => {
+    return reject(err);
+});
+```
+
 ### alt api
 
 The alt api implements alternative algorithms for each cryptographic operation. They should only be used over the core api when required by an external specification or interoperability concerns.

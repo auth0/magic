@@ -399,6 +399,36 @@ function pwverify(password, hash, cb) {
 }
 
 
+/***
+ * util.rand
+ *
+ * get random bytes
+ *
+ * @function
+ * @api public
+ *
+ * @param {Number} length
+ * @param {String} hash
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.util.rand = rand;
+function rand(len, cb) {
+  const done = ret(cb);
+
+  if (len <= 0) { return done(new Error('Invalid length')); }
+
+  let bytes;
+  try {
+    bytes = crypto.randomBytes(len);
+  } catch(ex) {
+    return done(new Error('Crypto error: ' + ex));
+  }
+
+  return done(null, bytes);
+}
+
+
 
 /*****************
  * Alternate API *
