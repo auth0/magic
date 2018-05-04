@@ -4,7 +4,7 @@
   "description": "Auth0 Internal Cryptography Toolkit",
   "main": "magic.js",
   "dependencies": {
-    "libsodium-wrappers-sumo": "^0.7.3"
+    "libsodium-wrappers-sumo": "0.7.3"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha --delay ./test/magic.test.js ./test/magic.test.vectors.js"

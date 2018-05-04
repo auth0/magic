@@ -81,7 +81,7 @@ libsodium-sumo@0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.3.tgz#c38d99dc3b2c056870ca8f3ac8f1ecbb150ecbbf"
 
-libsodium-wrappers-sumo@^0.7.3:
+libsodium-wrappers-sumo@0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.3.tgz#eeb4fc93a9802c34558e0f2ec350295ba6246fc8"
   dependencies:
