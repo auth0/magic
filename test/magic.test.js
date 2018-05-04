@@ -37,7 +37,7 @@ describe('magic tests', () => {
 
               magic.verify.sign(message, pk, output.signature, true, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -56,7 +56,7 @@ describe('magic tests', () => {
 
               return magic.verify.sign(message, pk, output.signature, true);
             }).then((verified) => {
-              assert.ok(verified);
+              assert.equal(verified, true);
 
               done();
             }).catch((err) => { assert.ok(false); });
@@ -80,7 +80,7 @@ describe('magic tests', () => {
 
               magic.verify.sign(message, epk, esig, true, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -108,7 +108,7 @@ describe('magic tests', () => {
 
               magic.verify.sign(message, output.sk, output.signature, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -127,7 +127,7 @@ describe('magic tests', () => {
 
               return magic.verify.sign(message, output.sk, output.signature);
             }).then((verified) => {
-              assert.ok(verified);
+              assert.equal(verified, true);
 
               done();
             }).catch((err) => { assert.ok(false); });
@@ -150,7 +150,7 @@ describe('magic tests', () => {
 
               magic.verify.sign(message, eseed, esig, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -173,7 +173,7 @@ describe('magic tests', () => {
 
               magic.verify.sign(message, output.sk, output.signature, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -192,7 +192,7 @@ describe('magic tests', () => {
 
               return magic.verify.sign(message, output.sk, output.signature);
             }).then((verified) => {
-              assert.ok(verified);
+              assert.equal(verified, true);
 
               done();
             }).catch((err) => { assert.ok(false); });
@@ -214,7 +214,7 @@ describe('magic tests', () => {
 
               magic.verify.sign(message, eseed, esig, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -316,7 +316,7 @@ describe('magic tests', () => {
 
               magic.verify.mac(message, output.sk, output.mac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -335,7 +335,7 @@ describe('magic tests', () => {
 
               return magic.verify.mac(message, output.sk, output.mac);
             }).then((verified) => {
-              assert.ok(verified);
+              assert.equal(verified, true);
 
               done();
             }).catch((err) => { assert.ok(false); });
@@ -358,7 +358,7 @@ describe('magic tests', () => {
 
               magic.verify.mac(message, ekey, emac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -381,7 +381,7 @@ describe('magic tests', () => {
 
               magic.verify.mac(message, output.sk, output.mac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -400,7 +400,7 @@ describe('magic tests', () => {
 
               return magic.verify.mac(message, output.sk, output.mac);
             }).then((verified) => {
-              assert.ok(verified);
+              assert.equal(verified, true);
 
               done();
             }).catch((err) => { assert.ok(false); });
@@ -422,7 +422,7 @@ describe('magic tests', () => {
 
               magic.verify.mac(message, ekey, emac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -530,6 +530,45 @@ describe('magic tests', () => {
         }).catch((err) => { assert.ok(false); });
       });
     });
+
+    describe('pwhash', () => {
+
+      const password = 'ascreamingcomesacrossthesky';
+
+      it('should verify a hashed password - callback api', (done) => {
+        magic.util.pwhash(password, (err, output) => {
+          assert.ok(!err);
+          assert.ok(output);
+          assert.ok(output.hash);
+
+          assert.equal(output.alg, 'argon2id');
+          assert.equal(output.hash.slice(0, 9), '$argon2id');
+
+          magic.util.pwverify(password, output.hash, (err, verified) => {
+            assert.ok(!err);
+            assert.equal(verified, true);
+
+            done();
+          });
+        });
+      });
+
+      it('should hash an input - promise api', (done) => {
+        magic.util.pwhash(password).then((output) => {
+          assert.ok(output);
+          assert.ok(output.hash);
+
+          assert.equal(output.alg, 'argon2id');
+          assert.equal(output.hash.slice(0, 9), '$argon2id');
+
+          return magic.util.pwverify(password, output.hash);
+        }).then((verified) => {
+          assert.equal(verified, true);
+
+          done();
+        }).catch((err) => { assert.ok(false); });
+      });
+    });
   });
 
 
@@ -559,7 +598,7 @@ describe('magic tests', () => {
 
               magic.alt.verify.hmacsha256(message, output.sk, output.mac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -578,7 +617,7 @@ describe('magic tests', () => {
 
               return magic.alt.verify.hmacsha256(message, output.sk, output.mac);
             }).then((verified) => {
-              assert.ok(verified);
+              assert.equal(verified, true);
 
               done();
             }).catch((err) => { assert.ok(false); });
@@ -601,7 +640,7 @@ describe('magic tests', () => {
 
               magic.alt.verify.hmacsha256(message, ekey, emac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -624,7 +663,7 @@ describe('magic tests', () => {
 
               magic.alt.verify.hmacsha256(message, output.sk, output.mac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -643,7 +682,7 @@ describe('magic tests', () => {
 
               return magic.alt.verify.hmacsha256(message, output.sk, output.mac);
             }).then((verified) => {
-              assert.ok(verified);
+              assert.equal(verified, true);
 
               done();
             }).catch((err) => { assert.ok(false); });
@@ -665,7 +704,7 @@ describe('magic tests', () => {
 
               magic.alt.verify.hmacsha256(message, ekey, emac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -766,7 +805,7 @@ describe('magic tests', () => {
 
               magic.alt.verify.hmacsha512(message, output.sk, output.mac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -785,7 +824,7 @@ describe('magic tests', () => {
 
               return magic.alt.verify.hmacsha512(message, output.sk, output.mac);
             }).then((verified) => {
-              assert.ok(verified);
+              assert.equal(verified, true);
 
               done();
             }).catch((err) => { assert.ok(false); });
@@ -808,7 +847,7 @@ describe('magic tests', () => {
 
               magic.alt.verify.hmacsha512(message, ekey, emac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -831,7 +870,7 @@ describe('magic tests', () => {
 
               magic.alt.verify.hmacsha512(message, output.sk, output.mac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });
@@ -850,7 +889,7 @@ describe('magic tests', () => {
 
               return magic.alt.verify.hmacsha512(message, output.sk, output.mac);
             }).then((verified) => {
-              assert.ok(verified);
+              assert.equal(verified, true);
 
               done();
             }).catch((err) => { assert.ok(false); });
@@ -872,7 +911,7 @@ describe('magic tests', () => {
 
               magic.alt.verify.hmacsha512(message, ekey, emac, (err, verified) => {
                 assert.ok(!err);
-                assert.ok(verified);
+                assert.equal(verified, true);
 
                 done();
               });

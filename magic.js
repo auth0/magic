@@ -326,13 +326,77 @@ module.exports.verify.mac = vmac('sha384');
  * hash a payload
  *
  * @function
- * @api private
+ * @api public
  *
  * @param {String|Buffer} message
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
 module.exports.util.hash = hash('sha384');
+
+
+/***
+ * util.pwhash
+ *
+ * hash a password
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} password
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.util.pwhash = pwhash;
+function pwhash(password, cb) {
+  const done = ret(cb);
+
+  if (!password) { return done(new Error('Empty password')); }
+
+  let hash;
+  try {
+    // generates the salt itself
+    hash = sodium.crypto_pwhash_str(password, sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE, sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE);
+  } catch(ex) {
+    return done(new Error('Libsodium error: ' + ex));
+  }
+
+  return done(null, convert({
+    alg:  'argon2id',
+    hash: hash
+  }));
+}
+
+
+/***
+ * util.pwverify
+ *
+ * verify a password
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} password
+ * @param {String} hash
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.util.pwverify = pwverify;
+function pwverify(password, hash, cb) {
+  const done = ret(cb);
+
+  if (!password) { return done(new Error('Empty password')); }
+  if (!hash) { return done(new Error('Cannot verify without stored hash')); }
+
+  let verified;
+  try {
+    verified = sodium.crypto_pwhash_str_verify(hash, password);
+  } catch(ex) {
+    return done(new Error('Libsodium error: ' + ex));
+  }
+
+  return done(null, verified);
+}
 
 
 
