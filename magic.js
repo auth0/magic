@@ -2,9 +2,16 @@ const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
 
 
+// Constants
+
+const HASHBYTES = { sha256: 32, sha384: 48, sha512: 64 };
+
+
+
 /************************
  * Variant Constructors *
  ************************/
+
 
 
 /***
@@ -19,6 +26,8 @@ const sodium = require('libsodium-wrappers-sumo');
  * @returns {Function}
  */
 function mac(algorithm) {
+
+  if (Object.keys(HASHBYTES).indexOf(algorithm) === -1) { throw new Error('Unknown hashing algorithm'); }
 
   /***
    * `lambda`
@@ -40,7 +49,8 @@ function mac(algorithm) {
     }
     const done = ret(cb);
 
-    if (!key) { key = crypto.randomBytes(48); }
+    // https://tools.ietf.org/html/rfc2104#section-3
+    if (!key) { key = crypto.randomBytes(HASHBYTES[algorithm]); }
 
     let payload, ikey;
     [ payload ] = iparse(message);
@@ -77,6 +87,8 @@ function mac(algorithm) {
  * @returns {Function}
  */
 function vmac(algorithm) {
+
+  if (Object.keys(HASHBYTES).indexOf(algorithm) === -1) { throw new Error('Unknown hashing algorithm'); }
 
   /***
    * `lambda`
