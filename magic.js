@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
+const cp     = require('child_process');
 
 
 // Constants
@@ -15,6 +16,102 @@ const HASHBYTES = { sha256: 32, sha384: 48, sha512: 64 };
 
 
 /***
+ * rsasign
+ *
+ * rsa constructor
+ *
+ * @function
+ * @api private
+ *
+ * @param {String} padding
+ * @param {String} digest
+ * @returns {Function}
+ */
+function rsasign(digest, padding) {
+
+  if (Object.keys(HASHBYTES).indexOf(digest) === -1) { throw new Error('Unknown hashing algorithm'); }
+
+  switch (padding) {
+    case 'pss':
+      padding = crypto.constants.RSA_PKCS1_PSS_PADDING;
+      break;
+    case 'v1_5':
+      padding = crypto.constants.RSA_PKCS1_PADDING;
+      break;
+    default:
+      throw new Error('Unknown padding method');
+  }
+
+  /***
+   * keying
+   *
+   * get an rsa key
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} provided
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  function keying(provided, cb) {
+    if (provided) { return cb(null, provided); }
+
+    cp.execFile('openssl', [ 'genpkey', '-algorithm', 'rsa', '2048' ], { timeout: 5000 }, (err, stdout, stderr) => {
+      if (err) { return cb(err); }
+      return cb(null, stdout);
+    });
+  }
+
+  /***
+   * `lambda`
+   *
+   * sign a payload
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} message
+   * @param {String|Buffer} key
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  return (message, key, cb) => {
+    if (typeof key === 'function') {
+      cb  = key;
+      key = null;
+    }
+    const done = ret(cb);
+
+    let payload;
+    [ payload ] = iparse(message);
+
+    keying(key, (err, ikey) => {
+      if (err) { return done(err); }
+      if (!ikey) { return done(new Error('Unable to generate key')); }
+
+      let signature;
+      try {
+        const alg  = ('rsa-' + digest).toUpperCase();
+        const sign = crypto.createSign(alg);
+        sign.update(message);
+        signature = sign.sign({ key: ikey, padding: padding });
+      } catch(ex) {
+        return done(new Error('Crypto error: ' + ex));
+      }
+
+      return done(null, convert({
+        alg:       'rsa-' + digest + '-' + padding,
+        sk:        key,
+        payload:   payload,
+        signature: signature
+      }));
+    });
+  }
+}
+
+
+ /***
  * mac
  *
  * mac constructor
@@ -442,6 +539,102 @@ module.exports.alt.verify  = new Object();
 module.exports.alt.encrypt = new Object();
 module.exports.alt.decrypt = new Object();
 module.exports.alt.util    = new Object();
+
+
+/***
+ * alt.auth.rsapsssha256
+ *
+ * sign a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.auth.rsapsssha256 = rsasign('sha256', 'pss');
+
+
+/***
+ * alt.auth.rsapsssha384
+ *
+ * sign a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.auth.rsapsssha384 = rsasign('sha384', 'pss');
+
+
+/***
+ * alt.auth.rsapsssha512
+ *
+ * sign a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.auth.rsapsssha512 = rsasign('sha512', 'pss');
+
+
+/***
+ * alt.auth.rsav1_5sha256
+ *
+ * sign a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.auth.rsav1_5sha256 = rsasign('sha256', 'v1_5');
+
+
+/***
+ * alt.auth.rsav1_5sha384
+ *
+ * sign a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.auth.rsav1_5sha384 = rsasign('sha384', 'v1_5');
+
+
+/***
+ * alt.auth.rsav1_5sha512
+ *
+ * sign a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.auth.rsav1_5sha512 = rsasign('sha512', 'v1_5');
 
 
 /***

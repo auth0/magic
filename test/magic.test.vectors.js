@@ -149,6 +149,143 @@ function core() {
 }
 
 
+// pulled out manually from vector suite so tests can be defined async
+const RSAKEYS = {
+  v1_5: `-----BEGIN RSA PRIVATE KEY-----
+MIIEpQIBAAKCAQEA4LFLmc1hzT25wgdmaIQTJPoxdPM85m/9UUOU00F40ppJSTJ2
+tndyM+fUaj5ovHyn6JnpAdVPbe4HScPkjd9oaFhn7irmbfiOtWP22xN6n2sXWhEu
+DtqDaOiORe/hzhS8YBbVJjlicGavGHLHL2C5FhwdI37rNLD4QbPwiW+f4OFrD3Q1
+LRASksxGSn54YbvrhvbfYVHLJlQXxmxWXtiXS9j8mE1d39TrkaPVI0zhtUZ/Ot43
+X4AuwHKT8SNu+jBovJGxWFUch1xdwKnW+jIb+UIfCN6skQ41wcKFSe6O7YMwz3BZ
+X/cLlLSZB+J2mKnZEfesBwavyxpKOf6ziwqASQIDAQABAoIBAB28qS5CRcLVe/un
+YhDMBgKbUCdTt8ghoyt5n70zyYtJ2xAiax6sAUPIV072UoM7ljdNA074TapVWcaT
+8/Ao1JcWuC6Ho/aC8lQkVjvZQJ3PnQgRBQD3P3QHbyjnXgGZsfKfovcLmjEZDexU
+6HKnQOehseOMPRG8qCZ964Qs70JiI3rIdXJQaPMlY7R4rKjWqZ80y4h2uXFFsuhS
+nsit6oPq1Oxj4/8tF6L/77BckCynqSFoN4yJ91ySj8TwcH5DSHpPR99wyuh+JCcs
+E20+mM9ZBm1Bo9A4hX0HPYtNLCe48Opr+lDSYwkaShjGP0RryaYejEpog0eyQ17I
+5y7drqcCgYEA9VYIoLvyKKPKwgdfzVHO6N1m/kglkrW8QwUtIfKlhanmYsTS+MMb
+mYPFauoO5gZcK326G55MCyXCWMC6KfmiDYMtgUDBMXePelNxzI0C6gsIJ/qeSLiQ
+RGKJ+53CZrDhEmBH0l5otgPmx7RwcIR9yCnkMbpLRvWwrkep9Uxt8qsCgYEA6nWN
+R4gv7M9IJqEdToCPoCE4FEyvFC41kdfiXJG43shpFF3ZzmBL2q1hqdW1nzSrFRdB
+Y4cw7MON8HEd+nDabLWN26C64fo1YfLyCuOoWnEaBYKCiBCetpsSJrEvBXxeVUrQ
+QVOd87VVjVnAYqXyL0fJvJeWoMYE4vk2+l+zuNsCgYEAwfQBIClVmWFb8ybnSyeo
+vxoByXd6FNEOA6H8+0CcMN6Pn3fhHf8JO8Ub9pkRrDJM/akIz7rGfW2dhpLe2j5b
+KfmRqQRrd1MBIAEGD2NPcX3FNe4A4pbenuGUGlKvFIYzeVaakSpH99V/xlPVLG7i
+DbNojxOrXW7w/ebz61Q/+78CgYEA4+Bm9TxfYCnC9ZCoXFFFxxwiVlCF5fZXqK2L
+2+7iIN3mi54AAL7FWwAjKR+GS/uzwGb+7c5K9gPHJAe9XFltYjU/cFSS7unyEoY/
+S+gjC+xbnzlOxxJoQBEOHj8d9ZYAVaPGL4gmv+TiBuVRwE+LyPpcEAnBo/dybmxM
+TCLSGfsCgYEA3nca2fjl7q9y6DKHNcLqXgxApqrcixpZhTepbrEIwAyq9+fsGrlc
+fUJGTMojm+lySSNIY4BwW9PNmbxDhi6X7KTpHeytRychzUaOZrq6xOKIGZYzh5wU
+tHfCire4oghtHumbIkmGYWI8CgkzyCd1QdrCl4jHzbKN5oaiJ+O+1Aw=
+-----END RSA PRIVATE KEY-----`,
+}
+
+
+/***
+ * rsav1_5sha256
+ *
+ * test vectors for magic.alt.auth.rsav1_5sha256()
+ *
+ */
+function rsav1_5sha256(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/rsav1_5sha256.vec') });
+
+  // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/digital-signatures
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const m = Buffer.from(sec[0], 'hex');
+
+    it('magic.alt.auth.rsav1_5sha256 - Test Vector #' + c, (done) => {
+      magic.alt.auth.rsav1_5sha256(m, RSAKEYS.v1_5, (err, out) => {
+        if (err) { return done(err); }
+
+        const t = out.signature;
+        assert.equal(sec[1], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * rsav1_5sha384
+ *
+ * test vectors for magic.alt.auth.rsav1_5sha384()
+ *
+ */
+function rsav1_5sha384(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/rsav1_5sha384.vec') });
+
+  // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/digital-signatures
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const m = Buffer.from(sec[0], 'hex');
+
+    it('magic.alt.auth.rsav1_5sha384 - Test Vector #' + c, (done) => {
+      magic.alt.auth.rsav1_5sha384(m, RSAKEYS.v1_5, (err, out) => {
+        if (err) { return done(err); }
+
+        const t = out.signature;
+        assert.equal(sec[1], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * rsav1_5sha512
+ *
+ * test vectors for magic.alt.auth.rsav1_5sha512()
+ *
+ */
+function rsav1_5sha512(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/rsav1_5sha512.vec') });
+
+  // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/digital-signatures
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const m = Buffer.from(sec[0], 'hex');
+
+    it('magic.alt.auth.rsav1_5sha512 - Test Vector #' + c, (done) => {
+      magic.alt.auth.rsav1_5sha512(m, RSAKEYS.v1_5, (err, out) => {
+        if (err) { return done(err); }
+
+        const t = out.signature;
+        assert.equal(sec[1], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
 /***
  * hmacsha256
  *
@@ -298,7 +435,7 @@ function sha512(cont) {
  *
  */
 function alt() {
-  const fs = [ hmacsha256, hmacsha512, sha256, sha512 ];
+  const fs = [ rsav1_5sha256, rsav1_5sha384, rsav1_5sha512, hmacsha256, hmacsha512, sha256, sha512 ];
 
   (function setup() {
     const f = fs.shift();
