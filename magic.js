@@ -31,12 +31,13 @@ function rsasign(digest, padding) {
 
   if (Object.keys(HASHBYTES).indexOf(digest) === -1) { throw new Error('Unknown hashing algorithm'); }
 
+  let algorithm;
   switch (padding) {
     case 'pss':
-      padding = crypto.constants.RSA_PKCS1_PSS_PADDING;
+      algorithm = crypto.constants.RSA_PKCS1_PSS_PADDING;
       break;
     case 'v1_5':
-      padding = crypto.constants.RSA_PKCS1_PADDING;
+      algorithm = crypto.constants.RSA_PKCS1_PADDING;
       break;
     default:
       throw new Error('Unknown padding method');
@@ -102,18 +103,94 @@ function rsasign(digest, padding) {
         const alg  = ('rsa-' + digest).toUpperCase();
         const sign = crypto.createSign(alg);
         sign.update(message);
-        signature = sign.sign({ key: ikey, padding: padding });
+        sign.end();
+
+        signature = sign.sign({ key: ikey, padding: algorithm });
       } catch(ex) {
         return done(new Error('Crypto error: ' + ex));
       }
 
       return done(null, convert({
-        alg:       'rsa-' + digest + '-' + padding,
-        sk:        key,
+        alg:       'rsa-' + padding + '-' + digest,
+        sk:        ikey,
         payload:   payload,
         signature: signature
       }));
     });
+  }
+}
+
+
+/***
+ * rsaverify
+ *
+ * rsa constructor
+ *
+ * @function
+ * @api private
+ *
+ * @param {String} padding
+ * @param {String} digest
+ * @returns {Function}
+ */
+function rsaverify(digest, padding) {
+
+  if (Object.keys(HASHBYTES).indexOf(digest) === -1) { throw new Error('Unknown hashing algorithm'); }
+
+  let algorithm;
+  switch (padding) {
+    case 'pss':
+      algorithm = crypto.constants.RSA_PKCS1_PSS_PADDING;
+      break;
+    case 'v1_5':
+      algorithm = crypto.constants.RSA_PKCS1_PADDING;
+      break;
+    default:
+      throw new Error('Unknown padding method');
+  }
+
+  /***
+   * `lambda`
+   *
+   * verify a signature
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} message
+   * @param {String|Buffer} key
+   * @param {String|Buffer} signature
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  return (message, key, signature, cb) => {
+    if (typeof key === 'function') {
+      cb  = key;
+      key = null;
+    }
+    const done = ret(cb);
+
+    if (!key) { return done(new Error('Cannot verify without a key')); }
+
+    let payload, received, ikey;
+    [ payload ]  = iparse(message);
+    [ received ] = cparse(signature);
+
+    ikey = key;
+
+    let verified;
+    try {
+      const alg    = ('rsa-' + digest).toUpperCase();
+      const verify = crypto.createVerify(alg);
+      verify.update(message);
+      verify.end();
+
+      verified = verify.verify({ key: ikey, padding: algorithm }, received);
+    } catch(ex) {
+      return done(new Error('Crypto error: ' + ex));
+    }
+
+    return done(null, verified);
   }
 }
 
@@ -213,7 +290,7 @@ function vmac(algorithm) {
 
     if (!key) { return done(new Error('Cannot verify without a key')); }
 
-    let payload, ikey;
+    let payload, received, ikey;
     [ payload ]       = iparse(message);
     [ key, received ] = cparse(key, tag);
 
@@ -374,7 +451,7 @@ function vsign(message, key, signature, iskey, cb) {
 
   if (!key) { return done(new Error('Cannot verify without a key')); }
 
-  let payload, ikey;
+  let payload, received, ikey;
   [ payload ]       = iparse(message);
   [ key, received ] = cparse(key, signature);
 
@@ -565,6 +642,23 @@ module.exports.alt.auth.rsapsssha256 = rsasign('sha256', 'pss');
 
 
 /***
+ * alt.verify.rsapsssha256
+ *
+ * verify a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {String|Buffer} signature
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.verify.rsapsssha256 = rsaverify('sha256', 'pss');
+
+
+/***
  * alt.auth.rsapsssha384
  *
  * sign a payload
@@ -578,6 +672,23 @@ module.exports.alt.auth.rsapsssha256 = rsasign('sha256', 'pss');
  * @returns {Callback|Promise}
  */
 module.exports.alt.auth.rsapsssha384 = rsasign('sha384', 'pss');
+
+
+/***
+ * alt.verify.rsapsssha384
+ *
+ * verify a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {String|Buffer} signature
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.verify.rsapsssha384 = rsaverify('sha384', 'pss');
 
 
 /***
@@ -597,6 +708,23 @@ module.exports.alt.auth.rsapsssha512 = rsasign('sha512', 'pss');
 
 
 /***
+ * alt.verify.rsapsssha512
+ *
+ * verify a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {String|Buffer} signature
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.verify.rsapsssha512 = rsaverify('sha512', 'pss');
+
+
+/***
  * alt.auth.rsav1_5sha256
  *
  * sign a payload
@@ -610,6 +738,23 @@ module.exports.alt.auth.rsapsssha512 = rsasign('sha512', 'pss');
  * @returns {Callback|Promise}
  */
 module.exports.alt.auth.rsav1_5sha256 = rsasign('sha256', 'v1_5');
+
+
+/***
+ * alt.verify.rsav1_5sha256
+ *
+ * verify a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {String|Buffer} signature
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.verify.rsav1_5sha256 = rsaverify('sha256', 'v1_5');
 
 
 /***
@@ -629,6 +774,23 @@ module.exports.alt.auth.rsav1_5sha384 = rsasign('sha384', 'v1_5');
 
 
 /***
+ * alt.verify.rsav1_5sha384
+ *
+ * verify a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {String|Buffer} signature
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.verify.rsav1_5sha384 = rsaverify('sha384', 'v1_5');
+
+
+/***
  * alt.auth.rsav1_5sha512
  *
  * sign a payload
@@ -642,6 +804,23 @@ module.exports.alt.auth.rsav1_5sha384 = rsasign('sha384', 'v1_5');
  * @returns {Callback|Promise}
  */
 module.exports.alt.auth.rsav1_5sha512 = rsasign('sha512', 'v1_5');
+
+
+/***
+ * alt.verify.rsav1_5sha512
+ *
+ * verify a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {String|Buffer} signature
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.verify.rsav1_5sha512 = rsaverify('sha512', 'v1_5');
 
 
 /***
