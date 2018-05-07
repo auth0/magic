@@ -90,6 +90,13 @@ function rsasign(digest, padding) {
       if (err) { return done(err); }
       if (!ikey) { return done(new Error('Unable to generate key')); }
 
+      // for pss tests, should crypto api change in the future to allow specifying salt
+      //let salt;
+      //if (typeof ikey === 'object' && padding === crypto.constants.RSA_PKCS1_PSS_PADDING) {
+      //  salt = ikey.salt;
+      //  ikey = ikey.key;
+      //}
+
       let signature;
       try {
         const alg  = ('rsa-' + digest).toUpperCase();
