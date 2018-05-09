@@ -142,7 +142,7 @@ magic.verify.sign(message, pk, signature, true)
 });
 ```
 
-##### magic.auth.mac | magic.verify.mac
+#### magic.auth.mac | magic.verify.mac
 
 Implements `HMAC-SHA384` using OpenSSL through `crypto`. The `HMAC` algorithm is the most common message authentication code construction, standardized by the [IETF](https://tools.ietf.org/html/rfc2104) and [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf). The choice of `SHA384` is due to its widespread availability and to provide a consistent hash function throughout `magic`, as `SHA256` may be susceptible to length extension attacks in certain situations. Both `HMAC-SHA256` and `HMAC-SHA512` are available in the alternative api.
 
@@ -227,9 +227,9 @@ magic.verify.mac(message, key, mac)
 });
 ```
 
-##### magic.encrypt.async | magic.decrypt.async
+#### magic.encrypt.async | magic.decrypt.async
 
-Implements `x25519` static Diffie-Hellman key exchange, and employs the resultant shared secret for `xsalsa20-poly1305` authenticated encryption using `libsodium.js`. This allows for an efficient, simple symmetric authenticated encryption scheme to be used in an asymmetric setting. A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). As a static Diffie-Hellman exchange, the API is slightly different than most asymmetric encryption schemes - for encryption both the recipient public key and sender private key are required, whereas for decryption the recipient private key and sender public key are required. Usually, only the keys are the recipient are required for encryption, though `x25519-xsalsa20-poly1305` has the benefit of being an authenticated scheme as well.
+Implements `x25519` static Diffie-Hellman key exchange, and employs the resultant shared secret for `xsalsa20poly1305` authenticated encryption using `libsodium.js`. This allows for an efficient, simple symmetric authenticated encryption scheme to be used in an asymmetric setting. A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). As a static Diffie-Hellman exchange, the API is slightly different than most asymmetric encryption schemes - for encryption both the recipient public key and sender private key are required, whereas for decryption the recipient private key and sender public key are required. Usually, only the keys are the recipient are required for encryption, though `x25519-xsalsa20-poly1305` has the benefit of being an authenticated scheme as well.
 
 ```js
 // key generation
@@ -317,7 +317,91 @@ magic.decrypt.async(sk, pk, ciphertext, nonce)
 });
 ```
 
-##### magic.util.hash
+#### magic.encrypt.sync | magic.decrypt.sync
+
+Implements `xsalsa20poly1305` authenticated encryption using `libsodium.js`. A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). The scheme is fast, simple, and as an AEAD construction provides each of confidentiality, authentication, and integrity on the message.
+
+```js
+// key generation
+
+// callback
+magic.encrypt.sync(message, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:        'xsalsa20poly1305',
+  //   sk:         <Buffer d7 d5 dd 2c 2a eb f1 ... >,
+  //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+  //   nonce:      <Buffer b3 4f 59 af 96 e4 4c ... >,
+  //   ciphertext: <Buffer 3c 3d 0e 8b c6 34 83 ... > }
+});
+
+// promise
+magic.encrypt.sync(message)
+  .then((output) => {
+    console.log(output);
+    // { alg:        'xsalsa20poly1305',
+    //   sk:         <Buffer d7 d5 dd 2c 2a eb f1 ... >,
+    //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+    //   nonce:      <Buffer b3 4f 59 af 96 e4 4c ... >,
+    //   ciphertext: <Buffer 3c 3d 0e 8b c6 34 83 ... > }
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied key
+const sk = 'd7d5dd...';
+
+// callback
+magic.encrypt.sync(message, sk, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:        'xsalsa20poly1305',
+  //   sk:         <Buffer d7 d5 dd 2c 2a eb f1 ... >,
+  //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+  //   nonce:      <Buffer b3 4f 59 af 96 e4 4c ... >,
+  //   ciphertext: <Buffer 3c 3d 0e 8b c6 34 83 ... > }
+});
+
+// promise
+magic.encrypt.sync(message, sk)
+  .then((output) => {
+    console.log(output);
+    // { alg:        'xsalsa20poly1305',
+    //   sk:         <Buffer d7 d5 dd 2c 2a eb f1 ... >,
+    //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+    //   nonce:      <Buffer b3 4f 59 af 96 e4 4c ... >,
+    //   ciphertext: <Buffer 3c 3d 0e 8b c6 34 83 ... > }
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+Decryption then returns the plaintext directly, without the metadata.
+
+```js
+const sk = 'e5e5c6...';
+
+// callback
+magic.decrypt.sync(sk, ciphertext, nonce, (err, plaintext) => {
+  if (err) { return cb(err); }
+  console.log(plaintext);
+  // <Buffer 41 20 73 63 72 65 61 ... >
+});
+
+// promise
+magic.decrypt.sync(sk, ciphertext, nonce)
+  .then((plaintext) => {
+    console.log(plaintext);
+    // <Buffer 41 20 73 63 72 65 61 ... >
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+#### magic.util.hash
 
 Implements `SHA2-384` (henceforth just `SHA384`) using OpenSSL through `crypto`. Unlike `SHA256` and `SHA512` - which are available through the alternative api - `SHA384` is resistant to length extension attacks, a capability which may be relevant in some circumstances. The `SHA2` family is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf), and the most commonly used fast, cryptographically secure hash function.
 
@@ -345,7 +429,7 @@ magic.util.hash(message)
 });
 ```
 
-##### magic.util.pwhash | magic.util.pwverify
+#### magic.util.pwhash | magic.util.pwverify
 
 Implements `argon2id` password hashing using `libsodium.js`. The winner of the [Password Hashing Competition](https://password-hashing.net/) and now the [OWASP recommendation](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet#Leverage_an_adaptive_one-way_function), `argon2id` is robust against both memory tradeoff and side-channel attacks. The output of the `argon2id` function is encoded with a prefix and other metadata, and so `output.hash` is encoded as a string, not a raw binary buffer as is normal for the rest of the `magic` api. Nor is the raw password itself returned.
 
@@ -398,7 +482,7 @@ magic.util.pwverify(password, hash)
 });
 ```
 
-##### magic.util.rand
+#### magic.util.rand
 
 Employs OpenSSL through `crypto` to return the requested number of random bytes, generated in a cryptographically secure manner.
 
@@ -425,18 +509,18 @@ magic.util.rand(length)
 
 The alt api implements alternative algorithms for each cryptographic operation. They should only be used over the core api when required by an external specification or interoperability concerns.
 
-##### magic.alt.auth.hmacsha256 | magic.alt.verify.hmacsha256
+#### magic.alt.auth.hmacsha256 | magic.alt.verify.hmacsha256
 
 Implements `HMAC-SHA256` using OpenSSL through `crypto`. An alterative to `magic.auth.mac`.
 
-##### magic.alt.auth.hmacsha512 | magic.alt.verify.hmacsha512
+#### magic.alt.auth.hmacsha512 | magic.alt.verify.hmacsha512
 
 Implements `HMAC-SHA512` using OpenSSL through `crypto`. An alterative to `magic.auth.mac`.
 
-##### magic.alt.util.sha256
+#### magic.alt.util.sha256
 
 Implements `SHA256` using OpenSSL through `crypto`. An alterative to `magic.util.hash`.
 
-##### magic.alt.util.sha512
+#### magic.alt.util.sha512
 
 Implements `SHA512` using OpenSSL through `crypto`. An alterative to `magic.util.hash`.

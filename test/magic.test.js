@@ -515,9 +515,8 @@ describe('magic tests', () => {
             pk = Buffer.from(keys.publicKey);
           });
 
-          it.only('should encrypt and decrypt an authenticated message - callback api', (done) => {
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
             magic.encrypt.async(message, sk, pk, (err, output) => {
-              console.log(output);
               assert.ok(!err);
               assert.ok(output);
 
@@ -665,7 +664,7 @@ describe('magic tests', () => {
         it('should error with only private key on encryption', (done) => {
           magic.encrypt.async(message, sodium.crypto_box_keypair().privateKey, null, (err, output) => {
             assert.ok(err);
-            assert.equal(err.message, 'Requires both or neither of private and public keys.');
+            assert.equal(err.message, 'Requires both or neither of private and public keys');
 
             done();
           });
@@ -674,7 +673,7 @@ describe('magic tests', () => {
         it('should error with only public key on encryption', (done) => {
           magic.encrypt.async(message, null, sodium.crypto_box_keypair().publicKey, (err, output) => {
             assert.ok(err);
-            assert.equal(err.message, 'Requires both or neither of private and public keys.');
+            assert.equal(err.message, 'Requires both or neither of private and public keys');
 
             done();
           });
@@ -695,7 +694,7 @@ describe('magic tests', () => {
 
             magic.decrypt.async(null, null, output.ciphertext, output.nonce, (err, plaintext) => {
               assert.ok(err);
-              assert.equal(err.message, 'Cannot decrypt without both private and public key.');
+              assert.equal(err.message, 'Cannot decrypt without both private and public key');
 
               done();
             });
@@ -717,7 +716,7 @@ describe('magic tests', () => {
 
             magic.decrypt.async(null, output.pk, output.ciphertext, output.nonce, (err, plaintext) => {
               assert.ok(err);
-              assert.equal(err.message, 'Cannot decrypt without both private and public key.');
+              assert.equal(err.message, 'Cannot decrypt without both private and public key');
 
               done();
             });
@@ -739,7 +738,7 @@ describe('magic tests', () => {
 
             magic.decrypt.async(output.sk, null, output.ciphertext, output.nonce, (err, plaintext) => {
               assert.ok(err);
-              assert.equal(err.message, 'Cannot decrypt without both private and public key.');
+              assert.equal(err.message, 'Cannot decrypt without both private and public key');
 
               done();
             });
@@ -793,49 +792,220 @@ describe('magic tests', () => {
             });
           });
         });
+      });
+    });
 
-        it('should fail if private key is altered', (done) => {
-          magic.encrypt.async(message, (err, output) => {
+
+    describe('sync', () => {
+
+      let sk;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => { sk = Buffer.from(sodium.crypto_secretbox_keygen()); });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.encrypt.sync(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'xsalsa20poly1305');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, sk) === 0);
+
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              magic.decrypt.sync(sk, output.ciphertext, output.nonce, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.encrypt.sync(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'xsalsa20poly1305');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, sk) === 0);
+
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              return magic.decrypt.sync(sk, output.ciphertext, output.nonce);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const esk = sk.toString('hex');
+
+            magic.encrypt.sync(message, esk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'xsalsa20poly1305');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, sk) === 0);
+
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              const ect = output.ciphertext.toString('hex');
+              const en  = output.nonce.toString('hex');
+
+              magic.decrypt.sync(esk, ect, en, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.encrypt.sync(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'xsalsa20poly1305');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              magic.decrypt.sync(output.sk, output.ciphertext, output.nonce, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.encrypt.sync(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'xsalsa20poly1305');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              return magic.decrypt.sync(output.sk, output.ciphertext, output.nonce);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.encrypt.sync(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'xsalsa20poly1305');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              const esk = output.sk.toString('hex');
+              const ect = output.ciphertext.toString('hex');
+              const en  = output.nonce.toString('hex');
+
+              magic.decrypt.sync(esk, ect, en, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error without key on decryption', (done) => {
+          magic.encrypt.sync(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'x25519-xsalsa20poly1305');
+            assert.equal(output.alg, 'xsalsa20poly1305');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
-            assert.ok(output.pk);
             assert.ok(output.ciphertext);
             assert.ok(output.nonce);
 
-            const altered = Buffer.from('a6849c76c3c1e33e9a39109ebcc78876816e8ab5fab9326f8e0654d2fe987686', 'hex');
-
-            magic.decrypt.async(altered, output.pk, output.ciphertext, output.nonce, (err, plaintext) => {
+            magic.decrypt.sync(null, output.ciphertext, output.nonce, (err, plaintext) => {
               assert.ok(err);
-              assert.equal(err.message, 'Libsodium error: Error: incorrect key pair for the given ciphertext');
+              assert.equal(err.message, 'Cannot decrypt without a key');
 
               done();
             });
           });
         });
 
-        it('should fail if public key is altered', (done) => {
-          magic.encrypt.async(message, (err, output) => {
+        it('should fail if ciphertext is altered', (done) => {
+          magic.encrypt.sync(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'x25519-xsalsa20poly1305');
+            assert.equal(output.alg, 'xsalsa20poly1305');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
-            assert.ok(output.pk);
             assert.ok(output.ciphertext);
             assert.ok(output.nonce);
 
-            const altered = Buffer.from('a6849c76c3c1e33e9a39109ebcc78876816e8ab5fab9326f8e0654d2fe987686', 'hex');
+            const altered = Buffer.from('b16da2bec401fc7a1d4723025ed2fa122f400631018cae837bade02289ee4e187541f57ee6efbc33ad4e08b5465bb6534d3edc7305c27fa6f61dc165f57f0ef79b64bb3d7409a83d2f196ad2496284d2caf934ad8047a17dfefe5c318afc96cda61e71e06d3ebcb60140a97666d7a0cc2512aa31', 'hex');
 
-            magic.decrypt.async(output.sk, altered, output.ciphertext, output.nonce, (err, plaintext) => {
+            magic.decrypt.sync(output.sk, altered, output.nonce, (err, plaintext) => {
               assert.ok(err);
-              assert.equal(err.message, 'Libsodium error: Error: incorrect key pair for the given ciphertext');
+              assert.equal(err.message, 'Libsodium error: Error: wrong secret key for the given ciphertext');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if nonce is altered', (done) => {
+          magic.encrypt.sync(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'xsalsa20poly1305');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.ciphertext);
+            assert.ok(output.nonce);
+
+            const altered = Buffer.from('f5319d1c72f6019683fa7992bb5acf3f540a9ae870f3806f', 'hex');
+
+            magic.decrypt.sync(output.sk, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Libsodium error: Error: wrong secret key for the given ciphertext');
 
               done();
             });

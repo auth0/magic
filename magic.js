@@ -504,7 +504,7 @@ module.exports.verify.mac = vmac('sha384');
 /***
  * encrypt.async
  *
- * asymmetric authentication encryption of a payload
+ * symmetric authenticated encryption of a payload
  *
  * @function
  * @api public
@@ -524,7 +524,7 @@ function async(message, sk, pk, cb) {
   }
   const done = ret(cb);
 
-  if (!!sk ^ !!pk) { return done(new Error('Requires both or neither of private and public keys.')); }
+  if (!!sk ^ !!pk) { return done(new Error('Requires both or neither of private and public keys')); }
 
   let payload, isk, ipk;
   [ payload ] = iparse(message);
@@ -561,7 +561,7 @@ function async(message, sk, pk, cb) {
 /***
  * decrypt.async
  *
- * asymmetric authentication decryption of a payload
+ * asymmetric authenticated decryption of a payload
  *
  * @function
  * @api public
@@ -577,9 +577,9 @@ module.exports.decrypt.async = dasync;
 function dasync(sk, pk, ciphertext, nonce, cb) {
   const done = ret(cb);
 
-  if (!sk || !pk) { return done(new Error('Cannot decrypt without both private and public key.')); }
+  if (!sk || !pk) { return done(new Error('Cannot decrypt without both private and public key')); }
 
-  let received, isk, ipk;
+  let isk, ipk;
   [ ciphertext, nonce, sk, pk ] = cparse(ciphertext, nonce, sk, pk);
 
   isk = sk;
@@ -588,6 +588,90 @@ function dasync(sk, pk, ciphertext, nonce, cb) {
   let plaintext;
   try {
     plaintext = sodium.crypto_box_open_easy(ciphertext, nonce, ipk, isk);
+  } catch(ex) {
+    return done(new Error('Libsodium error: ' + ex));
+  }
+
+  return done(null, convert(plaintext));
+}
+
+
+/***
+ * encrypt.sync
+ *
+ * symmetric authenticated encryption of a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} sk
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.encrypt.sync = sync;
+function sync(message, sk, cb) {
+  if (typeof sk === 'function') {
+    cb = sk;
+    sk = null;
+  }
+  const done = ret(cb);
+
+  let payload, isk;
+  [ payload ] = iparse(message);
+  [ sk ]      = cparse(sk);
+
+  if (!sk) { sk = sodium.crypto_secretbox_keygen(); }
+
+  isk = sk;
+
+  let ciphertext, nonce;
+  try {
+    nonce      = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+    ciphertext = sodium.crypto_secretbox_easy(payload, nonce, isk);
+  } catch(ex) {
+    return done(new Error('Libsodium error: ' + ex));
+  }
+
+  return done(null, convert({
+    alg:        'xsalsa20poly1305',
+    sk:         sk,
+    payload:    payload,
+    nonce:      nonce,
+    ciphertext: ciphertext
+  }));
+}
+
+
+/***
+ * decrypt.sync
+ *
+ * symmetric authenticated decryption of a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} sk
+ * @param {String|Buffer} pk
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} nonce
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.decrypt.sync = dsync;
+function dsync(sk, ciphertext, nonce, cb) {
+  const done = ret(cb);
+
+  if (!sk) { return done(new Error('Cannot decrypt without a key')); }
+
+  let isk;
+  [ ciphertext, nonce, sk ] = cparse(ciphertext, nonce, sk);
+
+  isk = sk;
+
+  let plaintext;
+  try {
+    plaintext = sodium.crypto_secretbox_open_easy(ciphertext, nonce, isk);
   } catch(ex) {
     return done(new Error('Libsodium error: ' + ex));
   }
