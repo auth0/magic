@@ -8,7 +8,7 @@ All public functions support both callbacks and promises (and therefore async/aw
 
 The core api implements the recommended algorithms for each cryptographic operation. When in doubt, use them.
 
-##### magic.auth.sign | magic.verify.sign
+#### magic.auth.sign | magic.verify.sign
 
 Implements `ed25519` signatures using `libsodium.js`. Efficient and without some of the concerns inherent in `ECDSA`, `ed25519` has been accepted and standardized by the [IETF](https://tools.ietf.org/html/rfc8032). By default, the api expects to be given a secret key as a seed, from which the actual keypair is derived (allowing easier, more concise storage). However, it may be used directly with a keypair, requiring only a boolean flag for the `verify` call.
 
