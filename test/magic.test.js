@@ -515,12 +515,13 @@ describe('magic tests', () => {
             pk = Buffer.from(keys.publicKey);
           });
 
-          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+          it.only('should encrypt and decrypt an authenticated message - callback api', (done) => {
             magic.encrypt.async(message, sk, pk, (err, output) => {
+              console.log(output);
               assert.ok(!err);
               assert.ok(output);
 
-              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.alg, 'x25519-xsalsa20poly1305');
               assert.equal(output.payload.toString('utf-8'), message);
               assert.ok(Buffer.compare(output.sk, sk) === 0);
               assert.ok(Buffer.compare(output.pk, pk) === 0);
@@ -541,7 +542,7 @@ describe('magic tests', () => {
             magic.encrypt.async(message, sk, pk).then((output) => {
               assert.ok(output);
 
-              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.alg, 'x25519-xsalsa20poly1305');
               assert.equal(output.payload.toString('utf-8'), message);
               assert.ok(Buffer.compare(output.sk, sk) === 0);
               assert.ok(Buffer.compare(output.pk, pk) === 0);
@@ -565,7 +566,7 @@ describe('magic tests', () => {
               assert.ok(!err);
               assert.ok(output);
 
-              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.alg, 'x25519-xsalsa20poly1305');
               assert.equal(output.payload.toString('utf-8'), message);
               assert.ok(Buffer.compare(output.sk, sk) === 0);
               assert.ok(Buffer.compare(output.pk, pk) === 0);
@@ -593,7 +594,7 @@ describe('magic tests', () => {
               assert.ok(!err);
               assert.ok(output);
 
-              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.alg, 'x25519-xsalsa20poly1305');
               assert.equal(output.payload.toString('utf-8'), message);
 
               assert.ok(output.sk);
@@ -614,7 +615,7 @@ describe('magic tests', () => {
             magic.encrypt.async(message).then((output) => {
               assert.ok(output);
 
-              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.alg, 'x25519-xsalsa20poly1305');
               assert.equal(output.payload.toString('utf-8'), message);
 
               assert.ok(output.sk);
@@ -635,7 +636,7 @@ describe('magic tests', () => {
               assert.ok(!err);
               assert.ok(output);
 
-              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.alg, 'x25519-xsalsa20poly1305');
               assert.equal(output.payload.toString('utf-8'), message);
 
               assert.ok(output.sk);
@@ -684,7 +685,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.alg, 'x25519-xsalsa20poly1305');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
@@ -706,7 +707,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.alg, 'x25519-xsalsa20poly1305');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
@@ -728,7 +729,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.alg, 'x25519-xsalsa20poly1305');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
@@ -750,7 +751,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.alg, 'x25519-xsalsa20poly1305');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
@@ -774,7 +775,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.alg, 'x25519-xsalsa20poly1305');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
@@ -798,7 +799,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.alg, 'x25519-xsalsa20poly1305');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);
@@ -822,7 +823,7 @@ describe('magic tests', () => {
             assert.ok(!err);
             assert.ok(output);
 
-            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.alg, 'x25519-xsalsa20poly1305');
             assert.equal(output.payload.toString('utf-8'), message);
 
             assert.ok(output.sk);

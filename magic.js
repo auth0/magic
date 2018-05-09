@@ -548,7 +548,7 @@ function async(message, sk, pk, cb) {
   }
 
   return done(null, convert({
-    alg:        'curve25519',
+    alg:        'x25519-xsalsa20poly1305',
     sk:         sk,
     pk:         pk,
     payload:    payload,
