@@ -502,6 +502,101 @@ module.exports.verify.mac = vmac('sha384');
 
 
 /***
+ * encrypt.async
+ *
+ * asymmetric authentication encryption of a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} sk
+ * @param {String|Buffer} pk
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.encrypt.async = async;
+function async(message, sk, pk, cb) {
+  if (typeof sk === 'function') {
+    cb = sk;
+    sk = null;
+    pk = null;
+  }
+  const done = ret(cb);
+
+  if (!!sk ^ !!pk) { return done(new Error('Requires both or neither of private and public keys.')); }
+
+  let payload, isk, ipk;
+  [ payload ] = iparse(message);
+  [ sk, pk ]  = cparse(sk, pk);
+
+  if (!sk) {
+    const keys = sodium.crypto_box_keypair();
+    sk = keys.privateKey;
+    pk = keys.publicKey;
+  }
+
+  isk = sk;
+  ipk = pk;
+
+  let ciphertext, nonce;
+  try {
+    nonce      = sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
+    ciphertext = sodium.crypto_box_easy(payload, nonce, ipk, isk);
+  } catch(ex) {
+    return done(new Error('Libsodium error: ' + ex));
+  }
+
+  return done(null, convert({
+    alg:        'curve25519',
+    sk:         sk,
+    pk:         pk,
+    payload:    payload,
+    nonce:      nonce,
+    ciphertext: ciphertext
+  }));
+}
+
+
+/***
+ * decrypt.async
+ *
+ * asymmetric authentication decryption of a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} sk
+ * @param {String|Buffer} pk
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} nonce
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.decrypt.async = dasync;
+function dasync(sk, pk, ciphertext, nonce, cb) {
+  const done = ret(cb);
+
+  if (!sk || !pk) { return done(new Error('Cannot decrypt without both private and public key.')); }
+
+  let received, isk, ipk;
+  [ ciphertext, nonce, sk, pk ] = cparse(ciphertext, nonce, sk, pk);
+
+  isk = sk;
+  ipk = pk;
+
+  let plaintext;
+  try {
+    plaintext = sodium.crypto_box_open_easy(ciphertext, nonce, ipk, isk);
+  } catch(ex) {
+    return done(new Error('Libsodium error: ' + ex));
+  }
+
+  return done(null, convert(plaintext));
+}
+
+
+/***
  * util.hash
  *
  * hash a payload
@@ -994,10 +1089,12 @@ function cparse() {
  * @function
  * @api private
  *
- * @param {Object} out
+ * @param {Uint8Array|Object} out
  * @returns {Object}
  */
 function convert(out) {
+  if (out instanceof Uint8Array) { return Buffer.from(out); }
+
   Object.keys(out).forEach((k) => { if (out[k] instanceof Uint8Array) out[k] = Buffer.from(out[k]); });
   return out;
 }

@@ -106,7 +106,7 @@ describe('magic tests', () => {
 
               assert.ok(output.signature);
 
-              magic.verify.sign(message, output.sk, output.signature, (err, verified) => {
+              magic.verify.sign(message, seed, output.signature, (err, verified) => {
                 assert.ok(!err);
                 assert.equal(verified, true);
 
@@ -125,7 +125,7 @@ describe('magic tests', () => {
 
               assert.ok(output.signature);
 
-              return magic.verify.sign(message, output.sk, output.signature);
+              return magic.verify.sign(message, seed, output.signature);
             }).then((verified) => {
               assert.equal(verified, true);
 
@@ -314,7 +314,7 @@ describe('magic tests', () => {
 
               assert.ok(output.mac);
 
-              magic.verify.mac(message, output.sk, output.mac, (err, verified) => {
+              magic.verify.mac(message, key, output.mac, (err, verified) => {
                 assert.ok(!err);
                 assert.equal(verified, true);
 
@@ -333,7 +333,7 @@ describe('magic tests', () => {
 
               assert.ok(output.mac);
 
-              return magic.verify.mac(message, output.sk, output.mac);
+              return magic.verify.mac(message, key, output.mac);
             }).then((verified) => {
               assert.equal(verified, true);
 
@@ -499,6 +499,351 @@ describe('magic tests', () => {
       });
     });
 
+
+    describe('async', () => {
+
+      let sk, pk;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => {
+            const keys = sodium.crypto_box_keypair();
+            sk = Buffer.from(keys.privateKey);
+            pk = Buffer.from(keys.publicKey);
+          });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.encrypt.async(message, sk, pk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, sk) === 0);
+              assert.ok(Buffer.compare(output.pk, pk) === 0);
+
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              magic.decrypt.async(sk, pk, output.ciphertext, output.nonce, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.encrypt.async(message, sk, pk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, sk) === 0);
+              assert.ok(Buffer.compare(output.pk, pk) === 0);
+
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              return magic.decrypt.async(sk, pk, output.ciphertext, output.nonce);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const esk = sk.toString('hex');
+            const epk = pk.toString('hex');
+
+            magic.encrypt.async(message, esk, epk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, sk) === 0);
+              assert.ok(Buffer.compare(output.pk, pk) === 0);
+
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              const ect = output.ciphertext.toString('hex');
+              const en  = output.nonce.toString('hex');
+
+              magic.decrypt.async(esk, epk, ect, en, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.encrypt.async(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.pk);
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              magic.decrypt.async(output.sk, output.pk, output.ciphertext, output.nonce, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.encrypt.async(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.pk);
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              return magic.decrypt.async(output.sk, output.pk, output.ciphertext, output.nonce);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.encrypt.async(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'curve25519');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.pk);
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              const esk = output.sk.toString('hex');
+              const epk = output.pk.toString('hex');
+              const ect = output.ciphertext.toString('hex');
+              const en  = output.nonce.toString('hex');
+
+              magic.decrypt.async(esk, epk, ect, en, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error with only private key on encryption', (done) => {
+          magic.encrypt.async(message, sodium.crypto_box_keypair().privateKey, null, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of private and public keys.');
+
+            done();
+          });
+        });
+
+        it('should error with only public key on encryption', (done) => {
+          magic.encrypt.async(message, null, sodium.crypto_box_keypair().publicKey, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of private and public keys.');
+
+            done();
+          });
+        });
+
+        it('should error without keys on decryption', (done) => {
+          magic.encrypt.async(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.pk);
+            assert.ok(output.ciphertext);
+            assert.ok(output.nonce);
+
+            magic.decrypt.async(null, null, output.ciphertext, output.nonce, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without both private and public key.');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without private key on decryption', (done) => {
+          magic.encrypt.async(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.pk);
+            assert.ok(output.ciphertext);
+            assert.ok(output.nonce);
+
+            magic.decrypt.async(null, output.pk, output.ciphertext, output.nonce, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without both private and public key.');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without public key on decryption', (done) => {
+          magic.encrypt.async(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.pk);
+            assert.ok(output.ciphertext);
+            assert.ok(output.nonce);
+
+            magic.decrypt.async(output.sk, null, output.ciphertext, output.nonce, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without both private and public key.');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.encrypt.async(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.pk);
+            assert.ok(output.ciphertext);
+            assert.ok(output.nonce);
+
+            const altered = Buffer.from('b16da2bec401fc7a1d4723025ed2fa122f400631018cae837bade02289ee4e187541f57ee6efbc33ad4e08b5465bb6534d3edc7305c27fa6f61dc165f57f0ef79b64bb3d7409a83d2f196ad2496284d2caf934ad8047a17dfefe5c318afc96cda61e71e06d3ebcb60140a97666d7a0cc2512aa31', 'hex');
+
+            magic.decrypt.async(output.sk, output.pk, altered, output.nonce, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Libsodium error: Error: incorrect key pair for the given ciphertext');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if nonce is altered', (done) => {
+          magic.encrypt.async(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.pk);
+            assert.ok(output.ciphertext);
+            assert.ok(output.nonce);
+
+            const altered = Buffer.from('f5319d1c72f6019683fa7992bb5acf3f540a9ae870f3806f', 'hex');
+
+            magic.decrypt.async(output.sk, output.pk, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Libsodium error: Error: incorrect key pair for the given ciphertext');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if private key is altered', (done) => {
+          magic.encrypt.async(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.pk);
+            assert.ok(output.ciphertext);
+            assert.ok(output.nonce);
+
+            const altered = Buffer.from('a6849c76c3c1e33e9a39109ebcc78876816e8ab5fab9326f8e0654d2fe987686', 'hex');
+
+            magic.decrypt.async(altered, output.pk, output.ciphertext, output.nonce, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Libsodium error: Error: incorrect key pair for the given ciphertext');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if public key is altered', (done) => {
+          magic.encrypt.async(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'curve25519');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.pk);
+            assert.ok(output.ciphertext);
+            assert.ok(output.nonce);
+
+            const altered = Buffer.from('a6849c76c3c1e33e9a39109ebcc78876816e8ab5fab9326f8e0654d2fe987686', 'hex');
+
+            magic.decrypt.async(output.sk, altered, output.ciphertext, output.nonce, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Libsodium error: Error: incorrect key pair for the given ciphertext');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
     describe('hash', () => {
 
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -659,7 +1004,7 @@ describe('magic tests', () => {
 
               assert.ok(output.mac);
 
-              magic.alt.verify.hmacsha256(message, output.sk, output.mac, (err, verified) => {
+              magic.alt.verify.hmacsha256(message, key, output.mac, (err, verified) => {
                 assert.ok(!err);
                 assert.equal(verified, true);
 
@@ -678,7 +1023,7 @@ describe('magic tests', () => {
 
               assert.ok(output.mac);
 
-              return magic.alt.verify.hmacsha256(message, output.sk, output.mac);
+              return magic.alt.verify.hmacsha256(message, key, output.mac);
             }).then((verified) => {
               assert.equal(verified, true);
 
@@ -866,7 +1211,7 @@ describe('magic tests', () => {
 
               assert.ok(output.mac);
 
-              magic.alt.verify.hmacsha512(message, output.sk, output.mac, (err, verified) => {
+              magic.alt.verify.hmacsha512(message, key, output.mac, (err, verified) => {
                 assert.ok(!err);
                 assert.equal(verified, true);
 
@@ -885,7 +1230,7 @@ describe('magic tests', () => {
 
               assert.ok(output.mac);
 
-              return magic.alt.verify.hmacsha512(message, output.sk, output.mac);
+              return magic.alt.verify.hmacsha512(message, key, output.mac);
             }).then((verified) => {
               assert.equal(verified, true);
 
