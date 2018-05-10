@@ -694,7 +694,7 @@ describe('magic tests', () => {
 
             magic.decrypt.async(null, null, output.ciphertext, output.nonce, (err, plaintext) => {
               assert.ok(err);
-              assert.equal(err.message, 'Cannot decrypt without both private and public key');
+              assert.equal(err.message, 'Cannot decrypt without both private and public keys');
 
               done();
             });
@@ -716,7 +716,7 @@ describe('magic tests', () => {
 
             magic.decrypt.async(null, output.pk, output.ciphertext, output.nonce, (err, plaintext) => {
               assert.ok(err);
-              assert.equal(err.message, 'Cannot decrypt without both private and public key');
+              assert.equal(err.message, 'Cannot decrypt without both private and public keys');
 
               done();
             });
@@ -738,7 +738,7 @@ describe('magic tests', () => {
 
             magic.decrypt.async(output.sk, null, output.ciphertext, output.nonce, (err, plaintext) => {
               assert.ok(err);
-              assert.equal(err.message, 'Cannot decrypt without both private and public key');
+              assert.equal(err.message, 'Cannot decrypt without both private and public keys');
 
               done();
             });
@@ -1566,6 +1566,3004 @@ describe('magic tests', () => {
         });
       });
     });
+
+
+    describe('aes128cbc_hmacsha256', () => {
+
+      let ekey, akey;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => {
+            ekey = crypto.randomBytes(16);
+            akey = crypto.randomBytes(32);
+          });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha256(message, ekey, akey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes128cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha256(message, ekey, akey).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes128cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const eekey = ekey.toString('hex');
+            const eakey = akey.toString('hex');
+
+            magic.alt.encrypt.aes128cbc_hmacsha256(message, eekey, eakey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const emac = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes128cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha256(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eekey = output.sek.toString('hex');
+              const eakey = output.sak.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const emac  = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes128cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error with only encryption key on encryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha256(message, crypto.randomBytes(16), null, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error with only authentication key on encryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha256(message, null, crypto.randomBytes(32), (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error without keys on decryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes128cbc_hmacsha256(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without encryption key on decryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without authentication key on decryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes128cbc_hmacsha256(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128cbc-hmacsha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128cbc-hmacsha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if mac is altered', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128cbc-hmacsha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('1cf20c1e94ac59f3ac17e029bc05190f4f5d34d9ead66ed0315644e668dc9cab', 'hex');
+
+            magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
+    describe('aes128cbc_hmacsha384', () => {
+
+      let ekey, akey;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => {
+            ekey = crypto.randomBytes(16);
+            akey = crypto.randomBytes(48);
+          });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha384(message, ekey, akey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes128cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha384(message, ekey, akey).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes128cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const eekey = ekey.toString('hex');
+            const eakey = akey.toString('hex');
+
+            magic.alt.encrypt.aes128cbc_hmacsha384(message, eekey, eakey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const emac = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes128cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha384(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eekey = output.sek.toString('hex');
+              const eakey = output.sak.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const emac  = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes128cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error with only encryption key on encryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha384(message, crypto.randomBytes(16), null, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error with only authentication key on encryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha384(message, null, crypto.randomBytes(48), (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error without keys on decryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes128cbc_hmacsha384(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without encryption key on decryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without authentication key on decryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes128cbc_hmacsha384(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128cbc-hmacsha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128cbc-hmacsha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if mac is altered', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128cbc-hmacsha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9cba256455c5a1328cfe12578bc1558ef43974a2fa373074ed8091a6c61b63da0c58c6ee31e249a063baf0223e25c6d0', 'hex');
+
+            magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
+    describe('aes128cbc_hmacsha512', () => {
+
+      let ekey, akey;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => {
+            ekey = crypto.randomBytes(16);
+            akey = crypto.randomBytes(64);
+          });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha512(message, ekey, akey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes128cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha512(message, ekey, akey).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes128cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const eekey = ekey.toString('hex');
+            const eakey = akey.toString('hex');
+
+            magic.alt.encrypt.aes128cbc_hmacsha512(message, eekey, eakey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const emac = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes128cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha512(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eekey = output.sek.toString('hex');
+              const eakey = output.sak.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const emac  = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes128cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error with only encryption key on encryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha512(message, crypto.randomBytes(16), null, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error with only authentication key on encryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha512(message, null, crypto.randomBytes(64), (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error without keys on decryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes128cbc_hmacsha512(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without encryption key on decryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without authentication key on decryption', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes128cbc_hmacsha512(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128cbc-hmacsha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128cbc-hmacsha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if mac is altered', (done) => {
+          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128cbc-hmacsha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('42f77f17198794a8f02480775212498a24a3d88d0e0aecabf97098bb2bcd1ac8fda5943d434e5c66f7c570a36d569439023a97c820917dd5d28dfe513756091c', 'hex');
+
+            magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
+    describe('aes192cbc_hmacsha256', () => {
+
+      let ekey, akey;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => {
+            ekey = crypto.randomBytes(24);
+            akey = crypto.randomBytes(32);
+          });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha256(message, ekey, akey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes192cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha256(message, ekey, akey).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes192cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const eekey = ekey.toString('hex');
+            const eakey = akey.toString('hex');
+
+            magic.alt.encrypt.aes192cbc_hmacsha256(message, eekey, eakey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const emac = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes192cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha256(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eekey = output.sek.toString('hex');
+              const eakey = output.sak.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const emac  = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes192cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error with only encryption key on encryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha256(message, crypto.randomBytes(24), null, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error with only authentication key on encryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha256(message, null, crypto.randomBytes(32), (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error without keys on decryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes192cbc_hmacsha256(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without encryption key on decryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without authentication key on decryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes192cbc_hmacsha256(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192cbc-hmacsha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192cbc-hmacsha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if mac is altered', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192cbc-hmacsha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('1cf20c1e94ac59f3ac17e029bc05190f4f5d34d9ead66ed0315644e668dc9cab', 'hex');
+
+            magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
+    describe('aes192cbc_hmacsha384', () => {
+
+      let ekey, akey;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => {
+            ekey = crypto.randomBytes(24);
+            akey = crypto.randomBytes(48);
+          });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha384(message, ekey, akey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes192cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha384(message, ekey, akey).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes192cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const eekey = ekey.toString('hex');
+            const eakey = akey.toString('hex');
+
+            magic.alt.encrypt.aes192cbc_hmacsha384(message, eekey, eakey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const emac = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes192cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha384(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eekey = output.sek.toString('hex');
+              const eakey = output.sak.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const emac  = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes192cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error with only encryption key on encryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha384(message, crypto.randomBytes(24), null, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error with only authentication key on encryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha384(message, null, crypto.randomBytes(48), (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error without keys on decryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes192cbc_hmacsha384(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without encryption key on decryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without authentication key on decryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes192cbc_hmacsha384(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192cbc-hmacsha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192cbc-hmacsha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if mac is altered', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192cbc-hmacsha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9cba256455c5a1328cfe12578bc1558ef43974a2fa373074ed8091a6c61b63da0c58c6ee31e249a063baf0223e25c6d0', 'hex');
+
+            magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
+    describe('aes192cbc_hmacsha512', () => {
+
+      let ekey, akey;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => {
+            ekey = crypto.randomBytes(24);
+            akey = crypto.randomBytes(64);
+          });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha512(message, ekey, akey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes192cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha512(message, ekey, akey).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes192cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const eekey = ekey.toString('hex');
+            const eakey = akey.toString('hex');
+
+            magic.alt.encrypt.aes192cbc_hmacsha512(message, eekey, eakey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const emac = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes192cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha512(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eekey = output.sek.toString('hex');
+              const eakey = output.sak.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const emac  = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes192cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error with only encryption key on encryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha512(message, crypto.randomBytes(24), null, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error with only authentication key on encryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha512(message, null, crypto.randomBytes(64), (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error without keys on decryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes192cbc_hmacsha512(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without encryption key on decryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without authentication key on decryption', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes192cbc_hmacsha512(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192cbc-hmacsha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192cbc-hmacsha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if mac is altered', (done) => {
+          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192cbc-hmacsha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('42f77f17198794a8f02480775212498a24a3d88d0e0aecabf97098bb2bcd1ac8fda5943d434e5c66f7c570a36d569439023a97c820917dd5d28dfe513756091c', 'hex');
+
+            magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
+    describe('aes256cbc_hmacsha256', () => {
+
+      let ekey, akey;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => {
+            ekey = crypto.randomBytes(32);
+            akey = crypto.randomBytes(32);
+          });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha256(message, ekey, akey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes256cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha256(message, ekey, akey).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes256cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const eekey = ekey.toString('hex');
+            const eakey = akey.toString('hex');
+
+            magic.alt.encrypt.aes256cbc_hmacsha256(message, eekey, eakey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const emac = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes256cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha256(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eekey = output.sek.toString('hex');
+              const eakey = output.sak.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const emac  = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes256cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error with only encryption key on encryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha256(message, crypto.randomBytes(32), null, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error with only authentication key on encryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha256(message, null, crypto.randomBytes(32), (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error without keys on decryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes256cbc_hmacsha256(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without encryption key on decryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without authentication key on decryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes256cbc_hmacsha256(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256cbc-hmacsha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256cbc-hmacsha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if mac is altered', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256cbc-hmacsha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('1cf20c1e94ac59f3ac17e029bc05190f4f5d34d9ead66ed0315644e668dc9cab', 'hex');
+
+            magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
+    describe('aes256cbc_hmacsha384', () => {
+
+      let ekey, akey;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => {
+            ekey = crypto.randomBytes(32);
+            akey = crypto.randomBytes(48);
+          });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha384(message, ekey, akey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes256cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha384(message, ekey, akey).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes256cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const eekey = ekey.toString('hex');
+            const eakey = akey.toString('hex');
+
+            magic.alt.encrypt.aes256cbc_hmacsha384(message, eekey, eakey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const emac = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes256cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha384(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eekey = output.sek.toString('hex');
+              const eakey = output.sak.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const emac  = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes256cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error with only encryption key on encryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha384(message, crypto.randomBytes(32), null, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error with only authentication key on encryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha384(message, null, crypto.randomBytes(48), (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error without keys on decryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes256cbc_hmacsha384(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without encryption key on decryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without authentication key on decryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes256cbc_hmacsha384(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256cbc-hmacsha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256cbc-hmacsha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if mac is altered', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256cbc-hmacsha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9cba256455c5a1328cfe12578bc1558ef43974a2fa373074ed8091a6c61b63da0c58c6ee31e249a063baf0223e25c6d0', 'hex');
+
+            magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
+    describe('aes256cbc_hmacsha512', () => {
+
+      let ekey, akey;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => {
+            ekey = crypto.randomBytes(32);
+            akey = crypto.randomBytes(64);
+          });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha512(message, ekey, akey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes256cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha512(message, ekey, akey).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes256cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const eekey = ekey.toString('hex');
+            const eakey = akey.toString('hex');
+
+            magic.alt.encrypt.aes256cbc_hmacsha512(message, eekey, eakey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sek, ekey) === 0);
+              assert.ok(Buffer.compare(output.sak, akey) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const emac = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes256cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha512(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              return magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+              const eekey = output.sek.toString('hex');
+              const eakey = output.sak.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const emac  = output.mac.toString('hex');
+
+              magic.alt.decrypt.aes256cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error with only encryption key on encryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha512(message, crypto.randomBytes(32), null, (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error with only authentication key on encryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha512(message, null, crypto.randomBytes(64), (err, output) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
+
+            done();
+          });
+        });
+
+        it('should error without keys on decryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes256cbc_hmacsha512(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without encryption key on decryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should error without authentication key on decryption', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256cbc-hmacsha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sek);
+              assert.ok(output.sak);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.mac);
+
+            magic.alt.decrypt.aes256cbc_hmacsha512(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256cbc-hmacsha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256cbc-hmacsha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if mac is altered', (done) => {
+          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256cbc-hmacsha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sek);
+            assert.ok(output.sak);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.mac);
+
+            const altered = Buffer.from('42f77f17198794a8f02480775212498a24a3d88d0e0aecabf97098bb2bcd1ac8fda5943d434e5c66f7c570a36d569439023a97c820917dd5d28dfe513756091c', 'hex');
+
+            magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
 
     describe('sha256', () => {
 

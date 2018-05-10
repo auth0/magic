@@ -369,8 +369,7 @@ function cbc(digest, keysize) {
       const cipher = crypto.createCipheriv('aes-' + keysize + '-cbc', iekey, iv);
       const hmac   = crypto.createHmac(digest, iakey);
 
-      cipher.update(payload);
-      ciphertext = cipher.final();
+      ciphertext = Buffer.concat([ cipher.update(payload), cipher.final() ]);
 
       hmac.update(Buffer.concat([ iv, ciphertext ]));
       mac = hmac.digest();
@@ -383,7 +382,7 @@ function cbc(digest, keysize) {
       sek:        ekey,
       sak:        akey,
       payload:    payload,
-      iv:         iv
+      iv:         iv,
       ciphertext: ciphertext,
       mac:        mac
     }));
@@ -441,7 +440,7 @@ function dcbc(digest, keysize) {
       hmac.update(Buffer.concat([ iv, ciphertext ]));
       const received = hmac.digest();
 
-      if (!cnstcmp(received, mac)) { return done(new Error('Invalid mac')); }
+      if (!cnstcomp(received, mac)) { return done(new Error('Invalid mac')); }
 
       plaintext = Buffer.concat([ cipher.update(ciphertext), cipher.final() ]);
     } catch (ex) {
@@ -721,7 +720,7 @@ module.exports.decrypt.async = dasync;
 function dasync(sk, pk, ciphertext, nonce, cb) {
   const done = ret(cb);
 
-  if (!sk || !pk) { return done(new Error('Cannot decrypt without both private and public key')); }
+  if (!sk || !pk) { return done(new Error('Cannot decrypt without both private and public keys')); }
 
   let isk, ipk;
   [ ciphertext, nonce, sk, pk ] = cparse(ciphertext, nonce, sk, pk);
