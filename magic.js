@@ -398,6 +398,7 @@ function cbc(digest, keysize) {
  * @function
  * @api private
  * @param {String} digest
+ * @param {String} keysize
  * @returns {Function}
  */
 function dcbc(digest, keysize) {
@@ -427,7 +428,7 @@ function dcbc(digest, keysize) {
     if (!ekey || !akey) { return done(new Error('Cannot decrypt without encryption and authentication keys')); }
 
     let iekey, iakey;
-    [ iv, ciphertext, mac, ekey, akey ] = cparse(iv, ciphertext, mac, ekey, akey);
+    [ ekey, akey, iv, ciphertext, mac ] = cparse(ekey, akey, iv, ciphertext, mac);
 
     iekey = ekey;
     iakey = akey;
@@ -441,6 +442,125 @@ function dcbc(digest, keysize) {
       const received = hmac.digest();
 
       if (!cnstcomp(received, mac)) { return done(new Error('Invalid mac')); }
+
+      plaintext = Buffer.concat([ cipher.update(ciphertext), cipher.final() ]);
+    } catch (ex) {
+      return done(new Error('Crypto error: ' + ex));
+    }
+
+    return done(null, convert(plaintext));
+  }
+}
+
+
+/***
+ * gcm
+ *
+ * aes-gcm encryption constructor
+ *
+ * @function
+ * @api private
+ * @param {String} keysize
+ * @returns {Function}
+ */
+function gcm(keysize) {
+
+  if (AESKEYS.indexOf(keysize) === -1) { throw new Error('Invalid key size'); }
+
+  /***
+   * `lambda`
+   *
+   * aead encrypt a plaintext
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} message
+   * @param {String|Buffer} key
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  return (message, key, cb) => {
+    if (typeof key === 'function') {
+      cb  = key;
+      key = null;
+    }
+    const done = ret(cb);
+
+    if (!key) { key = crypto.randomBytes(keysize / 8); }
+
+    let payload, ikey;
+    [ payload ] = iparse(message);
+    [ key ]     = cparse(key);
+
+    ikey = key;
+
+    let iv, ciphertext, tag;
+    try {
+      iv = crypto.randomBytes(12);
+
+      const cipher = crypto.createCipheriv('aes-' + keysize + '-gcm', key, iv);
+      ciphertext   = Buffer.concat([ cipher.update(payload), cipher.final() ]);
+      tag          = cipher.getAuthTag();
+    } catch (ex) {
+      return done(new Error('Crypto error: ' + ex));
+    }
+
+    return done(null, convert({
+      alg:        'aes' + keysize + 'gcm',
+      sk:         key,
+      payload:    payload,
+      iv:         iv,
+      ciphertext: ciphertext,
+      tag:        tag
+    }));
+  }
+}
+
+
+/***
+ * dgcm
+ *
+ * aes-gcm decryption constructor
+ *
+ * @function
+ * @api private
+ * @param {String} keysize
+ * @returns {Function}
+ */
+function dgcm(keysize) {
+
+  if (AESKEYS.indexOf(keysize) === -1) { throw new Error('Invalid key size'); }
+
+  /***
+   * `lambda`
+   *
+   * aead decrypt a ciphertext
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} key
+   * @param {String|Buffer} iv
+   * @param {String|Buffer} ciphertext
+   * @param {String|Buffer} tag
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  return (key, iv, ciphertext, tag, cb) => {
+    const done = ret(cb);
+
+    if (!key) { return done(new Error('Cannot decrypt without a key')); }
+
+    let ikey;
+    [ key, iv, ciphertext, tag ] = cparse(key, iv, ciphertext, tag);
+
+    ikey = key;
+
+    let plaintext;
+    try {
+      const cipher = crypto.createDecipheriv('aes-' + keysize + '-gcm', ikey, iv);
+      cipher.setAuthTag(tag);
 
       plaintext = Buffer.concat([ cipher.update(ciphertext), cipher.final() ]);
     } catch (ex) {
@@ -1533,6 +1653,105 @@ module.exports.alt.encrypt.aes256cbc_hmacsha512 = cbc('sha512', 256);
  * @returns {Callback|Promise}
  */
 module.exports.alt.decrypt.aes256cbc_hmacsha512 = dcbc('sha512', 256);
+
+
+/***
+ * alt.encrypt.aes128gcm
+ *
+ * aead encrypt a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes128gcm = gcm(128);
+
+
+/***
+ * alt.decrypt.aes128gcm
+ *
+ * aead decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} key
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes128gcm = dgcm(128);
+
+
+/***
+ * alt.encrypt.aes192gcm
+ *
+ * aead encrypt a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes192gcm = gcm(192);
+
+
+/***
+ * alt.decrypt.aes192gcm
+ *
+ * aead decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} key
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes192gcm = dgcm(192);
+
+
+/***
+ * alt.encrypt.aes256gcm
+ *
+ * aead encrypt a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} key
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes256gcm = gcm(256);
+
+
+/***
+ * alt.decrypt.aes256gcm
+ *
+ * aead decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} key
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes256gcm = dgcm(256);
 
 
 /***

@@ -4565,6 +4565,768 @@ describe('magic tests', () => {
     });
 
 
+    describe('aes128gcm', () => {
+
+      let key;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => { key = crypto.randomBytes(16); });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes128gcm(message, key, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, key) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              magic.alt.decrypt.aes128gcm(key, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes128gcm(message, key).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, key) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              return magic.alt.decrypt.aes128gcm(key, output.iv, output.ciphertext, output.tag);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const ekey = key.toString('hex');
+
+            magic.alt.encrypt.aes128gcm(message, ekey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, key) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const etag = output.tag.toString('hex');
+
+              magic.alt.decrypt.aes128gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes128gcm(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              magic.alt.decrypt.aes128gcm(output.sk, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes128gcm(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              return magic.alt.decrypt.aes128gcm(output.sk, output.iv, output.ciphertext, output.tag);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes128gcm(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes128gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              const ekey  = output.sk.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const etag  = output.tag.toString('hex');
+
+              magic.alt.decrypt.aes128gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error without key on decryption', (done) => {
+          magic.alt.encrypt.aes128gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            magic.alt.decrypt.aes128gcm(null, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without a key');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes128gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes128gcm(output.sk, altered, output.ciphertext, output.tag, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes128gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes128gcm(output.sk, output.iv, altered, output.tag, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if tag is altered', (done) => {
+          magic.alt.encrypt.aes128gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes128gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            const altered = Buffer.from('773280e4c1df5869284bb570e334864e', 'hex');
+
+            magic.alt.decrypt.aes128gcm(output.sk, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
+    describe('aes192gcm', () => {
+
+      let key;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => { key = crypto.randomBytes(24); });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes192gcm(message, key, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, key) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              magic.alt.decrypt.aes192gcm(key, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes192gcm(message, key).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, key) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              return magic.alt.decrypt.aes192gcm(key, output.iv, output.ciphertext, output.tag);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const ekey = key.toString('hex');
+
+            magic.alt.encrypt.aes192gcm(message, ekey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, key) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const etag = output.tag.toString('hex');
+
+              magic.alt.decrypt.aes192gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes192gcm(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              magic.alt.decrypt.aes192gcm(output.sk, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes192gcm(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              return magic.alt.decrypt.aes192gcm(output.sk, output.iv, output.ciphertext, output.tag);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes192gcm(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes192gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              const ekey  = output.sk.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const etag  = output.tag.toString('hex');
+
+              magic.alt.decrypt.aes192gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error without key on decryption', (done) => {
+          magic.alt.encrypt.aes192gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            magic.alt.decrypt.aes192gcm(null, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without a key');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes192gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            const altered = Buffer.from('4cc885d1925fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes192gcm(output.sk, altered, output.ciphertext, output.tag, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes192gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes192gcm(output.sk, output.iv, altered, output.tag, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if tag is altered', (done) => {
+          magic.alt.encrypt.aes192gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes192gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            const altered = Buffer.from('773280e4c1df5869284bb570e334864e', 'hex');
+
+            magic.alt.decrypt.aes192gcm(output.sk, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
+    describe('aes256gcm', () => {
+
+      let key;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation', () => {
+
+          beforeEach(() => { key = crypto.randomBytes(32); });
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes256gcm(message, key, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, key) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              magic.alt.decrypt.aes256gcm(key, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes256gcm(message, key).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, key) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              return magic.alt.decrypt.aes256gcm(key, output.iv, output.ciphertext, output.tag);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            const ekey = key.toString('hex');
+
+            magic.alt.encrypt.aes256gcm(message, ekey, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(Buffer.compare(output.sk, key) === 0);
+
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              const eiv  = output.iv.toString('hex');
+              const ect  = output.ciphertext.toString('hex');
+              const etag = output.tag.toString('hex');
+
+              magic.alt.decrypt.aes256gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+            magic.alt.encrypt.aes256gcm(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              magic.alt.decrypt.aes256gcm(output.sk, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+
+          it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+            magic.alt.encrypt.aes256gcm(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              return magic.alt.decrypt.aes256gcm(output.sk, output.iv, output.ciphertext, output.tag);
+            }).then((plaintext) => {
+              assert.equal(plaintext.toString('utf-8'), message);
+
+              done();
+            }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+            magic.alt.encrypt.aes256gcm(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'aes256gcm');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.iv);
+              assert.ok(output.ciphertext);
+              assert.ok(output.tag);
+
+              const ekey  = output.sk.toString('hex');
+              const eiv   = output.iv.toString('hex');
+              const ect   = output.ciphertext.toString('hex');
+              const etag  = output.tag.toString('hex');
+
+              magic.alt.decrypt.aes256gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+                assert.ok(!err);
+                assert.equal(plaintext.toString('utf-8'), message);
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error without key on decryption', (done) => {
+          magic.alt.encrypt.aes256gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            magic.alt.decrypt.aes256gcm(null, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot decrypt without a key');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if iv is altered', (done) => {
+          magic.alt.encrypt.aes256gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            const altered = Buffer.from('4cc885d2565fa7253eaf0d8d028e9587', 'hex');
+
+            magic.alt.decrypt.aes256gcm(output.sk, altered, output.ciphertext, output.tag, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if ciphertext is altered', (done) => {
+          magic.alt.encrypt.aes256gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
+
+            magic.alt.decrypt.aes256gcm(output.sk, output.iv, altered, output.tag, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if tag is altered', (done) => {
+          magic.alt.encrypt.aes256gcm(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'aes256gcm');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.iv);
+            assert.ok(output.ciphertext);
+            assert.ok(output.tag);
+
+            const altered = Buffer.from('773280e4c1df5869284bb570e334864e', 'hex');
+
+            magic.alt.decrypt.aes256gcm(output.sk, output.iv, output.ciphertext, altered, (err, plaintext) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
     describe('sha256', () => {
 
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
