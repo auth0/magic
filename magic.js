@@ -6,6 +6,7 @@ const cp     = require('child_process');
 // Constants
 
 const HASHBYTES = { sha256: 32, sha384: 48, sha512: 64 };
+const AESKEYS   = [ 128, 192, 256 ];
 
 
 
@@ -305,6 +306,149 @@ function vmac(algorithm) {
     }
 
     return done(null, verified);
+  }
+}
+
+
+/***
+ * cbc
+ *
+ * aes-cbc-hmac encryption constructor
+ *
+ * @function
+ * @api private
+ * @param {String} digest
+ * @param {String} keysize
+ * @returns {Function}
+ */
+function cbc(digest, keysize) {
+
+  if (Object.keys(HASHBYTES).indexOf(digest) === -1) { throw new Error('Unknown hashing algorithm'); }
+  if (AESKEYS.indexOf(keysize) === -1) { throw new Error('Invalid key size'); }
+
+  /***
+   * `lambda`
+   *
+   * encrypt-then-authenticate a plaintext
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} message
+   * @param {String|Buffer} ekey
+   * @param {String|Buffer} akey
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  return (message, ekey, akey, cb) => {
+    if (typeof ekey === 'function') {
+      cb   = ekey;
+      ekey = null;
+      akey = null;
+    }
+    const done = ret(cb);
+
+    if (!!ekey ^ !!akey) { return done(new Error('Requires both or neither of encryption and authentication keys')); }
+
+    let payload, iekey, iakey;
+    [ payload ]    = iparse(message);
+    [ ekey, akey ] = cparse(ekey, akey);
+
+    if (!ekey) {
+      ekey = crypto.randomBytes(keysize / 8);
+      akey = crypto.randomBytes(HASHBYTES[digest]);
+    }
+
+    iekey = ekey;
+    iakey = akey;
+
+    let iv, ciphertext, mac;
+    try {
+      iv = crypto.randomBytes(16);
+
+      const cipher = crypto.createCipheriv('aes-' + keysize + '-cbc', iekey, iv);
+      const hmac   = crypto.createHmac(digest, iakey);
+
+      cipher.update(payload);
+      ciphertext = cipher.final();
+
+      hmac.update(Buffer.concat([ iv, ciphertext ]));
+      mac = hmac.digest();
+    } catch (ex) {
+      return done(new Error('Crypto error: ' + ex));
+    }
+
+    return done(null, convert({
+      alg:        'aes' + keysize + 'cbc-hmac' + digest,
+      sek:        ekey,
+      sak:        akey,
+      payload:    payload,
+      iv:         iv
+      ciphertext: ciphertext,
+      mac:        mac
+    }));
+  }
+}
+
+
+/***
+ * dcbc
+ *
+ * aes-cbc-hmac decryption constructor
+ *
+ * @function
+ * @api private
+ * @param {String} digest
+ * @returns {Function}
+ */
+function dcbc(digest, keysize) {
+
+  if (Object.keys(HASHBYTES).indexOf(digest) === -1) { throw new Error('Unknown hashing algorithm'); }
+  if (AESKEYS.indexOf(keysize) === -1) { throw new Error('Invalid key size'); }
+
+  /***
+   * `lambda`
+   *
+   * verify-then-decrypt a ciphertext
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} ekey
+   * @param {String|Buffer} akey
+   * @param {String|Buffer} iv
+   * @param {String|Buffer} ciphertext
+   * @param {String|Buffer} mac
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  return (ekey, akey, iv, ciphertext, mac, cb) => {
+    const done = ret(cb);
+
+    if (!ekey || !akey) { return done(new Error('Cannot decrypt without encryption and authentication keys')); }
+
+    let iekey, iakey;
+    [ iv, ciphertext, mac, ekey, akey ] = cparse(iv, ciphertext, mac, ekey, akey);
+
+    iekey = ekey;
+    iakey = akey;
+
+    let plaintext;
+    try {
+      const cipher = crypto.createDecipheriv('aes-' + keysize + '-cbc', iekey, iv);
+      const hmac   = crypto.createHmac(digest, iakey);
+
+      hmac.update(Buffer.concat([ iv, ciphertext ]));
+      const received = hmac.digest();
+
+      if (!cnstcmp(received, mac)) { return done(new Error('Invalid mac')); }
+
+      plaintext = Buffer.concat([ cipher.update(ciphertext), cipher.final() ]);
+    } catch (ex) {
+      return done(new Error('Crypto error: ' + ex));
+    }
+
+    return done(null, convert(plaintext));
   }
 }
 
@@ -1066,6 +1210,330 @@ module.exports.alt.auth.hmacsha512 = mac('sha512');
  * @returns {Callback|Promise}
  */
 module.exports.alt.verify.hmacsha512 = vmac('sha512');
+
+
+/***
+ * alt.encrypt.aes128cbc_hmacsha256
+ *
+ * encrypt-then-authenticate a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes128cbc_hmacsha256 = cbc('sha256', 128);
+
+
+/***
+ * alt.decrypt.aes128cbc_hmacsha256
+ *
+ * verify-then-decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes128cbc_hmacsha256 = dcbc('sha256', 128);
+
+
+/***
+ * alt.encrypt.aes128cbc_hmacsha384
+ *
+ * encrypt-then-authenticate a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes128cbc_hmacsha384 = cbc('sha384', 128);
+
+
+/***
+ * alt.decrypt.aes128cbc_hmacsha384
+ *
+ * verify-then-decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes128cbc_hmacsha384 = dcbc('sha384', 128);
+
+
+/***
+ * alt.encrypt.aes128cbc_hmacsha512
+ *
+ * encrypt-then-authenticate a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes128cbc_hmacsha512 = cbc('sha512', 128);
+
+
+/***
+ * alt.decrypt.aes128cbc_hmacsha512
+ *
+ * verify-then-decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes128cbc_hmacsha512 = dcbc('sha512', 128);
+
+
+/***
+ * alt.encrypt.aes192cbc_hmacsha256
+ *
+ * encrypt-then-authenticate a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes192cbc_hmacsha256 = cbc('sha256', 192);
+
+
+/***
+ * alt.decrypt.aes192cbc_hmacsha256
+ *
+ * verify-then-decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes192cbc_hmacsha256 = dcbc('sha256', 192);
+
+
+/***
+ * alt.encrypt.aes192cbc_hmacsha384
+ *
+ * encrypt-then-authenticate a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes192cbc_hmacsha384 = cbc('sha384', 192);
+
+
+/***
+ * alt.decrypt.aes192cbc_hmacsha384
+ *
+ * verify-then-decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes192cbc_hmacsha384 = dcbc('sha384', 192);
+
+
+/***
+ * alt.encrypt.aes192cbc_hmacsha512
+ *
+ * encrypt-then-authenticate a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes192cbc_hmacsha512 = cbc('sha512', 192);
+
+
+/***
+ * alt.decrypt.aes192cbc_hmacsha512
+ *
+ * verify-then-decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes192cbc_hmacsha512 = dcbc('sha512', 192);
+
+
+/***
+ * alt.encrypt.aes256cbc_hmacsha256
+ *
+ * encrypt-then-authenticate a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes256cbc_hmacsha256 = cbc('sha256', 256);
+
+
+/***
+ * alt.decrypt.aes256cbc_hmacsha256
+ *
+ * verify-then-decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes256cbc_hmacsha256 = dcbc('sha256', 256);
+
+
+/***
+ * alt.encrypt.aes256cbc_hmacsha384
+ *
+ * encrypt-then-authenticate a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes256cbc_hmacsha384 = cbc('sha384', 256);
+
+
+/***
+ * alt.decrypt.aes256cbc_hmacsha384
+ *
+ * verify-then-decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes256cbc_hmacsha384 = dcbc('sha384', 256);
+
+
+/***
+ * alt.encrypt.aes256cbc_hmacsha512
+ *
+ * encrypt-then-authenticate a plaintext
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.encrypt.aes256cbc_hmacsha512 = cbc('sha512', 256);
+
+
+/***
+ * alt.decrypt.aes256cbc_hmacsha512
+ *
+ * verify-then-decrypt a ciphertext
+ *
+ * @function
+ * @api pubic
+ *
+ * @param {String|Buffer} ekey
+ * @param {String|Buffer} akey
+ * @param {String|Buffer} iv
+ * @param {String|Buffer} ciphertext
+ * @param {String|Buffer} mac
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.decrypt.aes256cbc_hmacsha512 = dcbc('sha512', 256);
 
 
 /***
