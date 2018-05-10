@@ -517,6 +517,228 @@ Implements `HMAC-SHA256` using OpenSSL through `crypto`. An alterative to `magic
 
 Implements `HMAC-SHA512` using OpenSSL through `crypto`. An alterative to `magic.auth.mac`.
 
+#### magic.alt.encrypt.aes128cbc_hmacsha256 | magic.alt.decrypt.aes128cbc_hmacsha256
+
+Implements `AES128CBC-SHA256` using OpenSSL through `crypto`. AES-CBC is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf) and provides authenticated eencryption using the industry standard symmetric encryption and authentication schemes, in an encrypt-than-authenticate construction.
+
+```js
+// key generation
+
+// callback
+magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:        'aes128cbc-hmacsha256',
+  //   sek:        <Buffer 61 d6 4b 6a 70 84 a0 ... >,
+  //   sak:        <Buffer 03 ce db e3 d2 d4 17 ... >,
+  //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+  //   iv:         <Buffer d4 84 14 29 ae a4 11 ... >,
+  //   ciphertext: <Buffer 75 f8 cf 94 07 81 46 ... >,
+  //   mac:        <Buffer a4 40 4b 6c 1b 7f d8 ... > }
+});
+
+// promise
+magic.alt.encrypt.aes128cbc_hmacsha256(message)
+  .then((output) => {
+    console.log(output);
+    // { alg:        'aes128cbc-hmacsha256',
+    //   sek:        <Buffer 61 d6 4b 6a 70 84 a0 ... >,
+    //   sak:        <Buffer 03 ce db e3 d2 d4 17 ... >,
+    //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+    //   iv:         <Buffer d4 84 14 29 ae a4 11 ... >,
+    //   ciphertext: <Buffer 75 f8 cf 94 07 81 46 ... >,
+    //   mac:        <Buffer a4 40 4b 6c 1b 7f d8 ... > }
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied key
+const sek = '61d64b...';
+const sak = '03cedb...';
+
+// callback
+magic.alt.encrypt.aes128cbc_hmacsha256(message, sek, sak, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:        'aes128cbc-hmacsha256',
+  //   sek:        <Buffer 61 d6 4b 6a 70 84 a0 ... >,
+  //   sak:        <Buffer 03 ce db e3 d2 d4 17 ... >,
+  //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+  //   iv:         <Buffer d4 84 14 29 ae a4 11 ... >,
+  //   ciphertext: <Buffer 75 f8 cf 94 07 81 46 ... >,
+  //   mac:        <Buffer a4 40 4b 6c 1b 7f d8 ... > }
+});
+
+// promise
+magic.alt.encrypt.aes128cbc_hmacsha256(message, sek, sak)
+  .then((output) => {
+    console.log(output);
+    // { alg:        'aes128cbc-hmacsha256',
+    //   sek:        <Buffer 61 d6 4b 6a 70 84 a0 ... >,
+    //   sak:        <Buffer 03 ce db e3 d2 d4 17 ... >,
+    //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+    //   iv:         <Buffer d4 84 14 29 ae a4 11 ... >,
+    //   ciphertext: <Buffer 75 f8 cf 94 07 81 46 ... >,
+    //   mac:        <Buffer a4 40 4b 6c 1b 7f d8 ... > }
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+Decryption then returns the plaintext directly, without the metadata.
+
+```js
+const sek = '61d64b...';
+const sak = '03cedb...';
+
+// callback
+magic.alt.decrypt.aes128cbc_hmacsha256(sek, sak, iv, ciphertext, mac, (err, plaintext) => {
+  if (err) { return cb(err); }
+  console.log(plaintext);
+  // <Buffer 41 20 73 63 72 65 61 ... >
+});
+
+// promise
+magic.alt.decrypt.aes128cbc_hmacsha256(sek, sak, iv, ciphertext, mac)
+  .then((plaintext) => {
+    console.log(plaintext);
+    // <Buffer 41 20 73 63 72 65 61 ... >
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+#### magic.alt.encrypt.aes128cbc_hmacsha384 | magic.alt.decrypt.aes128cbc_hmacsha384
+
+Implements `AES128CBC-SHA384` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
+
+#### magic.alt.encrypt.aes128cbc_hmacsha512 | magic.alt.decrypt.aes128cbc_hmacsha512
+
+Implements `AES128CBC-SHA512` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
+
+#### magic.alt.encrypt.aes192cbc_hmacsha256 | magic.alt.decrypt.aes192cbc_hmacsha256
+
+Implements `AES192CBC-SHA256` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
+
+#### magic.alt.encrypt.aes192cbc_hmacsha384 | magic.alt.decrypt.aes192cbc_hmacsha384
+
+Implements `AES192CBC-SHA384` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
+
+#### magic.alt.encrypt.aes192cbc_hmacsha512 | magic.alt.decrypt.aes192cbc_hmacsha512
+
+Implements `AES192CBC-SHA512` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
+
+#### magic.alt.encrypt.aes512cbc_hmacsha256 | magic.alt.decrypt.aes512cbc_hmacsha256
+
+Implements `AES256CBC-SHA256` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
+
+#### magic.alt.encrypt.aes512cbc_hmacsha384 | magic.alt.decrypt.aes512cbc_hmacsha384
+
+Implements `AES256CBC-SHA384` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
+
+#### magic.alt.encrypt.aes512cbc_hmacsha512 | magic.alt.decrypt.aes512cbc_hmacsha512
+
+Implements `AES256CBC-SHA512` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
+
+#### magic.alt.encrypt.aes128gcm | magic.alt.decrypt.aes128gcm
+
+Implements `AES128GCM` using OpenSSL through `crypto`. AES-GCM is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf) and provides authenticated encryption using the industry standard symmetric encryption scheme with an authenticated block cipher mode, a clean and simple construction.
+
+```js
+// key generation
+
+// callback
+magic.alt.encrypt.aes128gcm(message, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:        'aes128gcm',
+  //   sk:         <Buffer 6c 5e 93 6c a4 b8 43 ... >,
+  //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+  //   iv:         <Buffer 8e 81 31 91 d2 a3 2c ... >,
+  //   ciphertext: <Buffer 0a 37 d4 86 69 1e c9 ... >,
+  //   tag:        <Buffer 72 69 d6 25 18 92 9d ... > }
+});
+
+// promise
+magic.alt.encrypt.aes128gcm(message)
+  .then((output) => {
+    console.log(output);
+    // { alg:        'aes128gcm',
+    //   sk:         <Buffer 6c 5e 93 6c a4 b8 43 ... >,
+    //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+    //   iv:         <Buffer 8e 81 31 91 d2 a3 2c ... >,
+    //   ciphertext: <Buffer 0a 37 d4 86 69 1e c9 ... >,
+    //   tag:        <Buffer 72 69 d6 25 18 92 9d ... > }
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied key
+const sk = '6c5e93...';
+
+// callback
+magic.alt.encrypt.aes128gcm(message, sk, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:        'aes128gcm',
+  //   sk:         <Buffer 6c 5e 93 6c a4 b8 43 ... >,
+  //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+  //   iv:         <Buffer 8e 81 31 91 d2 a3 2c ... >,
+  //   ciphertext: <Buffer 0a 37 d4 86 69 1e c9 ... >,
+  //   tag:        <Buffer 72 69 d6 25 18 92 9d ... > }
+});
+
+// promise
+magic.alt.encrypt.aes128gcm(message, sk)
+  .then((output) => {
+    console.log(output);
+    // { alg:        'aes128gcm',
+    //   sk:         <Buffer 6c 5e 93 6c a4 b8 43 ... >,
+    //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+    //   iv:         <Buffer 8e 81 31 91 d2 a3 2c ... >,
+    //   ciphertext: <Buffer 0a 37 d4 86 69 1e c9 ... >,
+    //   tag:        <Buffer 72 69 d6 25 18 92 9d ... > }
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+Decryption then returns the plaintext directly, without the metadata.
+
+```js
+const sk = '6c5e93...';
+
+// callback
+magic.alt.decrypt.aes128gcm(sk, iv, ciphertext, tag, (err, plaintext) => {
+  if (err) { return cb(err); }
+  console.log(plaintext);
+  // <Buffer 41 20 73 63 72 65 61 ... >
+});
+
+// promise
+magic.alt.decrypt.aes128gcm(sk, iv, ciphertext, tag)
+  .then((plaintext) => {
+    console.log(plaintext);
+    // <Buffer 41 20 73 63 72 65 61 ... >
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+#### magic.alt.encrypt.aes192gcm | magic.alt.decrypt.aes192gcm
+
+Implements `AES192GCM` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128gcm`.
+
+#### magic.alt.encrypt.aes256gcm | magic.alt.decrypt.aes256gcm
+
+Implements `AES256GCM` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128gcm`.
+
 #### magic.alt.util.sha256
 
 Implements `SHA256` using OpenSSL through `crypto`. An alterative to `magic.util.hash`.
