@@ -789,9 +789,16 @@ function async(message, sk, pk, cb) {
 
   if (!!sk ^ !!pk) { return done(new Error('Requires both or neither of private and public keys')); }
 
+  // Undocumented functionality to allow specifying nonce for tests.
+  let nonce;
+  if (sk && typeof sk === 'object' && !(sk instanceof Buffer)) {
+    nonce = sk.nonce;
+    sk    = sk.key;
+  }
+
   let payload, isk, ipk;
-  [ payload ] = iparse(message);
-  [ sk, pk ]  = cparse(sk, pk);
+  [ payload ]       = iparse(message);
+  [ sk, pk, nonce ] = cparse(sk, pk, nonce);
 
   if (!sk) {
     const keys = sodium.crypto_box_keypair();
@@ -802,9 +809,9 @@ function async(message, sk, pk, cb) {
   isk = sk;
   ipk = pk;
 
-  let ciphertext, nonce;
+  let ciphertext;
   try {
-    nonce      = sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
+    nonce      = nonce || sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
     ciphertext = sodium.crypto_box_easy(payload, nonce, ipk, isk);
   } catch(ex) {
     return done(new Error('Libsodium error: ' + ex));
@@ -880,17 +887,24 @@ function sync(message, sk, cb) {
   }
   const done = ret(cb);
 
+  // Undocumented functionality to allow specifying nonce for tests.
+  let nonce;
+  if (sk && typeof sk === 'object' && !(sk instanceof Buffer)) {
+    nonce = sk.nonce;
+    sk    = sk.key;
+  }
+
   let payload, isk;
-  [ payload ] = iparse(message);
-  [ sk ]      = cparse(sk);
+  [ payload ]   = iparse(message);
+  [ sk, nonce ] = cparse(sk, nonce);
 
   if (!sk) { sk = sodium.crypto_secretbox_keygen(); }
 
   isk = sk;
 
-  let ciphertext, nonce;
+  let ciphertext;
   try {
-    nonce      = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+    nonce      = nonce || sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
     ciphertext = sodium.crypto_secretbox_easy(payload, nonce, isk);
   } catch(ex) {
     return done(new Error('Libsodium error: ' + ex));

@@ -97,6 +97,83 @@ function mac(cont) {
 
 
 /***
+ * async
+ *
+ * test vectors for magic.encrypt.async()
+ *
+ */
+function async(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/x25519xsalsa20poly1305.vec') });
+
+  // https://cr.yp.to/highspeed/naclcrypto-20090310.pdf
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const sk  = Buffer.from(sec[0], 'hex');
+    const pk  = Buffer.from(sec[1], 'hex');
+
+    const n = Buffer.from(sec[2], 'hex');
+    const m = Buffer.from(sec[3], 'hex');
+
+    it('magic.encrypt.async - Test Vector #' + c, (done) => {
+      magic.encrypt.async(m, { key: sk, nonce: n }, pk, (err, out) => {
+        if (err) { return done(err); }
+
+        const c = out.ciphertext;
+        assert.equal(sec[4], c.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * sync
+ *
+ * test vectors for magic.encrypt.sync()
+ *
+ */
+function sync(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/xsalsa20poly1305.vec') });
+
+  // https://cr.yp.to/highspeed/naclcrypto-20090310.pdf
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const sk  = Buffer.from(sec[0], 'hex');
+
+    const n = Buffer.from(sec[1], 'hex');
+    const m = Buffer.from(sec[2], 'hex');
+
+    it('magic.encrypt.sync - Test Vector #' + c, (done) => {
+      magic.encrypt.sync(m, { key: sk, nonce: n }, (err, out) => {
+        if (err) { return done(err); }
+
+        const c = out.ciphertext;
+        assert.equal(sec[3], c.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
  * hash
  *
  * test vectors for magic.util.hash()
@@ -138,7 +215,7 @@ function hash(cont) {
  *
  */
 function core() {
-  const fs = [ sign, mac, hash ];
+  const fs = [ sign, mac, async, sync, hash ];
 
   (function setup() {
     const f = fs.shift();
