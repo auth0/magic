@@ -631,15 +631,15 @@ Implements `AES192CBC-SHA384` using OpenSSL through `crypto`. An alternative to 
 
 Implements `AES192CBC-SHA512` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
 
-#### magic.alt.encrypt.aes512cbc_hmacsha256 | magic.alt.decrypt.aes512cbc_hmacsha256
+#### magic.alt.encrypt.aes256cbc_hmacsha256 | magic.alt.decrypt.aes256cbc_hmacsha256
 
 Implements `AES256CBC-SHA256` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
 
-#### magic.alt.encrypt.aes512cbc_hmacsha384 | magic.alt.decrypt.aes512cbc_hmacsha384
+#### magic.alt.encrypt.aes256cbc_hmacsha384 | magic.alt.decrypt.aes256cbc_hmacsha384
 
 Implements `AES256CBC-SHA384` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
 
-#### magic.alt.encrypt.aes512cbc_hmacsha512 | magic.alt.decrypt.aes512cbc_hmacsha512
+#### magic.alt.encrypt.aes256cbc_hmacsha512 | magic.alt.decrypt.aes256cbc_hmacsha512
 
 Implements `AES256CBC-SHA512` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128cbc_hmacsha256`.
 
