@@ -1047,6 +1047,7 @@ describe('magic tests', () => {
       });
     });
 
+
     describe('pwhash', () => {
 
       const password = 'ascreamingcomesacrossthesky';
@@ -1110,6 +1111,7 @@ describe('magic tests', () => {
       });
     });
 
+
     describe('rand', () => {
 
       describe('success', () => {
@@ -1140,6 +1142,65 @@ describe('magic tests', () => {
 
         it('should fail with invalid byte length', (done) => {
           magic.util.rand(-1, (err, bytes) => {
+            assert.ok(err);
+            assert.equal(err.message, 'Invalid length');
+
+            done();
+          });
+        });
+      });
+    });
+
+
+    describe('uid', () => {
+
+      describe('success', () => {
+
+        const security = 24;
+
+        it('should return a base64url encoded string of length corresponding to the default security parameter - callback api', (done) => {
+          magic.util.uid((err, uid) => {
+            assert.ok(!err);
+            assert.ok(uid);
+            assert.equal(uid.length, 43);
+
+            done();
+          });
+        });
+
+        it('should return a base64url encoded string of length corresponding to the default security parameter - promise api', (done) => {
+          magic.util.uid().then((uid) => {
+            assert.ok(uid);
+            assert.equal(uid.length, 43);
+
+            done();
+          }).catch((err) => { assert.ok(!err); });
+        });
+
+        it('should return a base64url encoded string of length corresponding to the provided security parameter - callback api', (done) => {
+          magic.util.uid(security, (err, uid) => {
+            assert.ok(!err);
+            assert.ok(uid);
+            assert.equal(uid.length, 32);
+
+            done();
+          });
+        });
+
+        it('should return a base64url encoded string of length corresponding to the provided security parameter - promise api', (done) => {
+          magic.util.uid(security).then((uid) => {
+            assert.ok(uid);
+            assert.equal(uid.length, 32);
+
+            done();
+          }).catch((err) => { assert.ok(!err); });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should fail with invalid byte length', (done) => {
+          magic.util.uid(-1, (err, uid) => {
             assert.ok(err);
             assert.equal(err.message, 'Invalid length');
 

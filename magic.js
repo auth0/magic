@@ -1045,7 +1045,6 @@ function pwverify(password, hash, cb) {
  * @api public
  *
  * @param {Number} length
- * @param {String} hash
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1063,6 +1062,34 @@ function rand(len, cb) {
   }
 
   return done(null, bytes);
+}
+
+
+/***
+ * util.uid
+ *
+ * get a base64url encoded uid
+ *
+ * @function
+ * @api public
+ *
+ * @param {Number} sec
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.util.uid = uid;
+function uid(sec, cb) {
+  if (typeof sec === 'function') {
+    cb  = sec;
+    sec = null;
+  }
+  const done = ret(cb);
+
+  sec = sec || 32;
+
+  return rand(sec).then((bytes) => {
+    return done(null, sodium.to_base64(bytes, sodium.base64_variants.URLSAFE_NO_PADDING));
+  }).catch((err) => { return done(err); })
 }
 
 

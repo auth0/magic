@@ -505,6 +505,50 @@ magic.util.rand(length)
 });
 ```
 
+#### magic.util.uid
+
+Employs OpenSSL through `crypto` to return a base64url encoded uid. The input is not the length of the returned uid, but rather a security parameter taken as the unencoded byte length of the identifer. The returned string will be roughly a third longer than it. The default security parameter (if one is not provided) is 32 bytes, returning a uid of 43 chars.
+
+```js
+// default security parameter
+
+// callback
+magic.util.uid((err, uid) => {
+  if (err) { return done(err); }
+  console.log(uid);
+  // 74iUE8utrO4vuR9MvdeEAZ2eVAMFch02P81uN-tlvIk
+});
+
+// promise
+magic.util.uid()
+  .then((uid) => {
+    console.log(uid);
+    // 74iUE8utrO4vuR9MvdeEAZ2eVAMFch02P81uN-tlvIk
+  })
+  .catch((err) => {
+    return reject(err);
+});
+
+// provided security parameter length
+
+// callback
+magic.util.uid(24, (err, uid) => {
+  if (err) { return done(err); }
+  console.log(uid);
+  // Md7Al-OnKydNF-ZsE5WBdgGVCcVIEcGu
+});
+
+// promise
+magic.util.uid(24)
+  .then((uid) => {
+    console.log(uid);
+    // Md7Al-OnKydNF-ZsE5WBdgGVCcVIEcGu
+  })
+  .catch((err) => {
+    return reject(err);
+});
+```
+
 ### alt api
 
 The alt api implements alternative algorithms for each cryptographic operation. They should only be used over the core api when required by an external specification or interoperability concerns.
