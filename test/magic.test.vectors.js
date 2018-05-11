@@ -574,6 +574,123 @@ function hmacsha512(cont) {
 
 
 /***
+ * aes128cbc
+ *
+ * test vectors for magic.alt.encrypt.aes128cbc_hmacshaxxx()
+ *
+ */
+function aes128cbc(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes128cbc.vec') });
+
+  const ak = 'a2fae7a1222f6a05a199e5a65d12e819f986c6c61b235982ee5f4f349fe97c60';
+
+  // https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const ek = Buffer.from(sec[0], 'hex');
+    const iv = Buffer.from(sec[1], 'hex');
+    const m  = Buffer.from(sec[2], 'hex');
+
+    it('magic.alt.encrypt.aes128cbc_hmacshaxxx - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.aes128cbc_hmacsha256(m, { key: ek, iv: iv }, ak, (err, out) => {
+        if (err) { return done(err); }
+
+        const c = out.ciphertext;
+        assert.equal(sec[3], c.toString('hex').slice(0, sec[3].length)); // NIST test vectors are per block
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * aes192cbc
+ *
+ * test vectors for magic.alt.encrypt.aes192cbc_hmacshaxxx()
+ *
+ */
+function aes192cbc(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes192cbc.vec') });
+
+  const ak = 'a2fae7a1222f6a05a199e5a65d12e819f986c6c61b235982ee5f4f349fe97c60';
+
+  // https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const ek = Buffer.from(sec[0], 'hex');
+    const iv = Buffer.from(sec[1], 'hex');
+    const m  = Buffer.from(sec[2], 'hex');
+
+    it('magic.alt.encrypt.aes192cbc_hmacshaxxx - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.aes192cbc_hmacsha256(m, { key: ek, iv: iv }, ak, (err, out) => {
+        if (err) { return done(err); }
+
+        const c = out.ciphertext;
+        assert.equal(sec[3], c.toString('hex').slice(0, sec[3].length)); // NIST test vectors are per block
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * aes256cbc
+ *
+ * test vectors for magic.alt.encrypt.aes256cbc_hmacshaxxx()
+ *
+ */
+function aes256cbc(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes256cbc.vec') });
+
+  const ak = 'a2fae7a1222f6a05a199e5a65d12e819f986c6c61b235982ee5f4f349fe97c60';
+
+  // https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const ek = Buffer.from(sec[0], 'hex');
+    const iv = Buffer.from(sec[1], 'hex');
+    const m  = Buffer.from(sec[2], 'hex');
+
+    it('magic.alt.encrypt.aes256cbc_hmacshaxxx - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.aes256cbc_hmacsha256(m, { key: ek, iv: iv }, ak, (err, out) => {
+        if (err) { return done(err); }
+
+        const c = out.ciphertext;
+        assert.equal(sec[3], c.toString('hex').slice(0, sec[3].length)); // NIST test vectors are per block
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
  * sha256
  *
  * test vectors for magic.alt.util.sha256()
@@ -650,7 +767,7 @@ function sha512(cont) {
  *
  */
 function alt() {
-  const fs = [ rsapsssha256, rsapsssha384, rsapsssha512, rsav1_5sha256, rsav1_5sha384, rsav1_5sha512, hmacsha256, hmacsha512, sha256, sha512 ];
+  const fs = [ rsapsssha256, rsapsssha384, rsapsssha512, rsav1_5sha256, rsav1_5sha384, rsav1_5sha512, hmacsha256, hmacsha512, aes128cbc, aes192cbc, aes256cbc, sha256, sha512 ];
 
   (function setup() {
     const f = fs.shift();

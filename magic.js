@@ -350,9 +350,16 @@ function cbc(digest, keysize) {
 
     if (!!ekey ^ !!akey) { return done(new Error('Requires both or neither of encryption and authentication keys')); }
 
+    // Undocumented functionality to allow specifying iv for tests.
+    let iv;
+    if (ekey && typeof ekey === 'object' && !(ekey instanceof Buffer)) {
+      iv   = ekey.iv;
+      ekey = ekey.key;
+    }
+
     let payload, iekey, iakey;
-    [ payload ]    = iparse(message);
-    [ ekey, akey ] = cparse(ekey, akey);
+    [ payload ]        = iparse(message);
+    [ ekey, akey, iv ] = cparse(ekey, akey, iv);
 
     if (!ekey) {
       ekey = crypto.randomBytes(keysize / 8);
@@ -362,9 +369,9 @@ function cbc(digest, keysize) {
     iekey = ekey;
     iakey = akey;
 
-    let iv, ciphertext, mac;
+    let ciphertext, mac;
     try {
-      iv = crypto.randomBytes(16);
+      iv = iv || crypto.randomBytes(16);
 
       const cipher = crypto.createCipheriv('aes-' + keysize + '-cbc', iekey, iv);
       const hmac   = crypto.createHmac(digest, iakey);
