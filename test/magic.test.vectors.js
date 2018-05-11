@@ -691,6 +691,123 @@ function aes256cbc(cont) {
 
 
 /***
+ * aes128gcm
+ *
+ * test vectors for magic.alt.encrypt.aes128gcm()
+ *
+ */
+function aes128gcm(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes128gcm.vec') });
+
+  // https://github.com/openssl/openssl/blob/97cf1f6c2854a3a955fd7dd3a1f113deba00c9ef/crypto/evp/evptests.txt#L340
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const k  = Buffer.from(sec[0], 'hex');
+    const iv = Buffer.from(sec[1], 'hex');
+    const m  = Buffer.from(sec[2], 'hex');
+
+    it('magic.alt.encrypt.aes128gcm - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.aes128gcm(m, { key: k, iv: iv }, (err, out) => {
+        if (err) { return done(err); }
+
+        const c = out.ciphertext;
+        const t = out.tag;
+        assert.equal(sec[3], c.toString('hex'));
+        assert.equal(sec[4], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * aes192gcm
+ *
+ * test vectors for magic.alt.encrypt.aes192gcm()
+ *
+ */
+function aes192gcm(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes192gcm.vec') });
+
+  // https://github.com/openssl/openssl/blob/97cf1f6c2854a3a955fd7dd3a1f113deba00c9ef/crypto/evp/evptests.txt#L340
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const k  = Buffer.from(sec[0], 'hex');
+    const iv = Buffer.from(sec[1], 'hex');
+    const m  = Buffer.from(sec[2], 'hex');
+
+    it('magic.alt.encrypt.aes192gcm - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.aes192gcm(m, { key: k, iv: iv }, (err, out) => {
+        if (err) { return done(err); }
+
+        const c = out.ciphertext;
+        const t = out.tag;
+        assert.equal(sec[3], c.toString('hex'));
+        assert.equal(sec[4], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
+ * aes256gcm
+ *
+ * test vectors for magic.alt.encrypt.aes256gcm()
+ *
+ */
+function aes256gcm(cont) {
+
+  // path resolution is from parent directory
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes256gcm.vec') });
+
+  // https://github.com/openssl/openssl/blob/97cf1f6c2854a3a955fd7dd3a1f113deba00c9ef/crypto/evp/evptests.txt#L340
+  let c = 0;
+  fp.on('line', (line) => {
+    c++;
+
+    const sec = line.split(':');
+    const k  = Buffer.from(sec[0], 'hex');
+    const iv = Buffer.from(sec[1], 'hex');
+    const m  = Buffer.from(sec[2], 'hex');
+
+    it('magic.alt.encrypt.aes256gcm - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.aes256gcm(m, { key: k, iv: iv }, (err, out) => {
+        if (err) { return done(err); }
+
+        const c = out.ciphertext;
+        const t = out.tag;
+        assert.equal(sec[3], c.toString('hex'));
+        assert.equal(sec[4], t.toString('hex'));
+
+        done();
+      });
+    });
+  });
+
+  fp.on('close', () => { cont(); });
+}
+
+
+/***
  * sha256
  *
  * test vectors for magic.alt.util.sha256()
@@ -767,7 +884,8 @@ function sha512(cont) {
  *
  */
 function alt() {
-  const fs = [ rsapsssha256, rsapsssha384, rsapsssha512, rsav1_5sha256, rsav1_5sha384, rsav1_5sha512, hmacsha256, hmacsha512, aes128cbc, aes192cbc, aes256cbc, sha256, sha512 ];
+  const fs = [ rsapsssha256, rsapsssha384, rsapsssha512, rsav1_5sha256, rsav1_5sha384, rsav1_5sha512, hmacsha256,
+               hmacsha512, aes128cbc, aes192cbc, aes256cbc, aes128gcm, aes192gcm, aes256gcm, sha256, sha512 ];
 
   (function setup() {
     const f = fs.shift();

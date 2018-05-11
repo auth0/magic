@@ -494,17 +494,24 @@ function gcm(keysize) {
     }
     const done = ret(cb);
 
-    if (!key) { key = crypto.randomBytes(keysize / 8); }
+    // Undocumented functionality to allow specifying iv for tests.
+    let iv;
+    if (key && typeof key === 'object' && !(key instanceof Buffer)) {
+      iv  = key.iv;
+      key = key.key;
+    }
 
     let payload, ikey;
     [ payload ] = iparse(message);
-    [ key ]     = cparse(key);
+    [ key, iv ] = cparse(key, iv);
+
+    if (!key) { key = crypto.randomBytes(keysize / 8); }
 
     ikey = key;
 
-    let iv, ciphertext, tag;
+    let ciphertext, tag;
     try {
-      iv = crypto.randomBytes(12);
+      iv = iv || crypto.randomBytes(12);
 
       const cipher = crypto.createCipheriv('aes-' + keysize + '-gcm', key, iv);
       ciphertext   = Buffer.concat([ cipher.update(payload), cipher.final() ]);
