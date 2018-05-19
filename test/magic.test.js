@@ -1025,8 +1025,6 @@ describe('magic tests', () => {
 
             magic.util.pwverify(password, output.hash, (err) => {
               assert.ok(!err);
-
-
               done();
             });
           });
@@ -1041,11 +1039,7 @@ describe('magic tests', () => {
             assert.equal(output.hash.slice(0, 9), '$argon2id');
 
             return magic.util.pwverify(password, output.hash);
-          }).then(() => {
-
-
-            done();
-          }).catch((err) => { assert.ok(!err); });
+          }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
         });
       });
 
@@ -5377,6 +5371,64 @@ describe('magic tests', () => {
 
           done();
         }).catch((err) => { assert.ok(!err); });
+      });
+    });
+
+
+    describe('bcrypt', () => {
+
+      const password = 'ascreamingcomesacrossthesky';
+
+      describe('success', () => {
+
+        it('should verify a hashed password - callback api', (done) => {
+          magic.alt.util.bcrypt(password, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+            assert.ok(output.hash);
+
+            assert.equal(output.alg, 'bcrypt');
+            assert.equal(output.hash.slice(0, 7), '$2b$13$');
+
+            magic.alt.util.bcrypt_verify(password, output.hash, (err) => {
+              assert.ok(!err);
+              done();
+            });
+          });
+        });
+
+        it('should verify a hashed password - promise api', (done) => {
+          magic.alt.util.bcrypt(password).then((output) => {
+            assert.ok(output);
+            assert.ok(output.hash);
+
+            assert.equal(output.alg, 'bcrypt');
+            assert.equal(output.hash.slice(0, 7), '$2b$13$');
+
+            return magic.alt.util.bcrypt_verify(password, output.hash);
+          }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should fail to verify the wrong password', (done) => {
+          magic.alt.util.bcrypt(password, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+            assert.ok(output.hash);
+
+            assert.equal(output.alg, 'bcrypt');
+            assert.equal(output.hash.slice(0, 7), '$2b$13$');
+
+            magic.alt.util.bcrypt_verify('someotherpassword', output.hash, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid password');
+
+              done();
+            });
+          });
+        });
       });
     });
   });

@@ -790,3 +790,7 @@ Implements `SHA256` using OpenSSL through `crypto`. An alterative to `magic.util
 #### magic.alt.util.sha512
 
 Implements `SHA512` using OpenSSL through `crypto`. An alterative to `magic.util.hash`.
+
+#### magic.alt.util.bcrypt | magic.alt.util.bcrypt_verify
+
+Implements `bcrypt` using [node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js/), wrapping the OpenBSD implementation of the algorithm. An alterative to `magic.util.pwhash`. The security parameter (rounds) is set to 13, to bring the computational time in line with that for the `argon2id` implementation in the core api. 

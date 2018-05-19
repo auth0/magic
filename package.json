@@ -4,6 +4,7 @@
   "description": "Auth0 Internal Cryptography Toolkit",
   "main": "magic.js",
   "dependencies": {
+    "bcrypt": "2.0.1",
     "libsodium-wrappers-sumo": "0.7.3"
   },
   "scripts": {

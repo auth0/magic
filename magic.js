@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
 const cp     = require('child_process');
@@ -1845,6 +1846,67 @@ module.exports.alt.util.sha256 = hash('sha256');
  * @returns {Callback|Promise}
  */
 module.exports.alt.util.sha512 = hash('sha512');
+
+
+/***
+ * alt.util.bcrypt
+ *
+ * hash a password
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} password
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.util.bcrypt = hbcrypt;
+function hbcrypt(password, cb) {
+  const done = ret(cb);
+
+  if (!password) { return done(new Error('Empty password')); }
+
+  return bcrypt.hash(password, 13)
+    .then((hash) => {
+      return done(null, convert({
+        alg:  'bcrypt',
+        hash: hash
+      }));
+    }).catch((ex) => {
+      return done(new Error('Bcrypt error: ' + ex));
+    });
+}
+
+
+/***
+ * alt.util.bcrypt_verify
+ *
+ * verify a password
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} password
+ * @param {String} hash
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.util.bcrypt_verify = vbcrypt;
+function vbcrypt(password, hash, cb) {
+  const done = ret(cb);
+
+  if (!password) { return done(new Error('Empty password')); }
+  if (!hash) { return done(new Error('Cannot verify without stored hash')); }
+
+  return bcrypt.compare(password, hash)
+    .then((verified) => {
+      if (!verified) { return done(new Error('Invalid password')); }
+      return done();
+    }).catch((ex) => {
+      console.log(ex);
+      return done(new Error('Bcrypt error: ' + ex));
+    });
+}
 
 
 
