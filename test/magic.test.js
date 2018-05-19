@@ -35,10 +35,8 @@ describe('magic tests', () => {
 
               assert.ok(output.signature);
 
-              magic.verify.sign(message, pk, output.signature, true, (err, verified) => {
+              magic.verify.sign(message, pk, output.signature, true, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -55,11 +53,7 @@ describe('magic tests', () => {
               assert.ok(output.signature);
 
               return magic.verify.sign(message, pk, output.signature, true);
-            }).then((verified) => {
-              assert.equal(verified, true);
-
-              done();
-            }).catch((err) => { assert.ok(!err); });
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
@@ -78,10 +72,8 @@ describe('magic tests', () => {
 
               const esig = output.signature.toString('hex');
 
-              magic.verify.sign(message, epk, esig, true, (err, verified) => {
+              magic.verify.sign(message, epk, esig, true, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -106,10 +98,8 @@ describe('magic tests', () => {
 
               assert.ok(output.signature);
 
-              magic.verify.sign(message, seed, output.signature, (err, verified) => {
+              magic.verify.sign(message, seed, output.signature, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -126,11 +116,7 @@ describe('magic tests', () => {
               assert.ok(output.signature);
 
               return magic.verify.sign(message, seed, output.signature);
-            }).then((verified) => {
-              assert.equal(verified, true);
-
-              done();
-            }).catch((err) => { assert.ok(!err); });
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
@@ -148,10 +134,8 @@ describe('magic tests', () => {
 
               const esig = output.signature.toString('hex');
 
-              magic.verify.sign(message, eseed, esig, (err, verified) => {
+              magic.verify.sign(message, eseed, esig, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -171,10 +155,8 @@ describe('magic tests', () => {
               assert.ok(output.sk);
               assert.ok(output.signature);
 
-              magic.verify.sign(message, output.sk, output.signature, (err, verified) => {
+              magic.verify.sign(message, output.sk, output.signature, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -191,11 +173,7 @@ describe('magic tests', () => {
               assert.ok(output.signature);
 
               return magic.verify.sign(message, output.sk, output.signature);
-            }).then((verified) => {
-              assert.equal(verified, true);
-
-              done();
-            }).catch((err) => { assert.ok(!err); });
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
@@ -212,10 +190,8 @@ describe('magic tests', () => {
               const eseed = output.sk.toString('hex');
               const esig  = output.signature.toString('hex');
 
-              magic.verify.sign(message, eseed, esig, (err, verified) => {
+              magic.verify.sign(message, eseed, esig, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -236,7 +212,7 @@ describe('magic tests', () => {
             assert.ok(output.sk);
             assert.ok(output.signature);
 
-            magic.verify.sign(message, null, output.signature, false, (err, verified) => {
+            magic.verify.sign(message, null, output.signature, false, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -258,9 +234,9 @@ describe('magic tests', () => {
 
             const altered = 'Some other message';
 
-            magic.verify.sign(altered, output.sk, output.signature, (err, verified) => {
-              assert.ok(!err);
-              assert.equal(verified, false);
+            magic.verify.sign(altered, output.sk, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid signature');
 
               done();
             });
@@ -280,9 +256,9 @@ describe('magic tests', () => {
 
             const altered = Buffer.from('b64a6fb5878091d0575d9b0d0be667fb5e37f54be2c2cd5cff139857c494c5eb', 'hex');
 
-            magic.verify.sign(message, altered, output.signature, (err, verified) => {
-              assert.ok(!err);
-              assert.equal(verified, false);
+            magic.verify.sign(message, altered, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid signature');
 
               done();
             });
@@ -314,10 +290,8 @@ describe('magic tests', () => {
 
               assert.ok(output.mac);
 
-              magic.verify.mac(message, key, output.mac, (err, verified) => {
+              magic.verify.mac(message, key, output.mac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -334,11 +308,7 @@ describe('magic tests', () => {
               assert.ok(output.mac);
 
               return magic.verify.mac(message, key, output.mac);
-            }).then((verified) => {
-              assert.equal(verified, true);
-
-              done();
-            }).catch((err) => { assert.ok(!err); });
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -356,10 +326,8 @@ describe('magic tests', () => {
 
               const emac = output.mac.toString('hex');
 
-              magic.verify.mac(message, ekey, emac, (err, verified) => {
+              magic.verify.mac(message, ekey, emac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -379,10 +347,8 @@ describe('magic tests', () => {
               assert.ok(output.sk);
               assert.ok(output.mac);
 
-              magic.verify.mac(message, output.sk, output.mac, (err, verified) => {
+              magic.verify.mac(message, output.sk, output.mac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -399,11 +365,7 @@ describe('magic tests', () => {
               assert.ok(output.mac);
 
               return magic.verify.mac(message, output.sk, output.mac);
-            }).then((verified) => {
-              assert.equal(verified, true);
-
-              done();
-            }).catch((err) => { assert.ok(!err); });
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -420,10 +382,8 @@ describe('magic tests', () => {
               const ekey = output.sk.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.verify.mac(message, ekey, emac, (err, verified) => {
+              magic.verify.mac(message, ekey, emac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -444,7 +404,7 @@ describe('magic tests', () => {
             assert.ok(output.sk);
             assert.ok(output.mac);
 
-            magic.verify.mac(message, null, output.mac, (err, verified) => {
+            magic.verify.mac(message, null, output.mac, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -466,9 +426,9 @@ describe('magic tests', () => {
 
             const altered = 'Some other message';
 
-            magic.verify.mac(altered, output.sk, output.mac, (err, verified) => {
-              assert.ok(!err);
-              assert.equal(verified, false);
+            magic.verify.mac(altered, output.sk, output.mac, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
 
               done();
             });
@@ -488,9 +448,9 @@ describe('magic tests', () => {
 
             const altered = Buffer.from('b3ae620c610b577c1a596fa96259426dc9bcc521c086a348e22b8169b092fcf01f20381e0edca71e4fa9811bc7ed05e9', 'hex');
 
-            magic.verify.mac(message, altered, output.mac, (err, verified) => {
-              assert.ok(!err);
-              assert.equal(verified, false);
+            magic.verify.mac(message, altered, output.mac, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
 
               done();
             });
@@ -1063,9 +1023,9 @@ describe('magic tests', () => {
             assert.equal(output.alg, 'argon2id');
             assert.equal(output.hash.slice(0, 9), '$argon2id');
 
-            magic.util.pwverify(password, output.hash, (err, verified) => {
+            magic.util.pwverify(password, output.hash, (err) => {
               assert.ok(!err);
-              assert.equal(verified, true);
+
 
               done();
             });
@@ -1081,8 +1041,8 @@ describe('magic tests', () => {
             assert.equal(output.hash.slice(0, 9), '$argon2id');
 
             return magic.util.pwverify(password, output.hash);
-          }).then((verified) => {
-            assert.equal(verified, true);
+          }).then(() => {
+
 
             done();
           }).catch((err) => { assert.ok(!err); });
@@ -1100,9 +1060,9 @@ describe('magic tests', () => {
             assert.equal(output.alg, 'argon2id');
             assert.equal(output.hash.slice(0, 9), '$argon2id');
 
-            magic.util.pwverify('someotherpassword', output.hash, (err, verified) => {
-              assert.ok(!err);
-              assert.equal(verified, false);
+            magic.util.pwverify('someotherpassword', output.hash, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid password');
 
               done();
             });
@@ -1236,10 +1196,8 @@ describe('magic tests', () => {
 
               assert.ok(output.mac);
 
-              magic.alt.verify.hmacsha256(message, key, output.mac, (err, verified) => {
+              magic.alt.verify.hmacsha256(message, key, output.mac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -1256,11 +1214,7 @@ describe('magic tests', () => {
               assert.ok(output.mac);
 
               return magic.alt.verify.hmacsha256(message, key, output.mac);
-            }).then((verified) => {
-              assert.equal(verified, true);
-
-              done();
-            }).catch((err) => { assert.ok(!err); });
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -1278,10 +1232,8 @@ describe('magic tests', () => {
 
               const emac = output.mac.toString('hex');
 
-              magic.alt.verify.hmacsha256(message, ekey, emac, (err, verified) => {
+              magic.alt.verify.hmacsha256(message, ekey, emac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -1301,10 +1253,8 @@ describe('magic tests', () => {
               assert.ok(output.sk);
               assert.ok(output.mac);
 
-              magic.alt.verify.hmacsha256(message, output.sk, output.mac, (err, verified) => {
+              magic.alt.verify.hmacsha256(message, output.sk, output.mac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -1321,11 +1271,7 @@ describe('magic tests', () => {
               assert.ok(output.mac);
 
               return magic.alt.verify.hmacsha256(message, output.sk, output.mac);
-            }).then((verified) => {
-              assert.equal(verified, true);
-
-              done();
-            }).catch((err) => { assert.ok(!err); });
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -1342,10 +1288,8 @@ describe('magic tests', () => {
               const ekey = output.sk.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.verify.hmacsha256(message, ekey, emac, (err, verified) => {
+              magic.alt.verify.hmacsha256(message, ekey, emac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -1366,7 +1310,7 @@ describe('magic tests', () => {
             assert.ok(output.sk);
             assert.ok(output.mac);
 
-            magic.alt.verify.hmacsha256(message, null, output.mac, (err, verified) => {
+            magic.alt.verify.hmacsha256(message, null, output.mac, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -1388,9 +1332,9 @@ describe('magic tests', () => {
 
             const altered = 'Some other message';
 
-            magic.alt.verify.hmacsha256(altered, output.sk, output.mac, (err, verified) => {
-              assert.ok(!err);
-              assert.equal(verified, false);
+            magic.alt.verify.hmacsha256(altered, output.sk, output.mac, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
 
               done();
             });
@@ -1410,9 +1354,9 @@ describe('magic tests', () => {
 
             const altered = Buffer.from('b3ae620c610b577c1a596fa96259426dc9bcc521c086a348e22b8169b092fcf01f20381e0edca71e4fa9811bc7ed05e9', 'hex');
 
-            magic.alt.verify.hmacsha256(message, altered, output.mac, (err, verified) => {
-              assert.ok(!err);
-              assert.equal(verified, false);
+            magic.alt.verify.hmacsha256(message, altered, output.mac, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
 
               done();
             });
@@ -1443,10 +1387,8 @@ describe('magic tests', () => {
 
               assert.ok(output.mac);
 
-              magic.alt.verify.hmacsha512(message, key, output.mac, (err, verified) => {
+              magic.alt.verify.hmacsha512(message, key, output.mac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -1463,11 +1405,7 @@ describe('magic tests', () => {
               assert.ok(output.mac);
 
               return magic.alt.verify.hmacsha512(message, key, output.mac);
-            }).then((verified) => {
-              assert.equal(verified, true);
-
-              done();
-            }).catch((err) => { assert.ok(!err); });
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -1485,10 +1423,8 @@ describe('magic tests', () => {
 
               const emac = output.mac.toString('hex');
 
-              magic.alt.verify.hmacsha512(message, ekey, emac, (err, verified) => {
+              magic.alt.verify.hmacsha512(message, ekey, emac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -1508,10 +1444,8 @@ describe('magic tests', () => {
               assert.ok(output.sk);
               assert.ok(output.mac);
 
-              magic.alt.verify.hmacsha512(message, output.sk, output.mac, (err, verified) => {
+              magic.alt.verify.hmacsha512(message, output.sk, output.mac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -1528,11 +1462,7 @@ describe('magic tests', () => {
               assert.ok(output.mac);
 
               return magic.alt.verify.hmacsha512(message, output.sk, output.mac);
-            }).then((verified) => {
-              assert.equal(verified, true);
-
-              done();
-            }).catch((err) => { assert.ok(!err); });
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
@@ -1549,10 +1479,8 @@ describe('magic tests', () => {
               const ekey = output.sk.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.verify.hmacsha512(message, ekey, emac, (err, verified) => {
+              magic.alt.verify.hmacsha512(message, ekey, emac, (err) => {
                 assert.ok(!err);
-                assert.equal(verified, true);
-
                 done();
               });
             });
@@ -1573,7 +1501,7 @@ describe('magic tests', () => {
             assert.ok(output.sk);
             assert.ok(output.mac);
 
-            magic.alt.verify.hmacsha512(message, null, output.mac, (err, verified) => {
+            magic.alt.verify.hmacsha512(message, null, output.mac, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -1595,9 +1523,9 @@ describe('magic tests', () => {
 
             const altered = 'Some other message';
 
-            magic.alt.verify.hmacsha512(altered, output.sk, output.mac, (err, verified) => {
-              assert.ok(!err);
-              assert.equal(verified, false);
+            magic.alt.verify.hmacsha512(altered, output.sk, output.mac, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
 
               done();
             });
@@ -1617,9 +1545,9 @@ describe('magic tests', () => {
 
             const altered = Buffer.from('b3ae620c610b577c1a596fa96259426dc9bcc521c086a348e22b8169b092fcf01f20381e0edca71e4fa9811bc7ed05e9', 'hex');
 
-            magic.alt.verify.hmacsha512(message, altered, output.mac, (err, verified) => {
-              assert.ok(!err);
-              assert.equal(verified, false);
+            magic.alt.verify.hmacsha512(message, altered, output.mac, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid mac');
 
               done();
             });

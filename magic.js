@@ -191,7 +191,9 @@ function rsaverify(digest, padding) {
       return done(new Error('Crypto error: ' + ex));
     }
 
-    return done(null, verified);
+    if (!verified) { return done(new Error('Invalid signature')); }
+
+    return done();
   }
 }
 
@@ -305,7 +307,9 @@ function vmac(algorithm) {
       return done(new Error('Crypto error: ' + ex));
     }
 
-    return done(null, verified);
+    if (!verified) { return done(new Error('Invalid mac')); }
+
+    return done();
   }
 }
 
@@ -741,7 +745,9 @@ function vsign(message, key, signature, iskey, cb) {
     return done(new Error('Libsodium error: ' + ex));
   }
 
-  return done(null, verified);
+  if (!verified) { return done(new Error('Invalid signature')); }
+
+  return done();
 }
 
 
@@ -1046,7 +1052,9 @@ function pwverify(password, hash, cb) {
     return done(new Error('Libsodium error: ' + ex));
   }
 
-  return done(null, verified);
+  if (!verified) { return done(new Error('Invalid password')); }
+
+  return done();
 }
 
 

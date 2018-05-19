@@ -94,7 +94,7 @@ magic.auth.sign(message, sk)
 });
 ```
 
-Verification has a very similar interface, requiring only the additional flag if the public key is presented directly, and returning a boolean as to whether the signature verifies.
+Verification has a very similar interface, requiring only the additional flag if the public key is presented directly, and returning without error if the signature is valid.
 
 ```js
 // supplied seed
@@ -102,17 +102,17 @@ const seed      = '0d05d0...';
 const signature = '544ad1...';
 
 // callback
-magic.verify.sign(message, seed, signature, (err, verified) => {
+magic.verify.sign(message, seed, signature, (err) => {
   if (err) { return cb(err); }
-  console.log(verified);
-  // true
+  console.log('verified');
+  // verified
 });
 
 // promise
 magic.verify.sign(message, seed, signature)
-  .then((verified) => {
-    console.log(verified);
-    // true
+  .then(() => {
+    console.log('verified');
+    // verified
   })
   .catch((err) => {
     return reject(err);
@@ -124,17 +124,17 @@ const pk        = 'bf288a...';
 const signature = 'b9ca8e...';
 
 // callback
-magic.verify.sign(message, pk, signature, true, (err, verified) => {
+magic.verify.sign(message, pk, signature, true, (err) => {
   if (err) { return cb(err); }
-  console.log(verified);
-  // true
+  console.log('verified');
+  // verified
 });
 
 // promise
 magic.verify.sign(message, pk, signature, true)
-  .then((verified) => {
-    console.log(verified);
-    // true
+  .then(() => {
+    console.log('verified');
+    // verified
   })
   .catch((err) => {
     return reject(err);
@@ -201,7 +201,7 @@ magic.auth.mac(message, key)
 });
 ```
 
-Once again verification has a similar interface, and returns a boolean denoting whether verification has succeeded.
+Once again verification has a similar interface, and returns without error if the mac is valid.
 
 ```js
 // supplied key
@@ -209,17 +209,17 @@ const key = '49d013...';
 const mac = 'f19dc0...';
 
 // callback
-magic.verify.mac(message, key, mac, (err, output) => {
+magic.verify.mac(message, key, mac, (err) => {
   if (err) { return cb(err); }
-  console.log(output);
-  // true
+  console.log('verified');
+  // verified
 });
 
 // promise
 magic.verify.mac(message, key, mac)
-  .then((output) => {
-    console.log(output);
-    // true
+  .then(() => {
+    console.log('verified');
+    // verified
   })
   .catch((err) => {
     return reject(err);
@@ -464,17 +464,17 @@ const pw   = 'ascream...';
 const hash = '$argon2id$v=19$m=65536,t=2,p=1$yLZ6CoF5exPHbHjvbZ3esQ$yAM5pHM9KnTYDg/9Nr9rgDdQqRpAe8JVky4mJ7escHM';
 
 // callback
-magic.util.pwverify(password, hash, (err, verified) => {
+magic.util.pwverify(password, hash, (err) => {
   if (err) { return cb(err); }
-  console.log(verified);
-  // true
+  console.log('verified');
+  // verified
 });
 
 // promise
 magic.util.pwverify(password, hash)
-  .then((verified) => {
-    console.log(verified);
-    // true
+  .then(() => {
+    console.log('verified');
+    // verified
   })
   .catch((err) => {
     return reject(err);
