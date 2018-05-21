@@ -1876,6 +1876,675 @@ nwIDAQAB
       });
     });
 
+    describe('rsav1_5sha256', () => {
+
+      let sk, pk;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation (private key)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsav1_5sha256(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsav1_5sha256(message, sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsav1_5sha256(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsav1_5sha256(message, sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsav1_5sha256(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsav1_5sha256(message, sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('without key generation (private and public keys)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsav1_5sha256(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsav1_5sha256(message, pk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsav1_5sha256(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsav1_5sha256(message, pk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsav1_5sha256(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsav1_5sha256(message, pk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsav1_5sha256(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsav1_5sha256(message, output.sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsav1_5sha256(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsav1_5sha256(message, output.sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsav1_5sha256(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsav1_5sha256(message, output.sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error without key on validation', (done) => {
+          magic.alt.auth.rsav1_5sha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsav1_5-sha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            magic.alt.verify.rsav1_5sha256(message, null, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot verify without a key');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if message is altered', (done) => {
+          magic.alt.auth.rsav1_5sha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsav1_5-sha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            const altered = 'Some other message';
+
+            magic.alt.verify.rsav1_5sha256(altered, output.sk, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid signature');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    describe('rsav1_5sha384', () => {
+
+      let sk, pk;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation (private key)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsav1_5sha384(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsav1_5sha384(message, sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsav1_5sha384(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsav1_5sha384(message, sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsav1_5sha384(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsav1_5sha384(message, sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('without key generation (private and public keys)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsav1_5sha384(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsav1_5sha384(message, pk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsav1_5sha384(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsav1_5sha384(message, pk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsav1_5sha384(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsav1_5sha384(message, pk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsav1_5sha384(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsav1_5sha384(message, output.sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsav1_5sha384(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsav1_5sha384(message, output.sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsav1_5sha384(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsav1_5sha384(message, output.sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error without key on validation', (done) => {
+          magic.alt.auth.rsav1_5sha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsav1_5-sha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            magic.alt.verify.rsav1_5sha384(message, null, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot verify without a key');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if message is altered', (done) => {
+          magic.alt.auth.rsav1_5sha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsav1_5-sha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            const altered = 'Some other message';
+
+            magic.alt.verify.rsav1_5sha384(altered, output.sk, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid signature');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    describe('rsav1_5sha512', () => {
+
+      let sk, pk;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation (private key)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsav1_5sha512(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsav1_5sha512(message, sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsav1_5sha512(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsav1_5sha512(message, sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsav1_5sha512(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsav1_5sha512(message, sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('without key generation (private and public keys)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsav1_5sha512(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsav1_5sha512(message, pk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsav1_5sha512(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsav1_5sha512(message, pk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsav1_5sha512(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsav1_5sha512(message, pk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsav1_5sha512(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsav1_5sha512(message, output.sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsav1_5sha512(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsav1_5sha512(message, output.sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsav1_5sha512(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsav1_5-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsav1_5sha512(message, output.sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error without key on validation', (done) => {
+          magic.alt.auth.rsav1_5sha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsav1_5-sha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            magic.alt.verify.rsav1_5sha512(message, null, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot verify without a key');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if message is altered', (done) => {
+          magic.alt.auth.rsav1_5sha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsav1_5-sha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            const altered = 'Some other message';
+
+            magic.alt.verify.rsav1_5sha512(altered, output.sk, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid signature');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
     describe('hmacsha256', () => {
 
       let key;
