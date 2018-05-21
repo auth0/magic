@@ -553,6 +553,131 @@ magic.util.uid(24)
 
 The alt api implements alternative algorithms for each cryptographic operation. They should only be used over the core api when required by an external specification or interoperability concerns.
 
+#### magic.alt.auth.rsapsssha256 | magic.alt.verify.rsapsssha256
+
+Implements `RSA PKCS#1 v2.1` over `SHA256`, better known as `RSAPSS-SHA256`. The protocol is standardized by the [IETF](https://tools.ietf.org/html/rfc3447). The `PSS` acronym stands for probablistic signature scheme, a construction which is theoretically more robust than the older `RSA PKCS#1 v1.5` protocol also available in the alternative api. When possible, this is the preferred RSA variant, although the `ed25519` signature scheme in the core api is preferred above any use of RSA at all. For key generation, the key (private only) is returned in PEM encoding.
+
+```js
+// key generation
+
+// callback
+magic.alt.auth.rsapsssha256(message, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  { alg:       'rsapss-sha256',
+    sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+    payload:   <Buffer 41 20 73 63 ... >,
+    signature: <Buffer 86 a8 d2 d7 67  ... > }
+});
+
+// promise
+magic.alt.auth.rsapsssha256(message)
+  .then((output) => {
+    console.log(output);
+    { alg:       'rsapss-sha256',
+    sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+    payload:   <Buffer 41 20 73 63 ... >,
+    signature: <Buffer 86 a8 d2 d7 67  ... > }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied key
+const sk = '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----';
+
+// callback
+magic.alt.auth.rsapsssha256(message, sk, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:       'rsapss-sha256',
+  //  sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+  //  payload:   <Buffer 41 20 73 63 ... >,
+  //  signature: <Buffer 86 a8 d2 d7 67  ... > }
+});
+
+// promise
+magic.alt.auth.rsapsssha256(message, sk)
+  .then((output) => {
+    console.log(output);
+    // { alg:       'rsapss-sha256',
+    //   sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+    //   payload:   <Buffer 41 20 73 63 ... >,
+    //   signature: <Buffer 86 a8 d2 d7 67  ... > }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+Verification can be done by supplying either a private key (from which the public key will be extracted) or the public key itself.
+
+```js
+// supplied private key
+const sk = '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----';
+
+// callback
+magic.alt.auth.rsapsssha256(message, sk, signature, (err) => {
+  if (err) { return cb(err); }
+  console.log('verified');
+  // verified
+});
+
+// promise
+magic.alt.auth.rsapsssha256(message, sk)
+  .then(() => {
+    console.log('verified');
+    // verified
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied public key
+const pk = '-----BEGIN RSA PUBLIC KEY-----\nMIIBI ... DAQAB\n-----END RSA PUBLIC KEY-----';
+
+// callback
+magic.alt.auth.rsapsssha256(message, pk, signature, (err) => {
+  if (err) { return cb(err); }
+  console.log('verified');
+  // verified
+});
+
+// promise
+magic.alt.auth.rsapsssha256(message, pk)
+  .then(() => {
+    console.log('verified');
+    // verified
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+#### magic.alt.auth.rsapsssha384 | magic.alt.verify.rsapsssha384
+
+Implements `RSA PKCS#1 v2.1` over `SHA384`, better known as `RSAPSS-SHA384`. An alternative to `magic.auth.sign` and `magic.alt.auth.rsapsssha256`.
+
+#### magic.alt.auth.rsapsssha512 | magic.alt.verify.rsapsssha512
+
+Implements `RSA PKCS#1 v2.1` over `SHA512`, better known as `RSAPSS-SHA512`. An alternative to `magic.auth.sign` and `magic.alt.auth.rsapsssha256`.
+
+#### magic.alt.auth.rsav1_5sha256 | magic.alt.verify.rsav1_5sha256
+
+Implements `RSA PKCS#1 v1.5` over `SHA256`, better known as `RSAPSS-SHA256`. An alternative to `magic.auth.sign` and `magic.alt.auth.rsapsssha256`.
+
+#### magic.alt.auth.rsav1_5sha384 | magic.alt.verify.rsav1_5sha384
+
+Implements `RSA PKCS#1 v1.5` over `SHA384`, better known as `RSAPSS-SHA384`. An alternative to `magic.auth.sign` and `magic.alt.auth.rsapsssha256`.
+
+#### magic.alt.auth.rsav1_5sha512 | magic.alt.verify.rsav1_5sha512
+
+Implements `RSA PKCS#1 v1.5` over `SHA512`, better known as `RSAPSS-SHA512`. An alternative to `magic.auth.sign` and `magic.alt.auth.rsapsssha256`.
+
 #### magic.alt.auth.hmacsha256 | magic.alt.verify.hmacsha256
 
 Implements `HMAC-SHA256` using OpenSSL through `crypto`. An alterative to `magic.auth.mac`.
@@ -563,7 +688,7 @@ Implements `HMAC-SHA512` using OpenSSL through `crypto`. An alterative to `magic
 
 #### magic.alt.encrypt.aes128cbc_hmacsha256 | magic.alt.decrypt.aes128cbc_hmacsha256
 
-Implements `AES128CBC-SHA256` using OpenSSL through `crypto`. AES-CBC is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf) and provides authenticated eencryption using the industry standard symmetric encryption and authentication schemes, in an encrypt-than-authenticate construction.
+Implements `AES128CBC-SHA256` using OpenSSL through `crypto`. The protocol is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf) and provides authenticated eencryption using the industry standard symmetric encryption and authentication schemes, in an encrypt-than-authenticate construction.
 
 ```js
 // key generation
