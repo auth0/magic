@@ -564,20 +564,20 @@ Implements `RSA PKCS#1 v2.1` over `SHA256`, better known as `RSAPSS-SHA256`. The
 magic.alt.auth.rsapsssha256(message, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
-  { alg:       'rsapss-sha256',
-    sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
-    payload:   <Buffer 41 20 73 63 ... >,
-    signature: <Buffer 86 a8 d2 d7 67  ... > }
+  // { alg:       'rsapss-sha256',
+  //   sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+  //   payload:   <Buffer 41 20 73 63 72 65 61 ... >,
+  //   signature: <Buffer 86 a8 d2 d7 67 01 8a ... > }
 });
 
 // promise
 magic.alt.auth.rsapsssha256(message)
   .then((output) => {
     console.log(output);
-    { alg:       'rsapss-sha256',
-    sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
-    payload:   <Buffer 41 20 73 63 ... >,
-    signature: <Buffer 86 a8 d2 d7 67  ... > }
+    // { alg:       'rsapss-sha256',
+    //   sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+    //   payload:   <Buffer 41 20 73 63 72 65 61 ... >,
+    //   signature: <Buffer 86 a8 d2 d7 67 01 8a ... > }
   })
   .catch((err) => {
     return reject(err);
@@ -592,9 +592,9 @@ magic.alt.auth.rsapsssha256(message, sk, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
   // { alg:       'rsapss-sha256',
-  //  sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
-  //  payload:   <Buffer 41 20 73 63 ... >,
-  //  signature: <Buffer 86 a8 d2 d7 67  ... > }
+  //   sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+  //   payload:   <Buffer 41 20 73 63 72 65 61 ... >,
+  //   signature: <Buffer 86 a8 d2 d7 67 01 8a ... > }
 });
 
 // promise
@@ -603,8 +603,8 @@ magic.alt.auth.rsapsssha256(message, sk)
     console.log(output);
     // { alg:       'rsapss-sha256',
     //   sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
-    //   payload:   <Buffer 41 20 73 63 ... >,
-    //   signature: <Buffer 86 a8 d2 d7 67  ... > }
+    //   payload:   <Buffer 41 20 73 63 72 65 61 ... >,
+    //   signature: <Buffer 86 a8 d2 d7 67 01 8a ... > }
   })
   .catch((err) => {
     return reject(err);
@@ -660,23 +660,23 @@ magic.alt.auth.rsapsssha256(message, pk)
 
 #### magic.alt.auth.rsapsssha384 | magic.alt.verify.rsapsssha384
 
-Implements `RSA PKCS#1 v2.1` over `SHA384`, better known as `RSAPSS-SHA384`. An alternative to `magic.auth.sign` and `magic.alt.auth.rsapsssha256`.
+Implements `RSA PKCS#1 v2.1` over `SHA384`, better known as `RSAPSS-SHA384`. An alternative to `magic.alt.auth.rsapsssha256`.
 
 #### magic.alt.auth.rsapsssha512 | magic.alt.verify.rsapsssha512
 
-Implements `RSA PKCS#1 v2.1` over `SHA512`, better known as `RSAPSS-SHA512`. An alternative to `magic.auth.sign` and `magic.alt.auth.rsapsssha256`.
+Implements `RSA PKCS#1 v2.1` over `SHA512`, better known as `RSAPSS-SHA512`. An alternative to `magic.alt.auth.rsapsssha256`.
 
 #### magic.alt.auth.rsav1_5sha256 | magic.alt.verify.rsav1_5sha256
 
-Implements `RSA PKCS#1 v1.5` over `SHA256`, better known as `RSAPSS-SHA256`. An alternative to `magic.auth.sign` and `magic.alt.auth.rsapsssha256`.
+Implements `RSA PKCS#1 v1.5` over `SHA256`, standardized by the [IETF](https://tools.ietf.org/html/rfc2313). An alternative to `magic.alt.auth.rsapsssha256`.
 
 #### magic.alt.auth.rsav1_5sha384 | magic.alt.verify.rsav1_5sha384
 
-Implements `RSA PKCS#1 v1.5` over `SHA384`, better known as `RSAPSS-SHA384`. An alternative to `magic.auth.sign` and `magic.alt.auth.rsapsssha256`.
+Implements `RSA PKCS#1 v1.5` over `SHA384`. An alternative to  `magic.alt.auth.rsapsssha256`.
 
 #### magic.alt.auth.rsav1_5sha512 | magic.alt.verify.rsav1_5sha512
 
-Implements `RSA PKCS#1 v1.5` over `SHA512`, better known as `RSAPSS-SHA512`. An alternative to `magic.auth.sign` and `magic.alt.auth.rsapsssha256`.
+Implements `RSA PKCS#1 v1.5` over `SHA512`. An alternative to  `magic.alt.auth.rsapsssha256`.
 
 #### magic.alt.auth.hmacsha256 | magic.alt.verify.hmacsha256
 
