@@ -793,4 +793,8 @@ Implements `SHA512` using OpenSSL through `crypto`. An alterative to `magic.util
 
 #### magic.alt.util.bcrypt | magic.alt.util.bcrypt_verify
 
-Implements `bcrypt` using [node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js/), wrapping the OpenBSD implementation of the algorithm. An alterative to `magic.util.pwhash`. The security parameter (rounds) is set to 13, to bring the computational time in line with that for the `argon2id` implementation in the core api. 
+Implements `bcrypt` using [node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js/), wrapping the OpenBSD implementation of the algorithm. An alterative to `magic.util.pwhash`. The security parameter (rounds) is set to 13, to bring the computational time in line with that of `magic.util.pwhash` on a development machine - they may not scale equivalently, but it provides a sensible default.
+
+#### Notes
+
+- As a recommendation, `magic` should always be used with [node.js buffers](https://nodejs.org/api/buffer.html) for all (non-boolean) inputs, with the exception of passwords. Due to the variety of tasks to which it may be put, the library attempts to be as unopinionated about encoding as it is opinionated about algorithms. There is minimal decoding functionality, which will attempt to break down any plaintext input as `utf-8` and any cryptographic input (keys, ciphertexts, macs, signatures, etc.) as `hex`. If as a consumer of this library you decide to depend on this builtin decoder it is recommended that you extensively test it to make sure your inputs are being parsed appropriately. When in doubt, it is always safer to parse them yourself and pass in binary data.
