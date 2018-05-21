@@ -58,12 +58,14 @@ function rsasign(digest, padding) {
    * @param {Function} cb
    * @returns {Callback|Promise}
    */
-  function keying(provided, cb) {
-    if (provided) { return cb(null, provided); }
+  function keying(provided) {
+    return new Promise((resolve, reject) => {
+      if (provided) { return resolve(provided); }
 
-    extcrypto.keygen((err, key) => {
-      if (err) { return cb(err); }
-      return cb(null, key);
+      extcrypto.keygen((err, key) => {
+        if (err) { return reject(err); }
+        return resolve(key);
+      });
     });
   }
 
@@ -90,8 +92,7 @@ function rsasign(digest, padding) {
     let payload;
     [ payload ] = iparse(message);
 
-    keying(key, (err, ikey) => {
-      if (err) { return done(err); }
+    return keying(key).then((ikey) => {
       if (!ikey) { return done(new Error('Unable to generate key')); }
 
       // for pss tests, should crypto api change in the future to allow specifying salt
@@ -114,12 +115,12 @@ function rsasign(digest, padding) {
       }
 
       return done(null, convert({
-        alg:       'rsa-' + padding + '-' + digest,
+        alg:       'rsa' + padding + '-' + digest,
         sk:        ikey,
         payload:   payload,
         signature: signature
       }));
-    });
+    }).catch((err) => { return done(err); });
   }
 }
 
@@ -153,6 +154,32 @@ function rsaverify(digest, padding) {
   }
 
   /***
+   * keying
+   *
+   * get an rsa public key, if necessary from private key
+   *
+   * @function
+   * @api private
+   *
+   * @param {String|Buffer} key
+   * @param {Function} cb
+   * @returns {Callback|Promise}
+   */
+  function keying(key) {
+    return new Promise((resolve, reject) => {
+      if (key.startsWith('-----BEGIN PUBLIC KEY-----'))     { return resolve(key); }
+      if (key.startsWith('-----BEGIN RSA PUBLIC KEY-----')) { return resolve(key); }
+
+      if (!key.startsWith('-----BEGIN RSA PRIVATE KEY-----')) { return reject(new Error('Invalid key formatting')); }
+
+      extcrypto.extract(key, (err, pkey) => {
+        if (err) { return reject(err); }
+        return resolve(pkey);
+      });
+    });
+  }
+
+  /***
    * `lambda`
    *
    * verify a signature
@@ -179,28 +206,30 @@ function rsaverify(digest, padding) {
     [ payload ]  = iparse(message);
     [ received ] = cparse(signature);
 
-    ikey = key;
+    return keying(key).then((ikey) => {
+      if (!ikey) { return done(new Error('Unable to load key')); }
 
-    let verified;
-    try {
-      const alg    = ('rsa-' + digest).toUpperCase();
-      const verify = crypto.createVerify(alg);
-      verify.update(message);
-      verify.end();
+      let verified;
+      try {
+        const alg    = ('rsa-' + digest).toUpperCase();
+        const verify = crypto.createVerify(alg);
+        verify.update(message);
+        verify.end();
 
-      verified = verify.verify({ key: ikey, padding: algorithm }, received);
-    } catch(ex) {
-      return done(new Error('Crypto error: ' + ex));
-    }
+        verified = verify.verify({ key: ikey, padding: algorithm }, received);
+      } catch(ex) {
+        return done(new Error('Crypto error: ' + ex));
+      }
 
-    if (!verified) { return done(new Error('Invalid signature')); }
+      if (!verified) { return done(new Error('Invalid signature')); }
 
-    return done();
+      return done();
+    }).catch((err) => { return done(err); });
   }
 }
 
 
- /***
+/***
  * mac
  *
  * mac constructor
@@ -1904,7 +1933,6 @@ function vbcrypt(password, hash, cb) {
       if (!verified) { return done(new Error('Invalid password')); }
       return done();
     }).catch((ex) => {
-      console.log(ex);
       return done(new Error('Bcrypt error: ' + ex));
     });
 }

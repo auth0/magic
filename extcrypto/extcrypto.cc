@@ -78,7 +78,7 @@ namespace extcrypto {
     BIO* obio = BIO_new(BIO_s_mem());
     RSA* rsa  = RSA_new();
 
-    BIO_read(ibio, skey, strlen(skey));
+    BIO_write(ibio, skey, strlen(skey));
     PEM_read_bio_RSAPrivateKey(ibio, &rsa, NULL, NULL);
     PEM_write_bio_RSAPublicKey(obio, rsa);
 

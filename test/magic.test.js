@@ -1168,6 +1168,714 @@ describe('magic tests', () => {
 
   describe('alt api', () => {
 
+    const RSAKEYS = {
+      sk: `-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAyLpqpUjdaBbsN9shuY0vNipkPrFZNK583n+VaXmMRPbASyTF
+A6PlhC7W/e/g1dCspJH0Md+GU7nf/bosq8vlzQd0Q9iMWXybU08JYr/JIvSRprB3
+pQ7LPjwkigHgPvXNqb7U/czmX2vfexRRR/gjuGmAGC8kVUMTHZGAQVdMl188Ydzv
+namzh0XquypGuw44WShWMyCExRl44SoVFe2YkSKHU3Ivt2VfW9BjhC/5dSQGtzdj
+p0ZsV7OOCwH19+xFtL3efSH6tJXbM1fuOuyg/X7kb9KTcmnSTaUst9NBjJYWe2fm
+3c6oyatVy6gmdoiMnVLM2nIgzA3YYeR0CjFknwIDAQABAoIBAQCdpxR1xrnmtAJJ
+iHl/c6z9/OOI/d/Taaw3ULt4APgzfh3fpvx59HMik2tWPN448NF33A6QUT/+aIHN
+lTjaoaVWmCEv3Fe3PQ/9qZj0jy8Znj77TaRa5jipI7GLFxgaOxKR3IkK4bCah24a
+DAYe4XykrW/nDreZo7nSwmGacEd+pu59EqxoB1z7gXytSedV/mah4hHn92wXgBwC
+kwtzpvqh7qsvAEczdxLZx/gU2/Ri4LGQvdPg8kGftjFRmKTsUuDDq+PZ5bi58ere
+lxBt5blocKwpKeyrRJVOX/UUKb6rLTn87XEOp09ogNdglcUZduJ7rOIzrk83zuKj
+siZQnv8hAoGBAP88IelMtMk802z8ulGf/j2NZ9oNToIG+lbkewxqetdMEIzKTVYM
+RN7LaXxRIJQ+d7Ojow9dLMeZAPXnQaUf0GcZQ7xqGtWZ8PDs6AoGgwZh276u2dy0
+e+6HbcAvBhtHbUZ/o5Fr0lwG9YN+gWnP/oxDpss3tDpWofDYdSH43czxAoGBAMlU
+dKM4mksYZZG1ZIUyqvmgL4is/jMmYnnj0i5rgc2k7r2v00yRLc9GbWOkS9JqyO4F
+65dDczAvwrzxyGj4f0Yq2rSfvWFQkEBRnieXMzPVyrQcTdsOrCcCz+TK5RPnSluV
+VgCMJjI2i92kzZ+na2FBeqPlz8aCKb1wPDpa8oqPAoGAQc0+8ObVtQv5dh+x6VlW
+MohCPfUwSFWENOKy1oCdKuRxX9rIFWcUWlwW1fYUcCOquKV3ZH6hDNRlawAz7F5H
+XE0nKWwxfuAxPevV5r/HB94yyPZLNJtTWCuSH/n/mQjRI1vEz7j8gr1Ijp4Ovzjg
+Z0kJt1qlHGU5Wt5zVE7U4AECgYEAtCuBaeQoqBWAJ8JV36F1QolooH53yhyKuhv4
+JxSMiBUWleg4RugRP9H96NLKC9cGU4Q2zhpNhgzn0CDrwYzIkWmeaVAesWzger7P
+swxrhPLJQR+nSOc7hnnMxCoSkRpF/+mHmlvRftQznLl0TnEL9nAbqXrq0vH/GonL
+TEnBjd8CgYAtlllCAqDQPD9GtW/idaKol/NE+WbDOFjO7PSIkcwS4WAC3v/a63xv
+KLZ8E01N5J6GV6Twx7/o5GjbHMgJR8kCCMRbwZV2Iy8W539CTsRHr7q9MP9roWlJ
+nkCAx8LYFGSCh+jjhCpXet468ipLdcWHTVCVaPVEHQ7sTVbLtNZ3Yw==
+-----END RSA PRIVATE KEY-----`,
+      pk: `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyLpqpUjdaBbsN9shuY0v
+NipkPrFZNK583n+VaXmMRPbASyTFA6PlhC7W/e/g1dCspJH0Md+GU7nf/bosq8vl
+zQd0Q9iMWXybU08JYr/JIvSRprB3pQ7LPjwkigHgPvXNqb7U/czmX2vfexRRR/gj
+uGmAGC8kVUMTHZGAQVdMl188Ydzvnamzh0XquypGuw44WShWMyCExRl44SoVFe2Y
+kSKHU3Ivt2VfW9BjhC/5dSQGtzdjp0ZsV7OOCwH19+xFtL3efSH6tJXbM1fuOuyg
+/X7kb9KTcmnSTaUst9NBjJYWe2fm3c6oyatVy6gmdoiMnVLM2nIgzA3YYeR0CjFk
+nwIDAQAB
+-----END PUBLIC KEY-----`
+    }
+
+    describe('rsapsssha256', () => {
+
+      let sk, pk;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation (private key)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsapsssha256(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsapsssha256(message, sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsapsssha256(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsapsssha256(message, sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsapsssha256(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsapsssha256(message, sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('without key generation (private and public keys)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsapsssha256(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsapsssha256(message, pk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsapsssha256(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsapsssha256(message, pk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsapsssha256(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsapsssha256(message, pk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsapsssha256(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsapsssha256(message, output.sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsapsssha256(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsapsssha256(message, output.sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsapsssha256(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha256');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsapsssha256(message, output.sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error without key on validation', (done) => {
+          magic.alt.auth.rsapsssha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsapss-sha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            magic.alt.verify.rsapsssha256(message, null, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot verify without a key');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if message is altered', (done) => {
+          magic.alt.auth.rsapsssha256(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsapss-sha256');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            const altered = 'Some other message';
+
+            magic.alt.verify.rsapsssha256(altered, output.sk, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid signature');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    describe('rsapsssha384', () => {
+
+      let sk, pk;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation (private key)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsapsssha384(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsapsssha384(message, sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsapsssha384(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsapsssha384(message, sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsapsssha384(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsapsssha384(message, sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('without key generation (private and public keys)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsapsssha384(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsapsssha384(message, pk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsapsssha384(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsapsssha384(message, pk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsapsssha384(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsapsssha384(message, pk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsapsssha384(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsapsssha384(message, output.sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsapsssha384(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsapsssha384(message, output.sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsapsssha384(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha384');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsapsssha384(message, output.sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error without key on validation', (done) => {
+          magic.alt.auth.rsapsssha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsapss-sha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            magic.alt.verify.rsapsssha384(message, null, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot verify without a key');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if message is altered', (done) => {
+          magic.alt.auth.rsapsssha384(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsapss-sha384');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            const altered = 'Some other message';
+
+            magic.alt.verify.rsapsssha384(altered, output.sk, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid signature');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    describe('rsapsssha512', () => {
+
+      let sk, pk;
+      const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
+
+      describe('success', () => {
+
+        describe('without key generation (private key)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsapsssha512(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsapsssha512(message, sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsapsssha512(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsapsssha512(message, sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsapsssha512(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsapsssha512(message, sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('without key generation (private and public keys)', (done) => {
+
+          before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsapsssha512(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsapsssha512(message, pk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsapsssha512(message, sk).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.equal(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsapsssha512(message, pk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsapsssha512(message, sk, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk, sk);
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsapsssha512(message, pk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+
+        describe('with key generation', () => {
+
+          it('should verify a computed signature - callback api', (done) => {
+            magic.alt.auth.rsapsssha512(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              magic.alt.verify.rsapsssha512(message, output.sk, output.signature, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a computed signature - promise api', (done) => {
+            magic.alt.auth.rsapsssha512(message).then((output) => {
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              return magic.alt.verify.rsapsssha512(message, output.sk, output.signature);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+
+          it('should verify a computed signature w/ hex encoding', (done) => {
+            magic.alt.auth.rsapsssha512(message, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'rsapss-sha512');
+              assert.equal(output.payload.toString('utf-8'), message);
+              assert.ok(output.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'));
+
+              assert.ok(output.signature);
+
+              const esig = output.signature.toString('hex');
+
+              magic.alt.verify.rsapsssha512(message, output.sk, esig, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should error without key on validation', (done) => {
+          magic.alt.auth.rsapsssha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsapss-sha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            magic.alt.verify.rsapsssha512(message, null, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot verify without a key');
+
+              done();
+            });
+          });
+        });
+
+        it('should fail if message is altered', (done) => {
+          magic.alt.auth.rsapsssha512(message, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+
+            assert.equal(output.alg, 'rsapss-sha512');
+            assert.equal(output.payload.toString('utf-8'), message);
+
+            assert.ok(output.sk);
+            assert.ok(output.signature);
+
+            const altered = 'Some other message';
+
+            magic.alt.verify.rsapsssha512(altered, output.sk, output.signature, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid signature');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
     describe('hmacsha256', () => {
 
       let key;
