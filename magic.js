@@ -1,7 +1,8 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
-const cp     = require('child_process');
+
+const extcrypto = require('./extcrypto');
 
 
 // Constants
@@ -60,9 +61,9 @@ function rsasign(digest, padding) {
   function keying(provided, cb) {
     if (provided) { return cb(null, provided); }
 
-    cp.execFile('openssl', [ 'genpkey', '-algorithm', 'rsa', '2048' ], { timeout: 5000 }, (err, stdout, stderr) => {
+    extcrypto.keygen((err, key) => {
       if (err) { return cb(err); }
-      return cb(null, stdout);
+      return cb(null, key);
     });
   }
 
