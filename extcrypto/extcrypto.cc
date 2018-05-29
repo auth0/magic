@@ -1,5 +1,6 @@
 // extcrypto.cc - some openssl wrappers to extend RSA support
 #include <node.h>
+#include <string.h>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/bio.h>
@@ -16,12 +17,6 @@ namespace extcrypto {
   using v8::Object;
   using v8::String;
   using v8::Value;
-
-
-  char* cstr(Local<String> str) {
-    String::Utf8Value value(str);
-    return *value;
-  }
 
 
   void ret(Isolate* isolate, Local<Function> cb, Local<String> statement) {
@@ -59,7 +54,7 @@ namespace extcrypto {
     char* key   = (char *) calloc(kl + 1, 1);
     BIO_read(bio, key, kl);
 
-    BIO_free_all(bio);
+    BIO_vfree(bio);
     RSA_free(rsa);
     BN_free(exp);
 
@@ -72,22 +67,21 @@ namespace extcrypto {
     Local<String> pem  = Local<String>::Cast(args[0]);
     Local<Function> cb = Local<Function>::Cast(args[1]);
 
-    char* skey = cstr(pem);
+    String::Utf8Value ipem(pem);
+    char* skey(*ipem);
 
-    BIO* ibio = BIO_new(BIO_s_mem());
-    BIO* obio = BIO_new(BIO_s_mem());
-    RSA* rsa  = RSA_new();
+    BIO* bio = BIO_new(BIO_s_mem());
+    RSA* rsa = RSA_new();
 
-    BIO_write(ibio, skey, strlen(skey));
-    PEM_read_bio_RSAPrivateKey(ibio, &rsa, NULL, NULL);
-    PEM_write_bio_RSAPublicKey(obio, rsa);
+    BIO_write(bio, skey, strlen(skey));
+    PEM_read_bio_RSAPrivateKey(bio, &rsa, NULL, NULL);
+    PEM_write_bio_RSAPublicKey(bio, rsa);
 
-    unsigned kl = BIO_pending(obio);
+    unsigned kl = BIO_pending(bio);
     char* pkey  = (char *) calloc(kl + 1, 1);
-    BIO_read(obio, pkey, kl);
+    BIO_read(bio, pkey, kl);
 
-    BIO_free_all(ibio);
-    BIO_free_all(obio);
+    BIO_vfree(bio);
     RSA_free(rsa);
 
     return ret(isolate, cb, String::NewFromUtf8(isolate, pkey));
