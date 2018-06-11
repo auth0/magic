@@ -898,12 +898,14 @@ function alt() {
 
 // TODO: Figure out why this describe doesn't print
 describe('test vectors', () => {
-  const apis = [ core, alt ];
+  sodium.ready.then(() => {
+    const apis = [ core, alt ];
 
-  (function setup() {
-    const api = apis.shift();
-    if (!api) { return run(); }
+    (function setup() {
+      const api = apis.shift();
+      if (!api) { return run(); }
 
-    api(setup);
-  })();
+      api(setup);
+    })();
+  });
 });

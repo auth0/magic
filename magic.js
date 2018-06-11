@@ -93,7 +93,7 @@ function rsasign(digest, padding) {
     [ payload ] = iparse(message);
 
     return keying(sk).then((isk) => {
-      if (!isk) { return done(new Error('Unable to generate sk')); }
+      if (!isk) { return done(new Error('Unable to generate key')); }
 
       // for pss tests, should crypto api change in the future to allow specifying salt
       //let salt;
@@ -109,7 +109,7 @@ function rsasign(digest, padding) {
         sign.update(message);
         sign.end();
 
-        signature = sign.sign({ sk: isk, padding: algorithm });
+        signature = sign.sign({ key: isk, padding: algorithm });
       } catch(ex) {
         return done(new Error('Crypto error: ' + ex));
       }
@@ -188,26 +188,26 @@ function rsaverify(digest, padding) {
    * @api private
    *
    * @param {String|Buffer} message
-   * @param {String|Buffer} key
+   * @param {String|Buffer} pk
    * @param {String|Buffer} signature
    * @param {Function} cb
    * @returns {Callback|Promise}
    */
   return (message, pk, signature, cb) => {
     if (typeof pk === 'function') {
-      cb  = pk;
+      cb = pk;
       pk = null;
     }
     const done = ret(cb);
 
-    if (!pk) { return done(new Error('Cannot verify without a pk')); }
+    if (!pk) { return done(new Error('Cannot verify without a key')); }
 
     let payload, received, ipk;
     [ payload ]  = iparse(message);
     [ received ] = cparse(signature);
 
     return keying(pk).then((ipk) => {
-      if (!ipk) { return done(new Error('Unable to load pk')); }
+      if (!ipk) { return done(new Error('Unable to load key')); }
 
       let verified;
       try {
@@ -216,7 +216,7 @@ function rsaverify(digest, padding) {
         verify.update(message);
         verify.end();
 
-        verified = verify.verify({ pk: ipk, padding: algorithm }, received);
+        verified = verify.verify({ key: ipk, padding: algorithm }, received);
       } catch(ex) {
         return done(new Error('Crypto error: ' + ex));
       }
@@ -322,7 +322,7 @@ function vmac(algorithm) {
   return (message, sk, tag, cb) => {
     const done = ret(cb);
 
-    if (!sk) { return done(new Error('Cannot verify without a sk')); }
+    if (!sk) { return done(new Error('Cannot verify without a key')); }
 
     let payload, received, isk;
     [ payload ]      = iparse(message);
@@ -533,14 +533,14 @@ function gcm(keysize) {
     let iv;
     if (sk && typeof sk === 'object' && !(sk instanceof Buffer)) {
       iv = sk.iv;
-      sk = sk.sk;
+      sk = sk.key;
     }
 
     let payload, isk;
     [ payload ] = iparse(message);
     [ sk, iv ]  = cparse(sk, iv);
 
-    if (!sk) { sk = crypto.randomBytes(sksize / 8); }
+    if (!sk) { sk = crypto.randomBytes(keysize / 8); }
 
     isk = sk;
 
@@ -548,7 +548,7 @@ function gcm(keysize) {
     try {
       iv = iv || crypto.randomBytes(12);
 
-      const cipher = crypto.createCipheriv('aes-' + sksize + '-gcm', sk, iv);
+      const cipher = crypto.createCipheriv('aes-' + keysize + '-gcm', sk, iv);
       ciphertext   = Buffer.concat([ cipher.update(payload), cipher.final() ]);
       tag          = cipher.getAuthTag();
     } catch (ex) {
@@ -556,7 +556,7 @@ function gcm(keysize) {
     }
 
     return done(null, convert({
-      alg:        'aes' + sksize + 'gcm',
+      alg:        'aes' + keysize + 'gcm',
       sk:         sk,
       payload:    payload,
       iv:         iv,
@@ -599,7 +599,7 @@ function dgcm(keysize) {
   return (sk, iv, ciphertext, tag, cb) => {
     const done = ret(cb);
 
-    if (!sk) { return done(new Error('Cannot decrypt without a sk')); }
+    if (!sk) { return done(new Error('Cannot decrypt without a key')); }
 
     let isk;
     [ sk, iv, ciphertext, tag ] = cparse(sk, iv, ciphertext, tag);
@@ -608,7 +608,7 @@ function dgcm(keysize) {
 
     let plaintext;
     try {
-      const cipher = crypto.createDecipheriv('aes-' + sksize + '-gcm', isk, iv);
+      const cipher = crypto.createDecipheriv('aes-' + keysize + '-gcm', isk, iv);
       cipher.setAuthTag(tag);
 
       plaintext = Buffer.concat([ cipher.update(ciphertext), cipher.final() ]);
@@ -698,7 +698,7 @@ module.exports.util      = new Object();
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.auth.sign = sign;
+module.exports.auth.sign = (m, s, cb) => { return sodium.ready.then(() => { return sign(m, s, cb); } ) }
 function sign(message, sk, cb) {
   if (typeof sk === 'function') {
     cb = sk;
@@ -711,14 +711,14 @@ function sign(message, sk, cb) {
   [ sk ]      = cparse(sk);
 
   switch (sk && Buffer.byteLength(sk)) {
-    case sodium.crypto_sign_SECRETSKBYTES:
+    case sodium.crypto_sign_SECRETKEYBYTES:
       isk = sk;
       break;
     case sodium.crypto_sign_SEEDBYTES:
-      isk = sodium.crypto_sign_seed_skpair(sk).privateSk;
+      isk = sodium.crypto_sign_seed_keypair(sk).privateKey;
       break;
     default:
-      isk = sodium.crypto_sign_skpair().privateSk;
+      isk = sodium.crypto_sign_keypair().privateKey;
       sk  = sodium.crypto_sign_ed25519_sk_to_seed(isk);
   }
 
@@ -753,7 +753,7 @@ function sign(message, sk, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.verify.sign = vsign;
+module.exports.verify.sign = (m, sk, s, i, cb) => { return sodium.ready.then(() => { return vsign(m, sk, s, i, cb); } ) }
 function vsign(message, sk, signature, issk, cb) {
   if (typeof issk === 'function') {
     cb   = issk;
@@ -761,13 +761,13 @@ function vsign(message, sk, signature, issk, cb) {
   }
   const done = ret(cb);
 
-  if (!sk) { return done(new Error('Cannot verify without a sk')); }
+  if (!sk) { return done(new Error('Cannot verify without a key')); }
 
   let payload, received, isk;
   [ payload ]      = iparse(message);
   [ sk, received ] = cparse(sk, signature);
 
-  isk = (issk) ? sk : sodium.crypto_sign_seed_skpair(sk).publicSk;
+  isk = (issk) ? sk : sodium.crypto_sign_seed_keypair(sk).publicKey;
 
   let verified;
   try {
@@ -829,7 +829,7 @@ module.exports.verify.mac = vmac('sha384');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.encrypt.async = async;
+module.exports.encrypt.async = (m, s, p, cb) => { return sodium.ready.then(() => { return async(m, s, p, cb); } ) };
 function async(message, sk, pk, cb) {
   if (typeof sk === 'function') {
     cb = sk;
@@ -894,7 +894,7 @@ function async(message, sk, pk, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.decrypt.async = dasync;
+module.exports.decrypt.async = (s, p, c, n, cb) => { return sodium.ready.then(() => { return dasync(s, p, c, n, cb); } ) };
 function dasync(sk, pk, ciphertext, nonce, cb) {
   const done = ret(cb);
 
@@ -930,7 +930,7 @@ function dasync(sk, pk, ciphertext, nonce, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.encrypt.sync = sync;
+module.exports.encrypt.sync = (m, s, cb) => { return sodium.ready.then(() => { return sync(m, s, cb); } ) };
 function sync(message, sk, cb) {
   if (typeof sk === 'function') {
     cb = sk;
@@ -986,7 +986,7 @@ function sync(message, sk, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.decrypt.sync = dsync;
+module.exports.decrypt.sync = (s, c, n, cb) => { return sodium.ready.then(() => { return dsync(s, c, n, cb); } ) };;
 function dsync(sk, ciphertext, nonce, cb) {
   const done = ret(cb);
 
@@ -1035,7 +1035,7 @@ module.exports.util.hash = hash('sha384');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.util.pwhash = pwhash;
+module.exports.util.pwhash = (p, cb) => { return sodium.ready.then(() => { return pwhash(p, cb); } ) };
 function pwhash(password, cb) {
   const done = ret(cb);
 
@@ -1069,7 +1069,7 @@ function pwhash(password, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.util.pwverify = pwverify;
+module.exports.util.pwverify = (p, h, cb) => { return sodium.ready.then(() => { return pwverify(p, h, cb); } ) };
 function pwverify(password, hash, cb) {
   const done = ret(cb);
 
