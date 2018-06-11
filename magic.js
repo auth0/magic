@@ -62,9 +62,9 @@ function rsasign(digest, padding) {
     return new Promise((resolve, reject) => {
       if (provided) { return resolve(provided); }
 
-      extcrypto.keygen((err, key) => {
+      extcrypto.keygen((err, sk) => {
         if (err) { return reject(err); }
-        return resolve(key);
+        return resolve(sk);
       });
     });
   }
@@ -78,28 +78,28 @@ function rsasign(digest, padding) {
    * @api private
    *
    * @param {String|Buffer} message
-   * @param {String|Buffer} key
+   * @param {String|Buffer} sk
    * @param {Function} cb
    * @returns {Callback|Promise}
    */
-  return (message, key, cb) => {
-    if (typeof key === 'function') {
-      cb  = key;
-      key = null;
+  return (message, sk, cb) => {
+    if (typeof sk === 'function') {
+      cb = sk;
+      sk = null;
     }
     const done = ret(cb);
 
     let payload;
     [ payload ] = iparse(message);
 
-    return keying(key).then((ikey) => {
-      if (!ikey) { return done(new Error('Unable to generate key')); }
+    return keying(sk).then((isk) => {
+      if (!isk) { return done(new Error('Unable to generate sk')); }
 
       // for pss tests, should crypto api change in the future to allow specifying salt
       //let salt;
-      //if (typeof ikey === 'object' && padding === crypto.constants.RSA_PKCS1_PSS_PADDING) {
-      //  salt = ikey.salt;
-      //  ikey = ikey.key;
+      //if (typeof isk === 'object' && padding === crypto.constants.RSA_PKCS1_PSS_PADDING) {
+      //  salt = isk.salt;
+      //  isk = isk.sk;
       //}
 
       let signature;
@@ -109,14 +109,14 @@ function rsasign(digest, padding) {
         sign.update(message);
         sign.end();
 
-        signature = sign.sign({ key: ikey, padding: algorithm });
+        signature = sign.sign({ sk: isk, padding: algorithm });
       } catch(ex) {
         return done(new Error('Crypto error: ' + ex));
       }
 
       return done(null, convert({
         alg:       'rsa' + padding + '-' + digest,
-        sk:        ikey,
+        sk:        isk,
         payload:   payload,
         signature: signature
       }));
@@ -193,21 +193,21 @@ function rsaverify(digest, padding) {
    * @param {Function} cb
    * @returns {Callback|Promise}
    */
-  return (message, key, signature, cb) => {
-    if (typeof key === 'function') {
-      cb  = key;
-      key = null;
+  return (message, pk, signature, cb) => {
+    if (typeof pk === 'function') {
+      cb  = pk;
+      pk = null;
     }
     const done = ret(cb);
 
-    if (!key) { return done(new Error('Cannot verify without a key')); }
+    if (!pk) { return done(new Error('Cannot verify without a pk')); }
 
-    let payload, received, ikey;
+    let payload, received, ipk;
     [ payload ]  = iparse(message);
     [ received ] = cparse(signature);
 
-    return keying(key).then((ikey) => {
-      if (!ikey) { return done(new Error('Unable to load key')); }
+    return keying(pk).then((ipk) => {
+      if (!ipk) { return done(new Error('Unable to load pk')); }
 
       let verified;
       try {
@@ -216,7 +216,7 @@ function rsaverify(digest, padding) {
         verify.update(message);
         verify.end();
 
-        verified = verify.verify({ key: ikey, padding: algorithm }, received);
+        verified = verify.verify({ pk: ipk, padding: algorithm }, received);
       } catch(ex) {
         return done(new Error('Crypto error: ' + ex));
       }
@@ -253,36 +253,36 @@ function mac(algorithm) {
    * @api private
    *
    * @param {String|Buffer} message
-   * @param {String|Buffer} key
+   * @param {String|Buffer} sk
    * @param {Function} cb
    * @returns {Callback|Promise}
    */
-  return (message, key, cb) => {
-    if (typeof key === 'function') {
-      cb  = key;
-      key = null;
+  return (message, sk, cb) => {
+    if (typeof sk === 'function') {
+      cb  = sk;
+      sk = null;
     }
     const done = ret(cb);
 
     // https://tools.ietf.org/html/rfc2104#section-3
-    if (!key) { key = crypto.randomBytes(HASHBYTES[algorithm]); }
+    if (!sk) { sk = crypto.randomBytes(HASHBYTES[algorithm]); }
 
-    let payload, ikey;
+    let payload, isk;
     [ payload ] = iparse(message);
-    [ key ]     = cparse(key);
+    [ sk ]      = cparse(sk);
 
-    ikey = key;
+    isk = sk;
 
     let mac;
     try {
-      mac = crypto.createHmac(algorithm, ikey).update(message).digest();
+      mac = crypto.createHmac(algorithm, isk).update(message).digest();
     } catch(ex) {
       return done(new Error('Crypto error: ' + ex));
     }
 
     return done(null, convert({
       alg:     'hmac' + algorithm,
-      sk:      key,
+      sk:      sk,
       payload: payload,
       mac:     mac
     }));
@@ -314,25 +314,25 @@ function vmac(algorithm) {
    * @api private
    *
    * @param {String|Buffer} message
-   * @param {String|Buffer} key
+   * @param {String|Buffer} sk
    * @param {String|Buffer} mac
    * @param {Function} cb
    * @returns {Callback|Promise}
    */
-  return (message, key, tag, cb) => {
+  return (message, sk, tag, cb) => {
     const done = ret(cb);
 
-    if (!key) { return done(new Error('Cannot verify without a key')); }
+    if (!sk) { return done(new Error('Cannot verify without a sk')); }
 
-    let payload, received, ikey;
-    [ payload ]       = iparse(message);
-    [ key, received ] = cparse(key, tag);
+    let payload, received, isk;
+    [ payload ]      = iparse(message);
+    [ sk, received ] = cparse(sk, tag);
 
-    ikey = key;
+    isk = sk;
 
     let mac, verified;
     try {
-      mac      = crypto.createHmac(algorithm, ikey).update(message).digest();
+      mac      = crypto.createHmac(algorithm, isk).update(message).digest();
       verified = cnstcomp(mac, received);
     } catch(ex) {
       return done(new Error('Crypto error: ' + ex));
@@ -370,46 +370,46 @@ function cbc(digest, keysize) {
    * @api private
    *
    * @param {String|Buffer} message
-   * @param {String|Buffer} ekey
-   * @param {String|Buffer} akey
+   * @param {String|Buffer} ek
+   * @param {String|Buffer} ak
    * @param {Function} cb
    * @returns {Callback|Promise}
    */
-  return (message, ekey, akey, cb) => {
-    if (typeof ekey === 'function') {
-      cb   = ekey;
-      ekey = null;
-      akey = null;
+  return (message, ek, ak, cb) => {
+    if (typeof ek === 'function') {
+      cb   = ek;
+      ek = null;
+      ak = null;
     }
     const done = ret(cb);
 
-    if (!!ekey ^ !!akey) { return done(new Error('Requires both or neither of encryption and authentication keys')); }
+    if (!!ek ^ !!ak) { return done(new Error('Requires both or neither of encryption and authentication keys')); }
 
     // Undocumented functionality to allow specifying iv for tests.
     let iv;
-    if (ekey && typeof ekey === 'object' && !(ekey instanceof Buffer)) {
-      iv   = ekey.iv;
-      ekey = ekey.key;
+    if (ek && typeof ek === 'object' && !(ek instanceof Buffer)) {
+      iv = ek.iv;
+      ek = ek.key;
     }
 
-    let payload, iekey, iakey;
-    [ payload ]        = iparse(message);
-    [ ekey, akey, iv ] = cparse(ekey, akey, iv);
+    let payload, iek, iak;
+    [ payload ]    = iparse(message);
+    [ ek, ak, iv ] = cparse(ek, ak, iv);
 
-    if (!ekey) {
-      ekey = crypto.randomBytes(keysize / 8);
-      akey = crypto.randomBytes(HASHBYTES[digest]);
+    if (!ek) {
+      ek = crypto.randomBytes(keysize / 8);
+      ak = crypto.randomBytes(HASHBYTES[digest]);
     }
 
-    iekey = ekey;
-    iakey = akey;
+    iek = ek;
+    iak = ak;
 
     let ciphertext, mac;
     try {
       iv = iv || crypto.randomBytes(16);
 
-      const cipher = crypto.createCipheriv('aes-' + keysize + '-cbc', iekey, iv);
-      const hmac   = crypto.createHmac(digest, iakey);
+      const cipher = crypto.createCipheriv('aes-' + keysize + '-cbc', iek, iv);
+      const hmac   = crypto.createHmac(digest, iak);
 
       ciphertext = Buffer.concat([ cipher.update(payload), cipher.final() ]);
 
@@ -421,8 +421,8 @@ function cbc(digest, keysize) {
 
     return done(null, convert({
       alg:        'aes' + keysize + 'cbc-hmac' + digest,
-      sek:        ekey,
-      sak:        akey,
+      sek:        ek,
+      sak:        ak,
       payload:    payload,
       iv:         iv,
       ciphertext: ciphertext,
@@ -456,29 +456,29 @@ function dcbc(digest, keysize) {
    * @function
    * @api private
    *
-   * @param {String|Buffer} ekey
-   * @param {String|Buffer} akey
+   * @param {String|Buffer} ek
+   * @param {String|Buffer} ak
    * @param {String|Buffer} iv
    * @param {String|Buffer} ciphertext
    * @param {String|Buffer} mac
    * @param {Function} cb
    * @returns {Callback|Promise}
    */
-  return (ekey, akey, iv, ciphertext, mac, cb) => {
+  return (ek, ak, iv, ciphertext, mac, cb) => {
     const done = ret(cb);
 
-    if (!ekey || !akey) { return done(new Error('Cannot decrypt without encryption and authentication keys')); }
+    if (!ek || !ak) { return done(new Error('Cannot decrypt without encryption and authentication keys')); }
 
-    let iekey, iakey;
-    [ ekey, akey, iv, ciphertext, mac ] = cparse(ekey, akey, iv, ciphertext, mac);
+    let iek, iak;
+    [ ek, ak, iv, ciphertext, mac ] = cparse(ek, ak, iv, ciphertext, mac);
 
-    iekey = ekey;
-    iakey = akey;
+    iek = ek;
+    iak = ak;
 
     let plaintext;
     try {
-      const cipher = crypto.createDecipheriv('aes-' + keysize + '-cbc', iekey, iv);
-      const hmac   = crypto.createHmac(digest, iakey);
+      const cipher = crypto.createDecipheriv('aes-' + keysize + '-cbc', iek, iv);
+      const hmac   = crypto.createHmac(digest, iak);
 
       hmac.update(Buffer.concat([ iv, ciphertext ]));
       const received = hmac.digest();
@@ -518,37 +518,37 @@ function gcm(keysize) {
    * @api private
    *
    * @param {String|Buffer} message
-   * @param {String|Buffer} key
+   * @param {String|Buffer} sk
    * @param {Function} cb
    * @returns {Callback|Promise}
    */
-  return (message, key, cb) => {
-    if (typeof key === 'function') {
-      cb  = key;
-      key = null;
+  return (message, sk, cb) => {
+    if (typeof sk === 'function') {
+      cb = sk;
+      sk = null;
     }
     const done = ret(cb);
 
     // Undocumented functionality to allow specifying iv for tests.
     let iv;
-    if (key && typeof key === 'object' && !(key instanceof Buffer)) {
-      iv  = key.iv;
-      key = key.key;
+    if (sk && typeof sk === 'object' && !(sk instanceof Buffer)) {
+      iv = sk.iv;
+      sk = sk.sk;
     }
 
-    let payload, ikey;
+    let payload, isk;
     [ payload ] = iparse(message);
-    [ key, iv ] = cparse(key, iv);
+    [ sk, iv ]  = cparse(sk, iv);
 
-    if (!key) { key = crypto.randomBytes(keysize / 8); }
+    if (!sk) { sk = crypto.randomBytes(sksize / 8); }
 
-    ikey = key;
+    isk = sk;
 
     let ciphertext, tag;
     try {
       iv = iv || crypto.randomBytes(12);
 
-      const cipher = crypto.createCipheriv('aes-' + keysize + '-gcm', key, iv);
+      const cipher = crypto.createCipheriv('aes-' + sksize + '-gcm', sk, iv);
       ciphertext   = Buffer.concat([ cipher.update(payload), cipher.final() ]);
       tag          = cipher.getAuthTag();
     } catch (ex) {
@@ -556,8 +556,8 @@ function gcm(keysize) {
     }
 
     return done(null, convert({
-      alg:        'aes' + keysize + 'gcm',
-      sk:         key,
+      alg:        'aes' + sksize + 'gcm',
+      sk:         sk,
       payload:    payload,
       iv:         iv,
       ciphertext: ciphertext,
@@ -589,26 +589,26 @@ function dgcm(keysize) {
    * @function
    * @api private
    *
-   * @param {String|Buffer} key
+   * @param {String|Buffer} sk
    * @param {String|Buffer} iv
    * @param {String|Buffer} ciphertext
    * @param {String|Buffer} tag
    * @param {Function} cb
    * @returns {Callback|Promise}
    */
-  return (key, iv, ciphertext, tag, cb) => {
+  return (sk, iv, ciphertext, tag, cb) => {
     const done = ret(cb);
 
-    if (!key) { return done(new Error('Cannot decrypt without a key')); }
+    if (!sk) { return done(new Error('Cannot decrypt without a sk')); }
 
-    let ikey;
-    [ key, iv, ciphertext, tag ] = cparse(key, iv, ciphertext, tag);
+    let isk;
+    [ sk, iv, ciphertext, tag ] = cparse(sk, iv, ciphertext, tag);
 
-    ikey = key;
+    isk = sk;
 
     let plaintext;
     try {
-      const cipher = crypto.createDecipheriv('aes-' + keysize + '-gcm', ikey, iv);
+      const cipher = crypto.createDecipheriv('aes-' + sksize + '-gcm', isk, iv);
       cipher.setAuthTag(tag);
 
       plaintext = Buffer.concat([ cipher.update(ciphertext), cipher.final() ]);
@@ -694,44 +694,44 @@ module.exports.util      = new Object();
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
 module.exports.auth.sign = sign;
-function sign(message, key, cb) {
-  if (typeof key === 'function') {
-    cb  = key;
-    key = null;
+function sign(message, sk, cb) {
+  if (typeof sk === 'function') {
+    cb = sk;
+    sk = null;
   }
   const done = ret(cb);
 
-  let payload, ikey;
+  let payload, isk;
   [ payload ] = iparse(message);
-  [ key ]     = cparse(key);
+  [ sk ]      = cparse(sk);
 
-  switch (key && Buffer.byteLength(key)) {
-    case sodium.crypto_sign_SECRETKEYBYTES:
-      ikey = key;
+  switch (sk && Buffer.byteLength(sk)) {
+    case sodium.crypto_sign_SECRETSKBYTES:
+      isk = sk;
       break;
     case sodium.crypto_sign_SEEDBYTES:
-      ikey = sodium.crypto_sign_seed_keypair(key).privateKey;
+      isk = sodium.crypto_sign_seed_skpair(sk).privateSk;
       break;
     default:
-      ikey = sodium.crypto_sign_keypair().privateKey;
-      key  = sodium.crypto_sign_ed25519_sk_to_seed(ikey);
+      isk = sodium.crypto_sign_skpair().privateSk;
+      sk  = sodium.crypto_sign_ed25519_sk_to_seed(isk);
   }
 
   let signature;
   try {
-    signature = sodium.crypto_sign_detached(payload, ikey);
+    signature = sodium.crypto_sign_detached(payload, isk);
   } catch(ex) {
     return done(new Error('Libsodium error: ' + ex));
   }
 
   return done(null, convert({
     alg:       'ed25519',
-    sk:        key,
+    sk:        sk,
     payload:   payload,
     signature: signature
   }));
@@ -747,31 +747,31 @@ function sign(message, key, cb) {
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {String|Buffer} signature
- * @param {Boolean}       iskey
+ * @param {Boolean}       issk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
 module.exports.verify.sign = vsign;
-function vsign(message, key, signature, iskey, cb) {
-  if (typeof iskey === 'function') {
-    cb    = iskey;
-    iskey = false;
+function vsign(message, sk, signature, issk, cb) {
+  if (typeof issk === 'function') {
+    cb   = issk;
+    issk = false;
   }
   const done = ret(cb);
 
-  if (!key) { return done(new Error('Cannot verify without a key')); }
+  if (!sk) { return done(new Error('Cannot verify without a sk')); }
 
-  let payload, received, ikey;
-  [ payload ]       = iparse(message);
-  [ key, received ] = cparse(key, signature);
+  let payload, received, isk;
+  [ payload ]      = iparse(message);
+  [ sk, received ] = cparse(sk, signature);
 
-  ikey = (iskey) ? key : sodium.crypto_sign_seed_keypair(key).publicKey;
+  isk = (issk) ? sk : sodium.crypto_sign_seed_skpair(sk).publicSk;
 
   let verified;
   try {
-    verified = sodium.crypto_sign_verify_detached(received, payload, ikey);
+    verified = sodium.crypto_sign_verify_detached(received, payload, isk);
   } catch(ex) {
     return done(new Error('Libsodium error: ' + ex));
   }
@@ -791,7 +791,7 @@ function vsign(message, key, signature, iskey, cb) {
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -807,7 +807,7 @@ module.exports.auth.mac = mac('sha384');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {String|Buffer} mac
  * @param {Function} cb
  * @returns {Callback|Promise}
@@ -1170,7 +1170,7 @@ module.exports.alt.util    = new Object();
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1186,7 +1186,7 @@ module.exports.alt.auth.rsapsssha256 = rsasign('sha256', 'pss');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} pk
  * @param {String|Buffer} signature
  * @param {Function} cb
  * @returns {Callback|Promise}
@@ -1203,7 +1203,7 @@ module.exports.alt.verify.rsapsssha256 = rsaverify('sha256', 'pss');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1219,7 +1219,7 @@ module.exports.alt.auth.rsapsssha384 = rsasign('sha384', 'pss');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} pk
  * @param {String|Buffer} signature
  * @param {Function} cb
  * @returns {Callback|Promise}
@@ -1236,7 +1236,7 @@ module.exports.alt.verify.rsapsssha384 = rsaverify('sha384', 'pss');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1252,7 +1252,7 @@ module.exports.alt.auth.rsapsssha512 = rsasign('sha512', 'pss');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} pk
  * @param {String|Buffer} signature
  * @param {Function} cb
  * @returns {Callback|Promise}
@@ -1269,7 +1269,7 @@ module.exports.alt.verify.rsapsssha512 = rsaverify('sha512', 'pss');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1285,7 +1285,7 @@ module.exports.alt.auth.rsav1_5sha256 = rsasign('sha256', 'v1_5');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} pk
  * @param {String|Buffer} signature
  * @param {Function} cb
  * @returns {Callback|Promise}
@@ -1302,7 +1302,7 @@ module.exports.alt.verify.rsav1_5sha256 = rsaverify('sha256', 'v1_5');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1318,7 +1318,7 @@ module.exports.alt.auth.rsav1_5sha384 = rsasign('sha384', 'v1_5');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} pk
  * @param {String|Buffer} signature
  * @param {Function} cb
  * @returns {Callback|Promise}
@@ -1335,7 +1335,7 @@ module.exports.alt.verify.rsav1_5sha384 = rsaverify('sha384', 'v1_5');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1351,7 +1351,7 @@ module.exports.alt.auth.rsav1_5sha512 = rsasign('sha512', 'v1_5');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} pk
  * @param {String|Buffer} signature
  * @param {Function} cb
  * @returns {Callback|Promise}
@@ -1368,7 +1368,7 @@ module.exports.alt.verify.rsav1_5sha512 = rsaverify('sha512', 'v1_5');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1384,7 +1384,7 @@ module.exports.alt.auth.hmacsha256 = mac('sha256');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {String|Buffer} mac
  * @param {Function} cb
  * @returns {Callback|Promise}
@@ -1401,7 +1401,7 @@ module.exports.alt.verify.hmacsha256 = vmac('sha256');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1417,7 +1417,7 @@ module.exports.alt.auth.hmacsha512 = mac('sha512');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {String|Buffer} mac
  * @param {Function} cb
  * @returns {Callback|Promise}
@@ -1434,8 +1434,8 @@ module.exports.alt.verify.hmacsha512 = vmac('sha512');
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1450,8 +1450,8 @@ module.exports.alt.encrypt.aes128cbc_hmacsha256 = cbc('sha256', 128);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {String|Buffer} mac
@@ -1470,8 +1470,8 @@ module.exports.alt.decrypt.aes128cbc_hmacsha256 = dcbc('sha256', 128);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1486,8 +1486,8 @@ module.exports.alt.encrypt.aes128cbc_hmacsha384 = cbc('sha384', 128);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {String|Buffer} mac
@@ -1506,8 +1506,8 @@ module.exports.alt.decrypt.aes128cbc_hmacsha384 = dcbc('sha384', 128);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1522,8 +1522,8 @@ module.exports.alt.encrypt.aes128cbc_hmacsha512 = cbc('sha512', 128);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {String|Buffer} mac
@@ -1542,8 +1542,8 @@ module.exports.alt.decrypt.aes128cbc_hmacsha512 = dcbc('sha512', 128);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1558,8 +1558,8 @@ module.exports.alt.encrypt.aes192cbc_hmacsha256 = cbc('sha256', 192);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {String|Buffer} mac
@@ -1578,8 +1578,8 @@ module.exports.alt.decrypt.aes192cbc_hmacsha256 = dcbc('sha256', 192);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1594,8 +1594,8 @@ module.exports.alt.encrypt.aes192cbc_hmacsha384 = cbc('sha384', 192);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {String|Buffer} mac
@@ -1614,8 +1614,8 @@ module.exports.alt.decrypt.aes192cbc_hmacsha384 = dcbc('sha384', 192);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1630,8 +1630,8 @@ module.exports.alt.encrypt.aes192cbc_hmacsha512 = cbc('sha512', 192);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {String|Buffer} mac
@@ -1650,8 +1650,8 @@ module.exports.alt.decrypt.aes192cbc_hmacsha512 = dcbc('sha512', 192);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1666,8 +1666,8 @@ module.exports.alt.encrypt.aes256cbc_hmacsha256 = cbc('sha256', 256);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {String|Buffer} mac
@@ -1686,8 +1686,8 @@ module.exports.alt.decrypt.aes256cbc_hmacsha256 = dcbc('sha256', 256);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1702,8 +1702,8 @@ module.exports.alt.encrypt.aes256cbc_hmacsha384 = cbc('sha384', 256);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {String|Buffer} mac
@@ -1722,8 +1722,8 @@ module.exports.alt.decrypt.aes256cbc_hmacsha384 = dcbc('sha384', 256);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1738,8 +1738,8 @@ module.exports.alt.encrypt.aes256cbc_hmacsha512 = cbc('sha512', 256);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} ekey
- * @param {String|Buffer} akey
+ * @param {String|Buffer} ek
+ * @param {String|Buffer} ak
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {String|Buffer} mac
@@ -1758,7 +1758,7 @@ module.exports.alt.decrypt.aes256cbc_hmacsha512 = dcbc('sha512', 256);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1773,7 +1773,7 @@ module.exports.alt.encrypt.aes128gcm = gcm(128);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {Function} cb
@@ -1791,7 +1791,7 @@ module.exports.alt.decrypt.aes128gcm = dgcm(128);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1806,7 +1806,7 @@ module.exports.alt.encrypt.aes192gcm = gcm(192);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {Function} cb
@@ -1824,7 +1824,7 @@ module.exports.alt.decrypt.aes192gcm = dgcm(192);
  * @api public
  *
  * @param {String|Buffer} message
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
@@ -1839,7 +1839,7 @@ module.exports.alt.encrypt.aes256gcm = gcm(256);
  * @function
  * @api pubic
  *
- * @param {String|Buffer} key
+ * @param {String|Buffer} sk
  * @param {String|Buffer} iv
  * @param {String|Buffer} ciphertext
  * @param {Function} cb
