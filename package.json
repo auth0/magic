@@ -1,6 +1,6 @@
 {
   "name": "magic",
-  "version": "v1.0.0-rc1",
+  "version": "v1.0.0-rc2",
   "description": "Auth0 Internal Cryptography Toolkit",
   "main": "magic.js",
   "dependencies": {
