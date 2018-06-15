@@ -753,25 +753,25 @@ function sign(message, sk, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.verify.sign = (m, sk, s, i, cb) => { return sodium.ready.then(() => { return vsign(m, sk, s, i, cb); } ) }
-function vsign(message, sk, signature, issk, cb) {
-  if (typeof issk === 'function') {
-    cb   = issk;
-    issk = false;
+module.exports.verify.sign = (m, p, s, i, cb) => { return sodium.ready.then(() => { return vsign(m, p, s, i, cb); } ) }
+function vsign(message, pk, signature, ispk, cb) {
+  if (typeof ispk === 'function') {
+    cb   = ispk;
+    ispk = false;
   }
   const done = ret(cb);
 
-  if (!sk) { return done(new Error('Cannot verify without a key')); }
+  if (!pk) { return done(new Error('Cannot verify without a key')); }
 
-  let payload, received, isk;
+  let payload, received, ipk;
   [ payload ]      = iparse(message);
-  [ sk, received ] = cparse(sk, signature);
+  [ pk, received ] = cparse(pk, signature);
 
-  isk = (issk) ? sk : sodium.crypto_sign_seed_keypair(sk).publicKey;
+  ipk = (ispk) ? pk : sodium.crypto_sign_seed_keypair(pk).publicKey;
 
   let verified;
   try {
-    verified = sodium.crypto_sign_verify_detached(received, payload, isk);
+    verified = sodium.crypto_sign_verify_detached(received, payload, ipk);
   } catch(ex) {
     return done(new Error('Libsodium error: ' + ex));
   }
