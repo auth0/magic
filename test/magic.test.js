@@ -977,6 +977,64 @@ describe('magic tests', () => {
       });
 
 
+      describe('password', () => {
+
+        const password = 'ascreamingcomesacrossthesky';
+
+        describe('success', () => {
+
+          it('should verify a hashed password - callback api', (done) => {
+            magic.password.hash(password, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+              assert.ok(output.hash);
+
+              assert.equal(output.alg, 'argon2id');
+              assert.equal(output.hash.slice(0, 9), '$argon2id');
+
+              magic.verify.password(password, output.hash, (err) => {
+                assert.ok(!err);
+                done();
+              });
+            });
+          });
+
+          it('should verify a hashed password - promise api', (done) => {
+            magic.password.hash(password).then((output) => {
+              assert.ok(output);
+              assert.ok(output.hash);
+
+              assert.equal(output.alg, 'argon2id');
+              assert.equal(output.hash.slice(0, 9), '$argon2id');
+
+              return magic.verify.password(password, output.hash);
+            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+          });
+        });
+
+        describe('failure', () => {
+
+          it('should fail to verify the wrong password', (done) => {
+            magic.password.hash(password, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+              assert.ok(output.hash);
+
+              assert.equal(output.alg, 'argon2id');
+              assert.equal(output.hash.slice(0, 9), '$argon2id');
+
+              magic.verify.password('someotherpassword', output.hash, (err) => {
+                assert.ok(err);
+                assert.equal(err.message, 'Invalid password');
+
+                done();
+              });
+            });
+          });
+        });
+      });
+
+
       describe('hash', () => {
 
         const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -1006,64 +1064,6 @@ describe('magic tests', () => {
 
             done();
           }).catch((err) => { assert.ok(!err); });
-        });
-      });
-
-
-      describe('pwhash', () => {
-
-        const password = 'ascreamingcomesacrossthesky';
-
-        describe('success', () => {
-
-          it('should verify a hashed password - callback api', (done) => {
-            magic.util.pwhash(password, (err, output) => {
-              assert.ok(!err);
-              assert.ok(output);
-              assert.ok(output.hash);
-
-              assert.equal(output.alg, 'argon2id');
-              assert.equal(output.hash.slice(0, 9), '$argon2id');
-
-              magic.util.pwverify(password, output.hash, (err) => {
-                assert.ok(!err);
-                done();
-              });
-            });
-          });
-
-          it('should verify a hashed password - promise api', (done) => {
-            magic.util.pwhash(password).then((output) => {
-              assert.ok(output);
-              assert.ok(output.hash);
-
-              assert.equal(output.alg, 'argon2id');
-              assert.equal(output.hash.slice(0, 9), '$argon2id');
-
-              return magic.util.pwverify(password, output.hash);
-            }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
-          });
-        });
-
-        describe('failure', () => {
-
-          it('should fail to verify the wrong password', (done) => {
-            magic.util.pwhash(password, (err, output) => {
-              assert.ok(!err);
-              assert.ok(output);
-              assert.ok(output.hash);
-
-              assert.equal(output.alg, 'argon2id');
-              assert.equal(output.hash.slice(0, 9), '$argon2id');
-
-              magic.util.pwverify('someotherpassword', output.hash, (err) => {
-                assert.ok(err);
-                assert.equal(err.message, 'Invalid password');
-
-                done();
-              });
-            });
-          });
         });
       });
 
@@ -6690,6 +6690,64 @@ nwIDAQAB
     });
 
 
+    describe('bcrypt', () => {
+
+      const password = 'ascreamingcomesacrossthesky';
+
+      describe('success', () => {
+
+        it('should verify a hashed password - callback api', (done) => {
+          magic.alt.password.bcrypt(password, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+            assert.ok(output.hash);
+
+            assert.equal(output.alg, 'bcrypt');
+            assert.equal(output.hash.slice(0, 7), '$2b$13$');
+
+            magic.alt.verify.bcrypt(password, output.hash, (err) => {
+              assert.ok(!err);
+              done();
+            });
+          });
+        });
+
+        it('should verify a hashed password - promise api', (done) => {
+          magic.alt.password.bcrypt(password).then((output) => {
+            assert.ok(output);
+            assert.ok(output.hash);
+
+            assert.equal(output.alg, 'bcrypt');
+            assert.equal(output.hash.slice(0, 7), '$2b$13$');
+
+            return magic.alt.verify.bcrypt(password, output.hash);
+          }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
+        });
+      });
+
+      describe('failure', () => {
+
+        it('should fail to verify the wrong password', (done) => {
+          magic.alt.password.bcrypt(password, (err, output) => {
+            assert.ok(!err);
+            assert.ok(output);
+            assert.ok(output.hash);
+
+            assert.equal(output.alg, 'bcrypt');
+            assert.equal(output.hash.slice(0, 7), '$2b$13$');
+
+            magic.alt.verify.bcrypt('someotherpassword', output.hash, (err) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Invalid password');
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
     describe('sha256', () => {
 
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -6722,6 +6780,7 @@ nwIDAQAB
       });
     });
 
+
     describe('sha512', () => {
 
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -6751,64 +6810,6 @@ nwIDAQAB
 
           done();
         }).catch((err) => { assert.ok(!err); });
-      });
-    });
-
-
-    describe('bcrypt', () => {
-
-      const password = 'ascreamingcomesacrossthesky';
-
-      describe('success', () => {
-
-        it('should verify a hashed password - callback api', (done) => {
-          magic.alt.util.bcrypt(password, (err, output) => {
-            assert.ok(!err);
-            assert.ok(output);
-            assert.ok(output.hash);
-
-            assert.equal(output.alg, 'bcrypt');
-            assert.equal(output.hash.slice(0, 7), '$2b$13$');
-
-            magic.alt.util.bcrypt_verify(password, output.hash, (err) => {
-              assert.ok(!err);
-              done();
-            });
-          });
-        });
-
-        it('should verify a hashed password - promise api', (done) => {
-          magic.alt.util.bcrypt(password).then((output) => {
-            assert.ok(output);
-            assert.ok(output.hash);
-
-            assert.equal(output.alg, 'bcrypt');
-            assert.equal(output.hash.slice(0, 7), '$2b$13$');
-
-            return magic.alt.util.bcrypt_verify(password, output.hash);
-          }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
-        });
-      });
-
-      describe('failure', () => {
-
-        it('should fail to verify the wrong password', (done) => {
-          magic.alt.util.bcrypt(password, (err, output) => {
-            assert.ok(!err);
-            assert.ok(output);
-            assert.ok(output.hash);
-
-            assert.equal(output.alg, 'bcrypt');
-            assert.equal(output.hash.slice(0, 7), '$2b$13$');
-
-            magic.alt.util.bcrypt_verify('someotherpassword', output.hash, (err) => {
-              assert.ok(err);
-              assert.equal(err.message, 'Invalid password');
-
-              done();
-            });
-          });
-        });
       });
     });
   });

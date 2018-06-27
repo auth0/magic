@@ -429,7 +429,7 @@ magic.util.hash(message)
 });
 ```
 
-#### magic.util.pwhash | magic.util.pwverify
+#### magic.password.hash | magic.verify.password
 
 Implements `argon2id` password hashing using `libsodium.js`. The winner of the [Password Hashing Competition](https://password-hashing.net/) and now the [OWASP recommendation](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet#Leverage_an_adaptive_one-way_function), `argon2id` is robust against both memory tradeoff and side-channel attacks. The output of the `argon2id` function is encoded with a prefix and other metadata, and so `output.hash` is encoded as a string, not a raw binary buffer as is normal for the rest of the `magic` api. Nor is the raw password itself returned.
 
@@ -437,7 +437,7 @@ Implements `argon2id` password hashing using `libsodium.js`. The winner of the [
 const pw = 'ascream...';
 
 // callback
-magic.util.pwhash(password, (err, output) => {
+magic.password.hash(password, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
   // { alg:  'argon2id',
@@ -445,7 +445,7 @@ magic.util.pwhash(password, (err, output) => {
 });
 
 // promise
-magic.util.pwhash(password)
+magic.password.hash(password)
   .then((output) => {
     console.log(output);
     // { alg:  'argon2id',
@@ -464,14 +464,14 @@ const pw   = 'ascream...';
 const hash = '$argon2id$v=19$m=65536,t=2,p=1$yLZ6CoF5exPHbHjvbZ3esQ$yAM5pHM9KnTYDg/9Nr9rgDdQqRpAe8JVky4mJ7escHM';
 
 // callback
-magic.util.pwverify(password, hash, (err) => {
+magic.verify.password(password, hash, (err) => {
   if (err) { return cb(err); }
   console.log('verified');
   // verified
 });
 
 // promise
-magic.util.pwverify(password, hash)
+magic.verify.password(password, hash)
   .then(() => {
     console.log('verified');
     // verified
@@ -908,6 +908,10 @@ Implements `AES192GCM` using OpenSSL through `crypto`. An alternative to `magic.
 
 Implements `AES256GCM` using OpenSSL through `crypto`. An alternative to `magic.alt.encrypt.aes128gcm`.
 
+#### magic.alt.password.bcrypt | magic.alt.verify.bcrypt
+
+Implements `bcrypt` using [node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js/), wrapping the OpenBSD implementation of the algorithm. An alterative to `magic.util.pwhash`. The security parameter (rounds) is set to 13, to bring the computational time in line with that of `magic.util.pwhash` on a development machine - they may not scale equivalently, but it provides a sensible default.
+
 #### magic.alt.util.sha256
 
 Implements `SHA256` using OpenSSL through `crypto`. An alterative to `magic.util.hash`.
@@ -915,10 +919,6 @@ Implements `SHA256` using OpenSSL through `crypto`. An alterative to `magic.util
 #### magic.alt.util.sha512
 
 Implements `SHA512` using OpenSSL through `crypto`. An alterative to `magic.util.hash`.
-
-#### magic.alt.util.bcrypt | magic.alt.util.bcrypt_verify
-
-Implements `bcrypt` using [node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js/), wrapping the OpenBSD implementation of the algorithm. An alterative to `magic.util.pwhash`. The security parameter (rounds) is set to 13, to bring the computational time in line with that of `magic.util.pwhash` on a development machine - they may not scale equivalently, but it provides a sensible default.
 
 #### Notes
 

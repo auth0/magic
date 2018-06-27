@@ -682,6 +682,7 @@ module.exports.auth      = new Object();
 module.exports.verify    = new Object();
 module.exports.encrypt   = new Object();
 module.exports.decrypt   = new Object();
+module.exports.password  = new Object();
 module.exports.util      = new Object();
 
 
@@ -1009,22 +1010,7 @@ function dsync(sk, ciphertext, nonce, cb) {
 
 
 /***
- * util.hash
- *
- * hash a payload
- *
- * @function
- * @api public
- *
- * @param {String|Buffer} message
- * @param {Function} cb
- * @returns {Callback|Promise}
- */
-module.exports.util.hash = hash('sha384');
-
-
-/***
- * util.pwhash
+ * password.hash
  *
  * hash a password
  *
@@ -1035,8 +1021,8 @@ module.exports.util.hash = hash('sha384');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.util.pwhash = (p, cb) => { return sodium.ready.then(() => { return pwhash(p, cb); } ) };
-function pwhash(password, cb) {
+module.exports.password.hash = (p, cb) => { return sodium.ready.then(() => { return pw(p, cb); } ) };
+function pw(password, cb) {
   const done = ret(cb);
 
   if (!password) { return done(new Error('Empty password')); }
@@ -1057,7 +1043,7 @@ function pwhash(password, cb) {
 
 
 /***
- * util.pwverify
+ * verify.password
  *
  * verify a password
  *
@@ -1069,7 +1055,7 @@ function pwhash(password, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.util.pwverify = (p, h, cb) => { return sodium.ready.then(() => { return pwverify(p, h, cb); } ) };
+module.exports.verify.password = (p, h, cb) => { return sodium.ready.then(() => { return pwverify(p, h, cb); } ) };
 function pwverify(password, hash, cb) {
   const done = ret(cb);
 
@@ -1087,6 +1073,21 @@ function pwverify(password, hash, cb) {
 
   return done();
 }
+
+
+/***
+ * util.hash
+ *
+ * hash a payload
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} message
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.util.hash = hash('sha384');
 
 
 /***
@@ -1153,12 +1154,13 @@ function uid(sec, cb) {
 
 
 
-module.exports.alt         = new Object();
-module.exports.alt.auth    = new Object();
-module.exports.alt.verify  = new Object();
-module.exports.alt.encrypt = new Object();
-module.exports.alt.decrypt = new Object();
-module.exports.alt.util    = new Object();
+module.exports.alt          = new Object();
+module.exports.alt.auth     = new Object();
+module.exports.alt.verify   = new Object();
+module.exports.alt.encrypt  = new Object();
+module.exports.alt.decrypt  = new Object();
+module.exports.alt.password = new Object();
+module.exports.alt.util     = new Object();
 
 
 /***
@@ -1849,6 +1851,66 @@ module.exports.alt.decrypt.aes256gcm = dgcm(256);
 
 
 /***
+ * alt.password.bcrypt
+ *
+ * hash a password
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} password
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.password.bcrypt = hbcrypt;
+function hbcrypt(password, cb) {
+  const done = ret(cb);
+
+  if (!password) { return done(new Error('Empty password')); }
+
+  return bcrypt.hash(password, 13)
+    .then((hash) => {
+      return done(null, convert({
+        alg:  'bcrypt',
+        hash: hash
+      }));
+    }).catch((ex) => {
+      return done(new Error('Bcrypt error: ' + ex));
+    });
+}
+
+
+/***
+ * alt.verify.bcrypt
+ *
+ * verify a password
+ *
+ * @function
+ * @api public
+ *
+ * @param {String|Buffer} password
+ * @param {String} hash
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+module.exports.alt.verify.bcrypt = vbcrypt;
+function vbcrypt(password, hash, cb) {
+  const done = ret(cb);
+
+  if (!password) { return done(new Error('Empty password')); }
+  if (!hash) { return done(new Error('Cannot verify without stored hash')); }
+
+  return bcrypt.compare(password, hash)
+    .then((verified) => {
+      if (!verified) { return done(new Error('Invalid password')); }
+      return done();
+    }).catch((ex) => {
+      return done(new Error('Bcrypt error: ' + ex));
+    });
+}
+
+
+/***
  * alt.util.sha256
  *
  * hash a payload
@@ -1876,66 +1938,6 @@ module.exports.alt.util.sha256 = hash('sha256');
  * @returns {Callback|Promise}
  */
 module.exports.alt.util.sha512 = hash('sha512');
-
-
-/***
- * alt.util.bcrypt
- *
- * hash a password
- *
- * @function
- * @api public
- *
- * @param {String|Buffer} password
- * @param {Function} cb
- * @returns {Callback|Promise}
- */
-module.exports.alt.util.bcrypt = hbcrypt;
-function hbcrypt(password, cb) {
-  const done = ret(cb);
-
-  if (!password) { return done(new Error('Empty password')); }
-
-  return bcrypt.hash(password, 13)
-    .then((hash) => {
-      return done(null, convert({
-        alg:  'bcrypt',
-        hash: hash
-      }));
-    }).catch((ex) => {
-      return done(new Error('Bcrypt error: ' + ex));
-    });
-}
-
-
-/***
- * alt.util.bcrypt_verify
- *
- * verify a password
- *
- * @function
- * @api public
- *
- * @param {String|Buffer} password
- * @param {String} hash
- * @param {Function} cb
- * @returns {Callback|Promise}
- */
-module.exports.alt.util.bcrypt_verify = vbcrypt;
-function vbcrypt(password, hash, cb) {
-  const done = ret(cb);
-
-  if (!password) { return done(new Error('Empty password')); }
-  if (!hash) { return done(new Error('Cannot verify without stored hash')); }
-
-  return bcrypt.compare(password, hash)
-    .then((verified) => {
-      if (!verified) { return done(new Error('Invalid password')); }
-      return done();
-    }).catch((ex) => {
-      return done(new Error('Bcrypt error: ' + ex));
-    });
-}
 
 
 
