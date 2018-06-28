@@ -1176,7 +1176,7 @@ module.exports.alt.util     = new Object();
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.auth.rsapsssha256 = rsasign('sha256', 'pss');
+module.exports.alt.auth.RSASSA_PSS_SHA256 = rsasign('sha256', 'pss');
 
 
 /***
@@ -1193,7 +1193,7 @@ module.exports.alt.auth.rsapsssha256 = rsasign('sha256', 'pss');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.verify.rsapsssha256 = rsaverify('sha256', 'pss');
+module.exports.alt.verify.RSASSA_PSS_SHA256 = rsaverify('sha256', 'pss');
 
 
 /***
@@ -1209,7 +1209,7 @@ module.exports.alt.verify.rsapsssha256 = rsaverify('sha256', 'pss');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.auth.rsapsssha384 = rsasign('sha384', 'pss');
+module.exports.alt.auth.RSASSA_PSS_SHA384 = rsasign('sha384', 'pss');
 
 
 /***
@@ -1226,7 +1226,7 @@ module.exports.alt.auth.rsapsssha384 = rsasign('sha384', 'pss');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.verify.rsapsssha384 = rsaverify('sha384', 'pss');
+module.exports.alt.verify.RSASSA_PSS_SHA384 = rsaverify('sha384', 'pss');
 
 
 /***
@@ -1242,7 +1242,7 @@ module.exports.alt.verify.rsapsssha384 = rsaverify('sha384', 'pss');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.auth.rsapsssha512 = rsasign('sha512', 'pss');
+module.exports.alt.auth.RSASSA_PSS_SHA512 = rsasign('sha512', 'pss');
 
 
 /***
@@ -1259,7 +1259,7 @@ module.exports.alt.auth.rsapsssha512 = rsasign('sha512', 'pss');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.verify.rsapsssha512 = rsaverify('sha512', 'pss');
+module.exports.alt.verify.RSASSA_PSS_SHA512 = rsaverify('sha512', 'pss');
 
 
 /***
@@ -1275,7 +1275,7 @@ module.exports.alt.verify.rsapsssha512 = rsaverify('sha512', 'pss');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.auth.rsav1_5sha256 = rsasign('sha256', 'v1_5');
+module.exports.alt.auth.RSASSA_PKCS1V1_5_SHA256 = rsasign('sha256', 'v1_5');
 
 
 /***
@@ -1292,7 +1292,7 @@ module.exports.alt.auth.rsav1_5sha256 = rsasign('sha256', 'v1_5');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.verify.rsav1_5sha256 = rsaverify('sha256', 'v1_5');
+module.exports.alt.verify.RSASSA_PKCS1V1_5_SHA256 = rsaverify('sha256', 'v1_5');
 
 
 /***
@@ -1308,7 +1308,7 @@ module.exports.alt.verify.rsav1_5sha256 = rsaverify('sha256', 'v1_5');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.auth.rsav1_5sha384 = rsasign('sha384', 'v1_5');
+module.exports.alt.auth.RSASSA_PKCS1V1_5_SHA384 = rsasign('sha384', 'v1_5');
 
 
 /***
@@ -1325,7 +1325,7 @@ module.exports.alt.auth.rsav1_5sha384 = rsasign('sha384', 'v1_5');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.verify.rsav1_5sha384 = rsaverify('sha384', 'v1_5');
+module.exports.alt.verify.RSASSA_PKCS1V1_5_SHA384 = rsaverify('sha384', 'v1_5');
 
 
 /***
@@ -1341,7 +1341,7 @@ module.exports.alt.verify.rsav1_5sha384 = rsaverify('sha384', 'v1_5');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.auth.rsav1_5sha512 = rsasign('sha512', 'v1_5');
+module.exports.alt.auth.RSASSA_PKCS1V1_5_SHA512 = rsasign('sha512', 'v1_5');
 
 
 /***
@@ -1358,7 +1358,7 @@ module.exports.alt.auth.rsav1_5sha512 = rsasign('sha512', 'v1_5');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.verify.rsav1_5sha512 = rsaverify('sha512', 'v1_5');
+module.exports.alt.verify.RSASSA_PKCS1V1_5_SHA512 = rsaverify('sha512', 'v1_5');
 
 
 /***
@@ -1374,7 +1374,7 @@ module.exports.alt.verify.rsav1_5sha512 = rsaverify('sha512', 'v1_5');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.auth.hmacsha256 = mac('sha256');
+module.exports.alt.auth.HMAC_SHA256 = mac('sha256');
 
 
 /***
@@ -1391,7 +1391,7 @@ module.exports.alt.auth.hmacsha256 = mac('sha256');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.verify.hmacsha256 = vmac('sha256');
+module.exports.alt.verify.HMAC_SHA256 = vmac('sha256');
 
 
 /***
@@ -1407,7 +1407,7 @@ module.exports.alt.verify.hmacsha256 = vmac('sha256');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.auth.hmacsha512 = mac('sha512');
+module.exports.alt.auth.HMAC_SHA512 = mac('sha512');
 
 
 /***
@@ -1424,7 +1424,7 @@ module.exports.alt.auth.hmacsha512 = mac('sha512');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.verify.hmacsha512 = vmac('sha512');
+module.exports.alt.verify.HMAC_SHA512 = vmac('sha512');
 
 
 /***
@@ -1441,7 +1441,7 @@ module.exports.alt.verify.hmacsha512 = vmac('sha512');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes128cbc_hmacsha256 = cbc('sha256', 128);
+module.exports.alt.encrypt.AES_128_CBC_HMAC_SHA256 = cbc('sha256', 128);
 
 
 /***
@@ -1460,7 +1460,7 @@ module.exports.alt.encrypt.aes128cbc_hmacsha256 = cbc('sha256', 128);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes128cbc_hmacsha256 = dcbc('sha256', 128);
+module.exports.alt.decrypt.AES_128_CBC_HMAC_SHA256 = dcbc('sha256', 128);
 
 
 /***
@@ -1477,7 +1477,7 @@ module.exports.alt.decrypt.aes128cbc_hmacsha256 = dcbc('sha256', 128);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes128cbc_hmacsha384 = cbc('sha384', 128);
+module.exports.alt.encrypt.AES_128_CBC_HMAC_SHA384 = cbc('sha384', 128);
 
 
 /***
@@ -1496,7 +1496,7 @@ module.exports.alt.encrypt.aes128cbc_hmacsha384 = cbc('sha384', 128);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes128cbc_hmacsha384 = dcbc('sha384', 128);
+module.exports.alt.decrypt.AES_128_CBC_HMAC_SHA384 = dcbc('sha384', 128);
 
 
 /***
@@ -1513,7 +1513,7 @@ module.exports.alt.decrypt.aes128cbc_hmacsha384 = dcbc('sha384', 128);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes128cbc_hmacsha512 = cbc('sha512', 128);
+module.exports.alt.encrypt.AES_128_CBC_HMAC_SHA512 = cbc('sha512', 128);
 
 
 /***
@@ -1532,7 +1532,7 @@ module.exports.alt.encrypt.aes128cbc_hmacsha512 = cbc('sha512', 128);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes128cbc_hmacsha512 = dcbc('sha512', 128);
+module.exports.alt.decrypt.AES_128_CBC_HMAC_SHA512 = dcbc('sha512', 128);
 
 
 /***
@@ -1549,7 +1549,7 @@ module.exports.alt.decrypt.aes128cbc_hmacsha512 = dcbc('sha512', 128);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes192cbc_hmacsha256 = cbc('sha256', 192);
+module.exports.alt.encrypt.AES_192_CBC_HMAC_SHA256 = cbc('sha256', 192);
 
 
 /***
@@ -1568,7 +1568,7 @@ module.exports.alt.encrypt.aes192cbc_hmacsha256 = cbc('sha256', 192);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes192cbc_hmacsha256 = dcbc('sha256', 192);
+module.exports.alt.decrypt.AES_192_CBC_HMAC_SHA256 = dcbc('sha256', 192);
 
 
 /***
@@ -1585,7 +1585,7 @@ module.exports.alt.decrypt.aes192cbc_hmacsha256 = dcbc('sha256', 192);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes192cbc_hmacsha384 = cbc('sha384', 192);
+module.exports.alt.encrypt.AES_192_CBC_HMAC_SHA384 = cbc('sha384', 192);
 
 
 /***
@@ -1604,7 +1604,7 @@ module.exports.alt.encrypt.aes192cbc_hmacsha384 = cbc('sha384', 192);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes192cbc_hmacsha384 = dcbc('sha384', 192);
+module.exports.alt.decrypt.AES_192_CBC_HMAC_SHA384 = dcbc('sha384', 192);
 
 
 /***
@@ -1621,7 +1621,7 @@ module.exports.alt.decrypt.aes192cbc_hmacsha384 = dcbc('sha384', 192);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes192cbc_hmacsha512 = cbc('sha512', 192);
+module.exports.alt.encrypt.AES_192_CBC_HMAC_SHA512 = cbc('sha512', 192);
 
 
 /***
@@ -1640,7 +1640,7 @@ module.exports.alt.encrypt.aes192cbc_hmacsha512 = cbc('sha512', 192);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes192cbc_hmacsha512 = dcbc('sha512', 192);
+module.exports.alt.decrypt.AES_192_CBC_HMAC_SHA512 = dcbc('sha512', 192);
 
 
 /***
@@ -1657,7 +1657,7 @@ module.exports.alt.decrypt.aes192cbc_hmacsha512 = dcbc('sha512', 192);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes256cbc_hmacsha256 = cbc('sha256', 256);
+module.exports.alt.encrypt.AES_256_CBC_HMAC_SHA256 = cbc('sha256', 256);
 
 
 /***
@@ -1676,7 +1676,7 @@ module.exports.alt.encrypt.aes256cbc_hmacsha256 = cbc('sha256', 256);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes256cbc_hmacsha256 = dcbc('sha256', 256);
+module.exports.alt.decrypt.AES_256_CBC_HMAC_SHA256 = dcbc('sha256', 256);
 
 
 /***
@@ -1693,7 +1693,7 @@ module.exports.alt.decrypt.aes256cbc_hmacsha256 = dcbc('sha256', 256);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes256cbc_hmacsha384 = cbc('sha384', 256);
+module.exports.alt.encrypt.AES_256_CBC_HMAC_SHA384 = cbc('sha384', 256);
 
 
 /***
@@ -1712,7 +1712,7 @@ module.exports.alt.encrypt.aes256cbc_hmacsha384 = cbc('sha384', 256);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes256cbc_hmacsha384 = dcbc('sha384', 256);
+module.exports.alt.decrypt.AES_256_CBC_HMAC_SHA384 = dcbc('sha384', 256);
 
 
 /***
@@ -1729,7 +1729,7 @@ module.exports.alt.decrypt.aes256cbc_hmacsha384 = dcbc('sha384', 256);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes256cbc_hmacsha512 = cbc('sha512', 256);
+module.exports.alt.encrypt.AES_256_CBC_HMAC_SHA512 = cbc('sha512', 256);
 
 
 /***
@@ -1748,7 +1748,7 @@ module.exports.alt.encrypt.aes256cbc_hmacsha512 = cbc('sha512', 256);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes256cbc_hmacsha512 = dcbc('sha512', 256);
+module.exports.alt.decrypt.AES_256_CBC_HMAC_SHA512 = dcbc('sha512', 256);
 
 
 /***
@@ -1764,7 +1764,7 @@ module.exports.alt.decrypt.aes256cbc_hmacsha512 = dcbc('sha512', 256);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes128gcm = gcm(128);
+module.exports.alt.encrypt.AES_128_GCM = gcm(128);
 
 
 /***
@@ -1781,7 +1781,7 @@ module.exports.alt.encrypt.aes128gcm = gcm(128);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes128gcm = dgcm(128);
+module.exports.alt.decrypt.AES_128_GCM = dgcm(128);
 
 
 /***
@@ -1797,7 +1797,7 @@ module.exports.alt.decrypt.aes128gcm = dgcm(128);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes192gcm = gcm(192);
+module.exports.alt.encrypt.AES_192_GCM = gcm(192);
 
 
 /***
@@ -1814,7 +1814,7 @@ module.exports.alt.encrypt.aes192gcm = gcm(192);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes192gcm = dgcm(192);
+module.exports.alt.decrypt.AES_192_GCM = dgcm(192);
 
 
 /***
@@ -1830,7 +1830,7 @@ module.exports.alt.decrypt.aes192gcm = dgcm(192);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.encrypt.aes256gcm = gcm(256);
+module.exports.alt.encrypt.AES_256_GCM = gcm(256);
 
 
 /***
@@ -1847,7 +1847,7 @@ module.exports.alt.encrypt.aes256gcm = gcm(256);
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.alt.decrypt.aes256gcm = dgcm(256);
+module.exports.alt.decrypt.AES_256_GCM = dgcm(256);
 
 
 /***
