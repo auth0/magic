@@ -69,7 +69,7 @@ function sign(cont) {
 function mac(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/hmacsha384.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/HMAC_SHA384.vec') });
 
   // https://tools.ietf.org/html/rfc4231
   let c = 0;
@@ -289,15 +289,15 @@ tHfCire4oghtHumbIkmGYWI8CgkzyCd1QdrCl4jHzbKN5oaiJ+O+1Aw=
 
 
 /***
- * rsapsssha256
+ * RSASSA_PSS_SHA256
  *
- * test vectors for magic.alt.auth.rsapsssha256()
+ * test vectors for magic.alt.auth.RSASSA_PSS_SHA256()
  *
  */
-function rsapsssha256(cont) {
+function RSASSA_PSS_SHA256(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/rsapsssha256.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/RSASSA_PSS_SHA256.vec') });
 
   // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/digital-signatures
   let c = 0;
@@ -308,8 +308,8 @@ function rsapsssha256(cont) {
     const m = Buffer.from(sec[0], 'hex');
 
     // crypto api doesn't allow specifying salt, so we must skip
-    it.skip('magic.alt.auth.rsapsssha256 - Test Vector #' + c, (done) => {
-      magic.alt.auth.rsapsssha256(m, RSAKEYS.pss, (err, out) => {
+    it.skip('magic.alt.auth.RSASSA_PSS_SHA256 - Test Vector #' + c, (done) => {
+      magic.alt.auth.RSASSA_PSS_SHA256(m, RSAKEYS.pss, (err, out) => {
         if (err) { return done(err); }
 
         const t = out.signature;
@@ -325,15 +325,15 @@ function rsapsssha256(cont) {
 
 
 /***
- * rsapsssha384
+ * RSASSA_PSS_SHA384
  *
- * test vectors for magic.alt.auth.rsapsssha384()
+ * test vectors for magic.alt.auth.RSASSA_PSS_SHA384()
  *
  */
-function rsapsssha384(cont) {
+function RSASSA_PSS_SHA384(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/rsapsssha384.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/RSASSA_PSS_SHA384.vec') });
 
   // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/digital-signatures
   let c = 0;
@@ -344,8 +344,8 @@ function rsapsssha384(cont) {
     const m = Buffer.from(sec[0], 'hex');
 
     // crypto api doesn't allow specifying salt, so we must skip
-    it.skip('magic.alt.auth.rsapsssha384 - Test Vector #' + c, (done) => {
-      magic.alt.auth.rsapsssha384(m, RSAKEYS.pss, (err, out) => {
+    it.skip('magic.alt.auth.RSASSA_PSS_SHA384 - Test Vector #' + c, (done) => {
+      magic.alt.auth.RSASSA_PSS_SHA384(m, RSAKEYS.pss, (err, out) => {
         if (err) { return done(err); }
 
         const t = out.signature;
@@ -361,15 +361,15 @@ function rsapsssha384(cont) {
 
 
 /***
- * rsapsssha512
+ * RSASSA_PSS_SHA512
  *
- * test vectors for magic.alt.auth.rsapsssha512()
+ * test vectors for magic.alt.auth.RSASSA_PSS_SHA512()
  *
  */
-function rsapsssha512(cont) {
+function RSASSA_PSS_SHA512(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/rsapsssha512.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/RSASSA_PSS_SHA512.vec') });
 
   // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/digital-signatures
   let c = 0;
@@ -380,8 +380,8 @@ function rsapsssha512(cont) {
     const m = Buffer.from(sec[0], 'hex');
 
     // crypto api doesn't allow specifying salt, so we must skip
-    it.skip('magic.alt.auth.rsapsssha512 - Test Vector #' + c, (done) => {
-      magic.alt.auth.rsapsssha512(m, RSAKEYS.pss, (err, out) => {
+    it.skip('magic.alt.auth.RSASSA_PSS_SHA512 - Test Vector #' + c, (done) => {
+      magic.alt.auth.RSASSA_PSS_SHA512(m, RSAKEYS.pss, (err, out) => {
         if (err) { return done(err); }
 
         const t = out.signature;
@@ -397,15 +397,15 @@ function rsapsssha512(cont) {
 
 
 /***
- * rsav1_5sha256
+ * RSASSA_PKCS1V1_5_SHA256
  *
- * test vectors for magic.alt.auth.rsav1_5sha256()
+ * test vectors for magic.alt.auth.RSASSA_PKCS1V1_5_SHA256()
  *
  */
-function rsav1_5sha256(cont) {
+function RSASSA_PKCS1V1_5_SHA256(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/rsav1_5sha256.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/RSASSA_PKCS1V1_5_SHA256.vec') });
 
   // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/digital-signatures
   let c = 0;
@@ -415,8 +415,8 @@ function rsav1_5sha256(cont) {
     const sec = line.split(':');
     const m = Buffer.from(sec[0], 'hex');
 
-    it('magic.alt.auth.rsav1_5sha256 - Test Vector #' + c, (done) => {
-      magic.alt.auth.rsav1_5sha256(m, RSAKEYS.v1_5, (err, out) => {
+    it('magic.alt.auth.RSASSA_PKCS1V1_5_SHA256 - Test Vector #' + c, (done) => {
+      magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(m, RSAKEYS.v1_5, (err, out) => {
         if (err) { return done(err); }
 
         const t = out.signature;
@@ -432,15 +432,15 @@ function rsav1_5sha256(cont) {
 
 
 /***
- * rsav1_5sha384
+ * RSASSA_PKCS1V1_5_SHA384
  *
- * test vectors for magic.alt.auth.rsav1_5sha384()
+ * test vectors for magic.alt.auth.RSASSA_PKCS1V1_5_SHA384()
  *
  */
-function rsav1_5sha384(cont) {
+function RSASSA_PKCS1V1_5_SHA384(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/rsav1_5sha384.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/RSASSA_PKCS1V1_5_SHA384.vec') });
 
   // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/digital-signatures
   let c = 0;
@@ -450,8 +450,8 @@ function rsav1_5sha384(cont) {
     const sec = line.split(':');
     const m = Buffer.from(sec[0], 'hex');
 
-    it('magic.alt.auth.rsav1_5sha384 - Test Vector #' + c, (done) => {
-      magic.alt.auth.rsav1_5sha384(m, RSAKEYS.v1_5, (err, out) => {
+    it('magic.alt.auth.RSASSA_PKCS1V1_5_SHA384 - Test Vector #' + c, (done) => {
+      magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(m, RSAKEYS.v1_5, (err, out) => {
         if (err) { return done(err); }
 
         const t = out.signature;
@@ -467,15 +467,15 @@ function rsav1_5sha384(cont) {
 
 
 /***
- * rsav1_5sha512
+ * RSASSA_PKCS1V1_5_SHA512
  *
- * test vectors for magic.alt.auth.rsav1_5sha512()
+ * test vectors for magic.alt.auth.RSASSA_PKCS1V1_5_SHA512()
  *
  */
-function rsav1_5sha512(cont) {
+function RSASSA_PKCS1V1_5_SHA512(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/rsav1_5sha512.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/RSASSA_PKCS1V1_5_SHA512.vec') });
 
   // https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/digital-signatures
   let c = 0;
@@ -485,8 +485,8 @@ function rsav1_5sha512(cont) {
     const sec = line.split(':');
     const m = Buffer.from(sec[0], 'hex');
 
-    it('magic.alt.auth.rsav1_5sha512 - Test Vector #' + c, (done) => {
-      magic.alt.auth.rsav1_5sha512(m, RSAKEYS.v1_5, (err, out) => {
+    it('magic.alt.auth.RSASSA_PKCS1V1_5_SHA512 - Test Vector #' + c, (done) => {
+      magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(m, RSAKEYS.v1_5, (err, out) => {
         if (err) { return done(err); }
 
         const t = out.signature;
@@ -502,15 +502,15 @@ function rsav1_5sha512(cont) {
 
 
 /***
- * hmacsha256
+ * HMAC_SHA256
  *
- * test vectors for magic.alt.auth.hmacsha256()
+ * test vectors for magic.alt.auth.HMAC_SHA256()
  *
  */
-function hmacsha256(cont) {
+function HMAC_SHA256(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/hmacsha256.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/HMAC_SHA256.vec') });
 
   // https://tools.ietf.org/html/rfc4231
   let c = 0;
@@ -521,8 +521,8 @@ function hmacsha256(cont) {
     const k = Buffer.from(sec[0], 'hex');
     const m = Buffer.from(sec[1], 'hex');
 
-    it('magic.alt.auth.hmacsha256 - Test Vector #' + c, (done) => {
-      magic.alt.auth.hmacsha256(m, k, (err, out) => {
+    it('magic.alt.auth.HMAC_SHA256 - Test Vector #' + c, (done) => {
+      magic.alt.auth.HMAC_SHA256(m, k, (err, out) => {
         if (err) { return done(err); }
 
         const t = out.mac;
@@ -538,15 +538,15 @@ function hmacsha256(cont) {
 
 
 /***
- * hmacsha512
+ * HMAC_SHA512
  *
- * test vectors for magic.alt.auth.hmacsha512()
+ * test vectors for magic.alt.auth.HMAC_SHA512()
  *
  */
-function hmacsha512(cont) {
+function HMAC_SHA512(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/hmacsha512.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/HMAC_SHA512.vec') });
 
   // https://tools.ietf.org/html/rfc4231
   let c = 0;
@@ -557,8 +557,8 @@ function hmacsha512(cont) {
     const k = Buffer.from(sec[0], 'hex');
     const m = Buffer.from(sec[1], 'hex');
 
-    it('magic.alt.auth.hmacsha512 - Test Vector #' + c, (done) => {
-      magic.alt.auth.hmacsha512(m, k, (err, out) => {
+    it('magic.alt.auth.HMAC_SHA512 - Test Vector #' + c, (done) => {
+      magic.alt.auth.HMAC_SHA512(m, k, (err, out) => {
         if (err) { return done(err); }
 
         const t = out.mac;
@@ -574,15 +574,15 @@ function hmacsha512(cont) {
 
 
 /***
- * aes128cbc
+ * AES_128_CBC
  *
- * test vectors for magic.alt.encrypt.aes128cbc_hmacshaxxx()
+ * test vectors for magic.alt.encrypt.AES_128_CBC_hmacshaxxx()
  *
  */
-function aes128cbc(cont) {
+function AES_128_CBC(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes128cbc.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/AES_128_CBC.vec') });
 
   const ak = 'a2fae7a1222f6a05a199e5a65d12e819f986c6c61b235982ee5f4f349fe97c60';
 
@@ -596,8 +596,8 @@ function aes128cbc(cont) {
     const iv = Buffer.from(sec[1], 'hex');
     const m  = Buffer.from(sec[2], 'hex');
 
-    it('magic.alt.encrypt.aes128cbc_hmacshaxxx - Test Vector #' + c, (done) => {
-      magic.alt.encrypt.aes128cbc_hmacsha256(m, { key: ek, iv: iv }, ak, (err, out) => {
+    it('magic.alt.encrypt.AES_128_CBC_HMAC_SHAXXX - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(m, { key: ek, iv: iv }, ak, (err, out) => {
         if (err) { return done(err); }
 
         const c = out.ciphertext;
@@ -613,15 +613,15 @@ function aes128cbc(cont) {
 
 
 /***
- * aes192cbc
+ * AES_192_CBC
  *
- * test vectors for magic.alt.encrypt.aes192cbc_hmacshaxxx()
+ * test vectors for magic.alt.encrypt.AES_192_CBC_HMAC_SHAXXX()
  *
  */
-function aes192cbc(cont) {
+function AES_192_CBC(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes192cbc.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/AES_192_CBC.vec') });
 
   const ak = 'a2fae7a1222f6a05a199e5a65d12e819f986c6c61b235982ee5f4f349fe97c60';
 
@@ -635,8 +635,8 @@ function aes192cbc(cont) {
     const iv = Buffer.from(sec[1], 'hex');
     const m  = Buffer.from(sec[2], 'hex');
 
-    it('magic.alt.encrypt.aes192cbc_hmacshaxxx - Test Vector #' + c, (done) => {
-      magic.alt.encrypt.aes192cbc_hmacsha256(m, { key: ek, iv: iv }, ak, (err, out) => {
+    it('magic.alt.encrypt.AES_192_CBC_HMAC_SHAXXX - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(m, { key: ek, iv: iv }, ak, (err, out) => {
         if (err) { return done(err); }
 
         const c = out.ciphertext;
@@ -652,15 +652,15 @@ function aes192cbc(cont) {
 
 
 /***
- * aes256cbc
+ * AES_256_CBC
  *
- * test vectors for magic.alt.encrypt.aes256cbc_hmacshaxxx()
+ * test vectors for magic.alt.encrypt.AES_256_CBC_HMAC_SHAXXX()
  *
  */
-function aes256cbc(cont) {
+function AES_256_CBC(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes256cbc.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/AES_256_CBC.vec') });
 
   const ak = 'a2fae7a1222f6a05a199e5a65d12e819f986c6c61b235982ee5f4f349fe97c60';
 
@@ -674,8 +674,8 @@ function aes256cbc(cont) {
     const iv = Buffer.from(sec[1], 'hex');
     const m  = Buffer.from(sec[2], 'hex');
 
-    it('magic.alt.encrypt.aes256cbc_hmacshaxxx - Test Vector #' + c, (done) => {
-      magic.alt.encrypt.aes256cbc_hmacsha256(m, { key: ek, iv: iv }, ak, (err, out) => {
+    it('magic.alt.encrypt.AES_256_CBC_HMAC_SHAXXX - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(m, { key: ek, iv: iv }, ak, (err, out) => {
         if (err) { return done(err); }
 
         const c = out.ciphertext;
@@ -691,15 +691,15 @@ function aes256cbc(cont) {
 
 
 /***
- * aes128gcm
+ * AES_128_GCM
  *
- * test vectors for magic.alt.encrypt.aes128gcm()
+ * test vectors for magic.alt.encrypt.AES_128_GCM()
  *
  */
-function aes128gcm(cont) {
+function AES_128_GCM(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes128gcm.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/AES_128_GCM.vec') });
 
   // https://github.com/openssl/openssl/blob/97cf1f6c2854a3a955fd7dd3a1f113deba00c9ef/crypto/evp/evptests.txt#L340
   let c = 0;
@@ -711,8 +711,8 @@ function aes128gcm(cont) {
     const iv = Buffer.from(sec[1], 'hex');
     const m  = Buffer.from(sec[2], 'hex');
 
-    it('magic.alt.encrypt.aes128gcm - Test Vector #' + c, (done) => {
-      magic.alt.encrypt.aes128gcm(m, { key: k, iv: iv }, (err, out) => {
+    it('magic.alt.encrypt.AES_128_GCM - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.AES_128_GCM(m, { key: k, iv: iv }, (err, out) => {
         if (err) { return done(err); }
 
         const c = out.ciphertext;
@@ -730,15 +730,15 @@ function aes128gcm(cont) {
 
 
 /***
- * aes192gcm
+ * AES_192_GCM
  *
- * test vectors for magic.alt.encrypt.aes192gcm()
+ * test vectors for magic.alt.encrypt.AES_192_GCM()
  *
  */
-function aes192gcm(cont) {
+function AES_192_GCM(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes192gcm.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/AES_192_GCM.vec') });
 
   // https://github.com/openssl/openssl/blob/97cf1f6c2854a3a955fd7dd3a1f113deba00c9ef/crypto/evp/evptests.txt#L340
   let c = 0;
@@ -750,8 +750,8 @@ function aes192gcm(cont) {
     const iv = Buffer.from(sec[1], 'hex');
     const m  = Buffer.from(sec[2], 'hex');
 
-    it('magic.alt.encrypt.aes192gcm - Test Vector #' + c, (done) => {
-      magic.alt.encrypt.aes192gcm(m, { key: k, iv: iv }, (err, out) => {
+    it('magic.alt.encrypt.AES_192_GCM - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.AES_192_GCM(m, { key: k, iv: iv }, (err, out) => {
         if (err) { return done(err); }
 
         const c = out.ciphertext;
@@ -769,15 +769,15 @@ function aes192gcm(cont) {
 
 
 /***
- * aes256gcm
+ * AES_256_GCM
  *
- * test vectors for magic.alt.encrypt.aes256gcm()
+ * test vectors for magic.alt.encrypt.AES_256_GCM()
  *
  */
-function aes256gcm(cont) {
+function AES_256_GCM(cont) {
 
   // path resolution is from parent directory
-  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/aes256gcm.vec') });
+  const fp = readline.createInterface({ input: fs.createReadStream('./test/vectors/AES_256_GCM.vec') });
 
   // https://github.com/openssl/openssl/blob/97cf1f6c2854a3a955fd7dd3a1f113deba00c9ef/crypto/evp/evptests.txt#L340
   let c = 0;
@@ -789,8 +789,8 @@ function aes256gcm(cont) {
     const iv = Buffer.from(sec[1], 'hex');
     const m  = Buffer.from(sec[2], 'hex');
 
-    it('magic.alt.encrypt.aes256gcm - Test Vector #' + c, (done) => {
-      magic.alt.encrypt.aes256gcm(m, { key: k, iv: iv }, (err, out) => {
+    it('magic.alt.encrypt.AES_256_GCM - Test Vector #' + c, (done) => {
+      magic.alt.encrypt.AES_256_GCM(m, { key: k, iv: iv }, (err, out) => {
         if (err) { return done(err); }
 
         const c = out.ciphertext;
@@ -884,8 +884,8 @@ function sha512(cont) {
  *
  */
 function alt() {
-  const fs = [ rsapsssha256, rsapsssha384, rsapsssha512, rsav1_5sha256, rsav1_5sha384, rsav1_5sha512, hmacsha256,
-               hmacsha512, aes128cbc, aes192cbc, aes256cbc, aes128gcm, aes192gcm, aes256gcm, sha256, sha512 ];
+  const fs = [ RSASSA_PSS_SHA256, RSASSA_PSS_SHA384, RSASSA_PSS_SHA512, RSASSA_PKCS1V1_5_SHA256, RSASSA_PKCS1V1_5_SHA384, RSASSA_PKCS1V1_5_SHA512,
+               HMAC_SHA256, HMAC_SHA512, AES_128_CBC, AES_192_CBC, AES_256_CBC, AES_128_GCM, AES_192_GCM, AES_256_GCM, sha256, sha512 ];
 
   (function setup() {
     const f = fs.shift();

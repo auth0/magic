@@ -1210,7 +1210,7 @@ nwIDAQAB
 -----END PUBLIC KEY-----`
     }
 
-    describe('rsapsssha256', () => {
+    describe('RSASSA_PSS_SHA256', () => {
 
       let sk, pk;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -1222,7 +1222,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsapsssha256(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA256(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1232,7 +1232,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsapsssha256(message, sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA256(message, sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1240,7 +1240,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsapsssha256(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PSS_SHA256(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsapss-sha256');
@@ -1249,12 +1249,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsapsssha256(message, sk, output.signature);
+              return magic.alt.verify.RSASSA_PSS_SHA256(message, sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsapsssha256(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA256(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1266,7 +1266,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsapsssha256(message, sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA256(message, sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1279,7 +1279,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsapsssha256(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA256(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1289,7 +1289,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsapsssha256(message, pk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA256(message, pk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1297,7 +1297,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsapsssha256(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PSS_SHA256(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsapss-sha256');
@@ -1306,12 +1306,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsapsssha256(message, pk, output.signature);
+              return magic.alt.verify.RSASSA_PSS_SHA256(message, pk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsapsssha256(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA256(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1323,7 +1323,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsapsssha256(message, pk, esig, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA256(message, pk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1334,7 +1334,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsapsssha256(message, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1344,7 +1344,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsapsssha256(message, output.sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA256(message, output.sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1352,7 +1352,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsapsssha256(message).then((output) => {
+            magic.alt.auth.RSASSA_PSS_SHA256(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsapss-sha256');
@@ -1361,12 +1361,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsapsssha256(message, output.sk, output.signature);
+              return magic.alt.verify.RSASSA_PSS_SHA256(message, output.sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsapsssha256(message, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1378,7 +1378,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsapsssha256(message, output.sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA256(message, output.sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1390,7 +1390,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on validation', (done) => {
-          magic.alt.auth.rsapsssha256(message, (err, output) => {
+          magic.alt.auth.RSASSA_PSS_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -1400,7 +1400,7 @@ nwIDAQAB
             assert.ok(output.sk);
             assert.ok(output.signature);
 
-            magic.alt.verify.rsapsssha256(message, null, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PSS_SHA256(message, null, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -1410,7 +1410,7 @@ nwIDAQAB
         });
 
         it('should fail if message is altered', (done) => {
-          magic.alt.auth.rsapsssha256(message, (err, output) => {
+          magic.alt.auth.RSASSA_PSS_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -1422,7 +1422,7 @@ nwIDAQAB
 
             const altered = 'Some other message';
 
-            magic.alt.verify.rsapsssha256(altered, output.sk, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PSS_SHA256(altered, output.sk, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid signature');
 
@@ -1433,7 +1433,7 @@ nwIDAQAB
       });
     });
 
-    describe('rsapsssha384', () => {
+    describe('RSASSA_PSS_SHA384', () => {
 
       let sk, pk;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -1445,7 +1445,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsapsssha384(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA384(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1455,7 +1455,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsapsssha384(message, sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA384(message, sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1463,7 +1463,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsapsssha384(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PSS_SHA384(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsapss-sha384');
@@ -1472,12 +1472,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsapsssha384(message, sk, output.signature);
+              return magic.alt.verify.RSASSA_PSS_SHA384(message, sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsapsssha384(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA384(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1489,7 +1489,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsapsssha384(message, sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA384(message, sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1502,7 +1502,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsapsssha384(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA384(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1512,7 +1512,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsapsssha384(message, pk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA384(message, pk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1520,7 +1520,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsapsssha384(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PSS_SHA384(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsapss-sha384');
@@ -1529,12 +1529,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsapsssha384(message, pk, output.signature);
+              return magic.alt.verify.RSASSA_PSS_SHA384(message, pk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsapsssha384(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA384(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1546,7 +1546,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsapsssha384(message, pk, esig, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA384(message, pk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1557,7 +1557,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsapsssha384(message, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA384(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1567,7 +1567,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsapsssha384(message, output.sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA384(message, output.sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1575,7 +1575,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsapsssha384(message).then((output) => {
+            magic.alt.auth.RSASSA_PSS_SHA384(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsapss-sha384');
@@ -1584,12 +1584,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsapsssha384(message, output.sk, output.signature);
+              return magic.alt.verify.RSASSA_PSS_SHA384(message, output.sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsapsssha384(message, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA384(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1601,7 +1601,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsapsssha384(message, output.sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA384(message, output.sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1613,7 +1613,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on validation', (done) => {
-          magic.alt.auth.rsapsssha384(message, (err, output) => {
+          magic.alt.auth.RSASSA_PSS_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -1623,7 +1623,7 @@ nwIDAQAB
             assert.ok(output.sk);
             assert.ok(output.signature);
 
-            magic.alt.verify.rsapsssha384(message, null, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PSS_SHA384(message, null, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -1633,7 +1633,7 @@ nwIDAQAB
         });
 
         it('should fail if message is altered', (done) => {
-          magic.alt.auth.rsapsssha384(message, (err, output) => {
+          magic.alt.auth.RSASSA_PSS_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -1645,7 +1645,7 @@ nwIDAQAB
 
             const altered = 'Some other message';
 
-            magic.alt.verify.rsapsssha384(altered, output.sk, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PSS_SHA384(altered, output.sk, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid signature');
 
@@ -1656,7 +1656,7 @@ nwIDAQAB
       });
     });
 
-    describe('rsapsssha512', () => {
+    describe('RSASSA_PSS_SHA512', () => {
 
       let sk, pk;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -1668,7 +1668,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsapsssha512(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA512(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1678,7 +1678,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsapsssha512(message, sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA512(message, sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1686,7 +1686,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsapsssha512(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PSS_SHA512(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsapss-sha512');
@@ -1695,12 +1695,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsapsssha512(message, sk, output.signature);
+              return magic.alt.verify.RSASSA_PSS_SHA512(message, sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsapsssha512(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA512(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1712,7 +1712,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsapsssha512(message, sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA512(message, sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1725,7 +1725,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsapsssha512(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA512(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1735,7 +1735,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsapsssha512(message, pk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA512(message, pk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1743,7 +1743,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsapsssha512(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PSS_SHA512(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsapss-sha512');
@@ -1752,12 +1752,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsapsssha512(message, pk, output.signature);
+              return magic.alt.verify.RSASSA_PSS_SHA512(message, pk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsapsssha512(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA512(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1769,7 +1769,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsapsssha512(message, pk, esig, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA512(message, pk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1780,7 +1780,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsapsssha512(message, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1790,7 +1790,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsapsssha512(message, output.sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA512(message, output.sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1798,7 +1798,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsapsssha512(message).then((output) => {
+            magic.alt.auth.RSASSA_PSS_SHA512(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsapss-sha512');
@@ -1807,12 +1807,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsapsssha512(message, output.sk, output.signature);
+              return magic.alt.verify.RSASSA_PSS_SHA512(message, output.sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsapsssha512(message, (err, output) => {
+            magic.alt.auth.RSASSA_PSS_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1824,7 +1824,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsapsssha512(message, output.sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PSS_SHA512(message, output.sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1836,7 +1836,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on validation', (done) => {
-          magic.alt.auth.rsapsssha512(message, (err, output) => {
+          magic.alt.auth.RSASSA_PSS_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -1846,7 +1846,7 @@ nwIDAQAB
             assert.ok(output.sk);
             assert.ok(output.signature);
 
-            magic.alt.verify.rsapsssha512(message, null, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PSS_SHA512(message, null, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -1856,7 +1856,7 @@ nwIDAQAB
         });
 
         it('should fail if message is altered', (done) => {
-          magic.alt.auth.rsapsssha512(message, (err, output) => {
+          magic.alt.auth.RSASSA_PSS_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -1868,7 +1868,7 @@ nwIDAQAB
 
             const altered = 'Some other message';
 
-            magic.alt.verify.rsapsssha512(altered, output.sk, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PSS_SHA512(altered, output.sk, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid signature');
 
@@ -1879,7 +1879,7 @@ nwIDAQAB
       });
     });
 
-    describe('rsav1_5sha256', () => {
+    describe('RSASSA_PKCS1V1_5_SHA256', () => {
 
       let sk, pk;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -1891,7 +1891,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsav1_5sha256(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1901,7 +1901,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsav1_5sha256(message, sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(message, sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1909,7 +1909,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsav1_5sha256(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsav1_5-sha256');
@@ -1918,12 +1918,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsav1_5sha256(message, sk, output.signature);
+              return magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(message, sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsav1_5sha256(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1935,7 +1935,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsav1_5sha256(message, sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(message, sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1948,7 +1948,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsav1_5sha256(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1958,7 +1958,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsav1_5sha256(message, pk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(message, pk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -1966,7 +1966,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsav1_5sha256(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsav1_5-sha256');
@@ -1975,12 +1975,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsav1_5sha256(message, pk, output.signature);
+              return magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(message, pk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsav1_5sha256(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -1992,7 +1992,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsav1_5sha256(message, pk, esig, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(message, pk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2003,7 +2003,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsav1_5sha256(message, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2013,7 +2013,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsav1_5sha256(message, output.sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(message, output.sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2021,7 +2021,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsav1_5sha256(message).then((output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsav1_5-sha256');
@@ -2030,12 +2030,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsav1_5sha256(message, output.sk, output.signature);
+              return magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(message, output.sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsav1_5sha256(message, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2047,7 +2047,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsav1_5sha256(message, output.sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(message, output.sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2059,7 +2059,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on validation', (done) => {
-          magic.alt.auth.rsav1_5sha256(message, (err, output) => {
+          magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2069,7 +2069,7 @@ nwIDAQAB
             assert.ok(output.sk);
             assert.ok(output.signature);
 
-            magic.alt.verify.rsav1_5sha256(message, null, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(message, null, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -2079,7 +2079,7 @@ nwIDAQAB
         });
 
         it('should fail if message is altered', (done) => {
-          magic.alt.auth.rsav1_5sha256(message, (err, output) => {
+          magic.alt.auth.RSASSA_PKCS1V1_5_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2091,7 +2091,7 @@ nwIDAQAB
 
             const altered = 'Some other message';
 
-            magic.alt.verify.rsav1_5sha256(altered, output.sk, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PKCS1V1_5_SHA256(altered, output.sk, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid signature');
 
@@ -2102,7 +2102,7 @@ nwIDAQAB
       });
     });
 
-    describe('rsav1_5sha384', () => {
+    describe('RSASSA_PKCS1V1_5_SHA384', () => {
 
       let sk, pk;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -2114,7 +2114,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsav1_5sha384(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2124,7 +2124,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsav1_5sha384(message, sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(message, sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2132,7 +2132,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsav1_5sha384(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsav1_5-sha384');
@@ -2141,12 +2141,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsav1_5sha384(message, sk, output.signature);
+              return magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(message, sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsav1_5sha384(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2158,7 +2158,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsav1_5sha384(message, sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(message, sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2171,7 +2171,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsav1_5sha384(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2181,7 +2181,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsav1_5sha384(message, pk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(message, pk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2189,7 +2189,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsav1_5sha384(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsav1_5-sha384');
@@ -2198,12 +2198,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsav1_5sha384(message, pk, output.signature);
+              return magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(message, pk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsav1_5sha384(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2215,7 +2215,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsav1_5sha384(message, pk, esig, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(message, pk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2226,7 +2226,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsav1_5sha384(message, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2236,7 +2236,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsav1_5sha384(message, output.sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(message, output.sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2244,7 +2244,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsav1_5sha384(message).then((output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsav1_5-sha384');
@@ -2253,12 +2253,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsav1_5sha384(message, output.sk, output.signature);
+              return magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(message, output.sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsav1_5sha384(message, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2270,7 +2270,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsav1_5sha384(message, output.sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(message, output.sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2282,7 +2282,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on validation', (done) => {
-          magic.alt.auth.rsav1_5sha384(message, (err, output) => {
+          magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2292,7 +2292,7 @@ nwIDAQAB
             assert.ok(output.sk);
             assert.ok(output.signature);
 
-            magic.alt.verify.rsav1_5sha384(message, null, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(message, null, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -2302,7 +2302,7 @@ nwIDAQAB
         });
 
         it('should fail if message is altered', (done) => {
-          magic.alt.auth.rsav1_5sha384(message, (err, output) => {
+          magic.alt.auth.RSASSA_PKCS1V1_5_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2314,7 +2314,7 @@ nwIDAQAB
 
             const altered = 'Some other message';
 
-            magic.alt.verify.rsav1_5sha384(altered, output.sk, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PKCS1V1_5_SHA384(altered, output.sk, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid signature');
 
@@ -2325,7 +2325,7 @@ nwIDAQAB
       });
     });
 
-    describe('rsav1_5sha512', () => {
+    describe('RSASSA_PKCS1V1_5_SHA512', () => {
 
       let sk, pk;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -2337,7 +2337,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsav1_5sha512(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2347,7 +2347,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsav1_5sha512(message, sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(message, sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2355,7 +2355,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsav1_5sha512(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsav1_5-sha512');
@@ -2364,12 +2364,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsav1_5sha512(message, sk, output.signature);
+              return magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(message, sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsav1_5sha512(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2381,7 +2381,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsav1_5sha512(message, sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(message, sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2394,7 +2394,7 @@ nwIDAQAB
           before(() => { sk = RSAKEYS.sk; pk = RSAKEYS.pk });
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsav1_5sha512(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2404,7 +2404,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsav1_5sha512(message, pk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(message, pk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2412,7 +2412,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsav1_5sha512(message, sk).then((output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message, sk).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsav1_5-sha512');
@@ -2421,12 +2421,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsav1_5sha512(message, pk, output.signature);
+              return magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(message, pk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsav1_5sha512(message, sk, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message, sk, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2438,7 +2438,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsav1_5sha512(message, pk, esig, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(message, pk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2449,7 +2449,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should verify a computed signature - callback api', (done) => {
-            magic.alt.auth.rsav1_5sha512(message, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2459,7 +2459,7 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              magic.alt.verify.rsav1_5sha512(message, output.sk, output.signature, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(message, output.sk, output.signature, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2467,7 +2467,7 @@ nwIDAQAB
           });
 
           it('should verify a computed signature - promise api', (done) => {
-            magic.alt.auth.rsav1_5sha512(message).then((output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'rsav1_5-sha512');
@@ -2476,12 +2476,12 @@ nwIDAQAB
 
               assert.ok(output.signature);
 
-              return magic.alt.verify.rsav1_5sha512(message, output.sk, output.signature);
+              return magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(message, output.sk, output.signature);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed signature w/ hex encoding', (done) => {
-            magic.alt.auth.rsav1_5sha512(message, (err, output) => {
+            magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2493,7 +2493,7 @@ nwIDAQAB
 
               const esig = output.signature.toString('hex');
 
-              magic.alt.verify.rsav1_5sha512(message, output.sk, esig, (err) => {
+              magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(message, output.sk, esig, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2505,7 +2505,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on validation', (done) => {
-          magic.alt.auth.rsav1_5sha512(message, (err, output) => {
+          magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2515,7 +2515,7 @@ nwIDAQAB
             assert.ok(output.sk);
             assert.ok(output.signature);
 
-            magic.alt.verify.rsav1_5sha512(message, null, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(message, null, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -2525,7 +2525,7 @@ nwIDAQAB
         });
 
         it('should fail if message is altered', (done) => {
-          magic.alt.auth.rsav1_5sha512(message, (err, output) => {
+          magic.alt.auth.RSASSA_PKCS1V1_5_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2537,7 +2537,7 @@ nwIDAQAB
 
             const altered = 'Some other message';
 
-            magic.alt.verify.rsav1_5sha512(altered, output.sk, output.signature, (err) => {
+            magic.alt.verify.RSASSA_PKCS1V1_5_SHA512(altered, output.sk, output.signature, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid signature');
 
@@ -2548,7 +2548,7 @@ nwIDAQAB
       });
     });
 
-    describe('hmacsha256', () => {
+    describe('HMAC_SHA256', () => {
 
       let key;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -2560,7 +2560,7 @@ nwIDAQAB
           beforeEach(() => { key = crypto.randomBytes(32); });
 
           it('should verify a computed mac - callback api', (done) => {
-            magic.alt.auth.hmacsha256(message, key, (err, output) => {
+            magic.alt.auth.HMAC_SHA256(message, key, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2570,7 +2570,7 @@ nwIDAQAB
 
               assert.ok(output.mac);
 
-              magic.alt.verify.hmacsha256(message, key, output.mac, (err) => {
+              magic.alt.verify.HMAC_SHA256(message, key, output.mac, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2578,7 +2578,7 @@ nwIDAQAB
           });
 
           it('should verify a computed mac - promise api', (done) => {
-            magic.alt.auth.hmacsha256(message, key).then((output) => {
+            magic.alt.auth.HMAC_SHA256(message, key).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'hmacsha256');
@@ -2587,14 +2587,14 @@ nwIDAQAB
 
               assert.ok(output.mac);
 
-              return magic.alt.verify.hmacsha256(message, key, output.mac);
+              return magic.alt.verify.HMAC_SHA256(message, key, output.mac);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
             const ekey = key.toString('hex');
 
-            magic.alt.auth.hmacsha256(message, ekey, (err, output) => {
+            magic.alt.auth.HMAC_SHA256(message, ekey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2606,7 +2606,7 @@ nwIDAQAB
 
               const emac = output.mac.toString('hex');
 
-              magic.alt.verify.hmacsha256(message, ekey, emac, (err) => {
+              magic.alt.verify.HMAC_SHA256(message, ekey, emac, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2617,7 +2617,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should verify a computed mac - callback api', (done) => {
-            magic.alt.auth.hmacsha256(message, (err, output) => {
+            magic.alt.auth.HMAC_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2627,7 +2627,7 @@ nwIDAQAB
               assert.ok(output.sk);
               assert.ok(output.mac);
 
-              magic.alt.verify.hmacsha256(message, output.sk, output.mac, (err) => {
+              magic.alt.verify.HMAC_SHA256(message, output.sk, output.mac, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2635,7 +2635,7 @@ nwIDAQAB
           });
 
           it('should verify a computed mac - promise api', (done) => {
-            magic.alt.auth.hmacsha256(message).then((output) => {
+            magic.alt.auth.HMAC_SHA256(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'hmacsha256');
@@ -2644,12 +2644,12 @@ nwIDAQAB
               assert.ok(output.sk);
               assert.ok(output.mac);
 
-              return magic.alt.verify.hmacsha256(message, output.sk, output.mac);
+              return magic.alt.verify.HMAC_SHA256(message, output.sk, output.mac);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
-            magic.alt.auth.hmacsha256(message, (err, output) => {
+            magic.alt.auth.HMAC_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2662,7 +2662,7 @@ nwIDAQAB
               const ekey = output.sk.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.verify.hmacsha256(message, ekey, emac, (err) => {
+              magic.alt.verify.HMAC_SHA256(message, ekey, emac, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2674,7 +2674,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on validation', (done) => {
-          magic.alt.auth.hmacsha256(message, (err, output) => {
+          magic.alt.auth.HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2684,7 +2684,7 @@ nwIDAQAB
             assert.ok(output.sk);
             assert.ok(output.mac);
 
-            magic.alt.verify.hmacsha256(message, null, output.mac, (err) => {
+            magic.alt.verify.HMAC_SHA256(message, null, output.mac, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -2694,7 +2694,7 @@ nwIDAQAB
         });
 
         it('should fail if message is altered', (done) => {
-          magic.alt.auth.hmacsha256(message, (err, output) => {
+          magic.alt.auth.HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2706,7 +2706,7 @@ nwIDAQAB
 
             const altered = 'Some other message';
 
-            magic.alt.verify.hmacsha256(altered, output.sk, output.mac, (err) => {
+            magic.alt.verify.HMAC_SHA256(altered, output.sk, output.mac, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -2716,7 +2716,7 @@ nwIDAQAB
         });
 
         it('should fail if key is altered', (done) => {
-          magic.alt.auth.hmacsha256(message, (err, output) => {
+          magic.alt.auth.HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2728,7 +2728,7 @@ nwIDAQAB
 
             const altered = Buffer.from('b3ae620c610b577c1a596fa96259426dc9bcc521c086a348e22b8169b092fcf01f20381e0edca71e4fa9811bc7ed05e9', 'hex');
 
-            magic.alt.verify.hmacsha256(message, altered, output.mac, (err) => {
+            magic.alt.verify.HMAC_SHA256(message, altered, output.mac, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -2739,7 +2739,7 @@ nwIDAQAB
       });
     });
 
-    describe('hmacsha512', () => {
+    describe('HMAC_SHA512', () => {
 
       let key;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -2751,7 +2751,7 @@ nwIDAQAB
           beforeEach(() => { key = crypto.randomBytes(32); });
 
           it('should verify a computed mac - callback api', (done) => {
-            magic.alt.auth.hmacsha512(message, key, (err, output) => {
+            magic.alt.auth.HMAC_SHA512(message, key, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2761,7 +2761,7 @@ nwIDAQAB
 
               assert.ok(output.mac);
 
-              magic.alt.verify.hmacsha512(message, key, output.mac, (err) => {
+              magic.alt.verify.HMAC_SHA512(message, key, output.mac, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2769,7 +2769,7 @@ nwIDAQAB
           });
 
           it('should verify a computed mac - promise api', (done) => {
-            magic.alt.auth.hmacsha512(message, key).then((output) => {
+            magic.alt.auth.HMAC_SHA512(message, key).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'hmacsha512');
@@ -2778,14 +2778,14 @@ nwIDAQAB
 
               assert.ok(output.mac);
 
-              return magic.alt.verify.hmacsha512(message, key, output.mac);
+              return magic.alt.verify.HMAC_SHA512(message, key, output.mac);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
             const ekey = key.toString('hex');
 
-            magic.alt.auth.hmacsha512(message, ekey, (err, output) => {
+            magic.alt.auth.HMAC_SHA512(message, ekey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2797,7 +2797,7 @@ nwIDAQAB
 
               const emac = output.mac.toString('hex');
 
-              magic.alt.verify.hmacsha512(message, ekey, emac, (err) => {
+              magic.alt.verify.HMAC_SHA512(message, ekey, emac, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2808,7 +2808,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should verify a computed mac - callback api', (done) => {
-            magic.alt.auth.hmacsha512(message, (err, output) => {
+            magic.alt.auth.HMAC_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2818,7 +2818,7 @@ nwIDAQAB
               assert.ok(output.sk);
               assert.ok(output.mac);
 
-              magic.alt.verify.hmacsha512(message, output.sk, output.mac, (err) => {
+              magic.alt.verify.HMAC_SHA512(message, output.sk, output.mac, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2826,7 +2826,7 @@ nwIDAQAB
           });
 
           it('should verify a computed mac - promise api', (done) => {
-            magic.alt.auth.hmacsha512(message).then((output) => {
+            magic.alt.auth.HMAC_SHA512(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'hmacsha512');
@@ -2835,12 +2835,12 @@ nwIDAQAB
               assert.ok(output.sk);
               assert.ok(output.mac);
 
-              return magic.alt.verify.hmacsha512(message, output.sk, output.mac);
+              return magic.alt.verify.HMAC_SHA512(message, output.sk, output.mac);
             }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
           });
 
           it('should verify a computed mac w/ hex encoding', (done) => {
-            magic.alt.auth.hmacsha512(message, (err, output) => {
+            magic.alt.auth.HMAC_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2853,7 +2853,7 @@ nwIDAQAB
               const ekey = output.sk.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.verify.hmacsha512(message, ekey, emac, (err) => {
+              magic.alt.verify.HMAC_SHA512(message, ekey, emac, (err) => {
                 assert.ok(!err);
                 done();
               });
@@ -2865,7 +2865,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on validation', (done) => {
-          magic.alt.auth.hmacsha512(message, (err, output) => {
+          magic.alt.auth.HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2875,7 +2875,7 @@ nwIDAQAB
             assert.ok(output.sk);
             assert.ok(output.mac);
 
-            magic.alt.verify.hmacsha512(message, null, output.mac, (err) => {
+            magic.alt.verify.HMAC_SHA512(message, null, output.mac, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot verify without a key');
 
@@ -2885,7 +2885,7 @@ nwIDAQAB
         });
 
         it('should fail if message is altered', (done) => {
-          magic.alt.auth.hmacsha512(message, (err, output) => {
+          magic.alt.auth.HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2897,7 +2897,7 @@ nwIDAQAB
 
             const altered = 'Some other message';
 
-            magic.alt.verify.hmacsha512(altered, output.sk, output.mac, (err) => {
+            magic.alt.verify.HMAC_SHA512(altered, output.sk, output.mac, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -2907,7 +2907,7 @@ nwIDAQAB
         });
 
         it('should fail if key is altered', (done) => {
-          magic.alt.auth.hmacsha512(message, (err, output) => {
+          magic.alt.auth.HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -2919,7 +2919,7 @@ nwIDAQAB
 
             const altered = Buffer.from('b3ae620c610b577c1a596fa96259426dc9bcc521c086a348e22b8169b092fcf01f20381e0edca71e4fa9811bc7ed05e9', 'hex');
 
-            magic.alt.verify.hmacsha512(message, altered, output.mac, (err) => {
+            magic.alt.verify.HMAC_SHA512(message, altered, output.mac, (err) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -2931,7 +2931,7 @@ nwIDAQAB
     });
 
 
-    describe('aes128cbc_hmacsha256', () => {
+    describe('AES_128_CBC_HMAC_SHA256', () => {
 
       let ekey, akey;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -2946,7 +2946,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha256(message, ekey, akey, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, ekey, akey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -2959,7 +2959,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes128cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -2969,7 +2969,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha256(message, ekey, akey).then((output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, ekey, akey).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes128cbc-hmacsha256');
@@ -2981,7 +2981,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes128cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(ekey, akey, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -2993,7 +2993,7 @@ nwIDAQAB
             const eekey = ekey.toString('hex');
             const eakey = akey.toString('hex');
 
-            magic.alt.encrypt.aes128cbc_hmacsha256(message, eekey, eakey, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, eekey, eakey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3010,7 +3010,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes128cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3023,7 +3023,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3036,7 +3036,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3046,7 +3046,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha256(message).then((output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes128cbc-hmacsha256');
@@ -3058,7 +3058,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3067,7 +3067,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3086,7 +3086,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const emac  = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes128cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3100,7 +3100,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error with only encryption key on encryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha256(message, crypto.randomBytes(16), null, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, crypto.randomBytes(16), null, (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -3109,7 +3109,7 @@ nwIDAQAB
         });
 
         it('should error with only authentication key on encryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha256(message, null, crypto.randomBytes(32), (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, null, crypto.randomBytes(32), (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -3118,7 +3118,7 @@ nwIDAQAB
         });
 
         it('should error without keys on decryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -3131,7 +3131,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes128cbc_hmacsha256(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -3141,7 +3141,7 @@ nwIDAQAB
         });
 
         it('should error without encryption key on decryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -3154,7 +3154,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -3164,7 +3164,7 @@ nwIDAQAB
         });
 
         it('should error without authentication key on decryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -3177,7 +3177,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes128cbc_hmacsha256(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -3187,7 +3187,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -3202,7 +3202,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -3212,7 +3212,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -3227,7 +3227,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -3237,7 +3237,7 @@ nwIDAQAB
         });
 
         it('should fail if mac is altered', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -3252,7 +3252,7 @@ nwIDAQAB
 
             const altered = Buffer.from('1cf20c1e94ac59f3ac17e029bc05190f4f5d34d9ead66ed0315644e668dc9cab', 'hex');
 
-            magic.alt.decrypt.aes128cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -3264,7 +3264,7 @@ nwIDAQAB
     });
 
 
-    describe('aes128cbc_hmacsha384', () => {
+    describe('AES_128_CBC_HMAC_SHA384', () => {
 
       let ekey, akey;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -3279,7 +3279,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha384(message, ekey, akey, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, ekey, akey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3292,7 +3292,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes128cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3302,7 +3302,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha384(message, ekey, akey).then((output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, ekey, akey).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes128cbc-hmacsha384');
@@ -3314,7 +3314,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes128cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(ekey, akey, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3326,7 +3326,7 @@ nwIDAQAB
             const eekey = ekey.toString('hex');
             const eakey = akey.toString('hex');
 
-            magic.alt.encrypt.aes128cbc_hmacsha384(message, eekey, eakey, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, eekey, eakey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3343,7 +3343,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes128cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3356,7 +3356,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3369,7 +3369,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3379,7 +3379,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha384(message).then((output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes128cbc-hmacsha384');
@@ -3391,7 +3391,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3400,7 +3400,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3419,7 +3419,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const emac  = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes128cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3433,7 +3433,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error with only encryption key on encryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha384(message, crypto.randomBytes(16), null, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, crypto.randomBytes(16), null, (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -3442,7 +3442,7 @@ nwIDAQAB
         });
 
         it('should error with only authentication key on encryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha384(message, null, crypto.randomBytes(48), (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, null, crypto.randomBytes(48), (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -3451,7 +3451,7 @@ nwIDAQAB
         });
 
         it('should error without keys on decryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -3464,7 +3464,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes128cbc_hmacsha384(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -3474,7 +3474,7 @@ nwIDAQAB
         });
 
         it('should error without encryption key on decryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -3487,7 +3487,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -3497,7 +3497,7 @@ nwIDAQAB
         });
 
         it('should error without authentication key on decryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -3510,7 +3510,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes128cbc_hmacsha384(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -3520,7 +3520,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -3535,7 +3535,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -3545,7 +3545,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -3560,7 +3560,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -3570,7 +3570,7 @@ nwIDAQAB
         });
 
         it('should fail if mac is altered', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -3585,7 +3585,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9cba256455c5a1328cfe12578bc1558ef43974a2fa373074ed8091a6c61b63da0c58c6ee31e249a063baf0223e25c6d0', 'hex');
 
-            magic.alt.decrypt.aes128cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -3597,7 +3597,7 @@ nwIDAQAB
     });
 
 
-    describe('aes128cbc_hmacsha512', () => {
+    describe('AES_128_CBC_HMAC_SHA512', () => {
 
       let ekey, akey;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -3612,7 +3612,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha512(message, ekey, akey, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, ekey, akey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3625,7 +3625,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes128cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3635,7 +3635,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha512(message, ekey, akey).then((output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, ekey, akey).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes128cbc-hmacsha512');
@@ -3647,7 +3647,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes128cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(ekey, akey, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3659,7 +3659,7 @@ nwIDAQAB
             const eekey = ekey.toString('hex');
             const eakey = akey.toString('hex');
 
-            magic.alt.encrypt.aes128cbc_hmacsha512(message, eekey, eakey, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, eekey, eakey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3676,7 +3676,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes128cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3689,7 +3689,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3702,7 +3702,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3712,7 +3712,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha512(message).then((output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes128cbc-hmacsha512');
@@ -3724,7 +3724,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3733,7 +3733,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+            magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3752,7 +3752,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const emac  = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes128cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3766,7 +3766,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error with only encryption key on encryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha512(message, crypto.randomBytes(16), null, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, crypto.randomBytes(16), null, (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -3775,7 +3775,7 @@ nwIDAQAB
         });
 
         it('should error with only authentication key on encryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha512(message, null, crypto.randomBytes(64), (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, null, crypto.randomBytes(64), (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -3784,7 +3784,7 @@ nwIDAQAB
         });
 
         it('should error without keys on decryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -3797,7 +3797,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes128cbc_hmacsha512(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -3807,7 +3807,7 @@ nwIDAQAB
         });
 
         it('should error without encryption key on decryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -3820,7 +3820,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -3830,7 +3830,7 @@ nwIDAQAB
         });
 
         it('should error without authentication key on decryption', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -3843,7 +3843,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes128cbc_hmacsha512(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -3853,7 +3853,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -3868,7 +3868,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -3878,7 +3878,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -3893,7 +3893,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -3903,7 +3903,7 @@ nwIDAQAB
         });
 
         it('should fail if mac is altered', (done) => {
-          magic.alt.encrypt.aes128cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_128_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -3918,7 +3918,7 @@ nwIDAQAB
 
             const altered = Buffer.from('42f77f17198794a8f02480775212498a24a3d88d0e0aecabf97098bb2bcd1ac8fda5943d434e5c66f7c570a36d569439023a97c820917dd5d28dfe513756091c', 'hex');
 
-            magic.alt.decrypt.aes128cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -3930,7 +3930,7 @@ nwIDAQAB
     });
 
 
-    describe('aes192cbc_hmacsha256', () => {
+    describe('AES_192_CBC_HMAC_SHA256', () => {
 
       let ekey, akey;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -3945,7 +3945,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha256(message, ekey, akey, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, ekey, akey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -3958,7 +3958,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes192cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3968,7 +3968,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha256(message, ekey, akey).then((output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, ekey, akey).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes192cbc-hmacsha256');
@@ -3980,7 +3980,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes192cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(ekey, akey, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -3992,7 +3992,7 @@ nwIDAQAB
             const eekey = ekey.toString('hex');
             const eakey = akey.toString('hex');
 
-            magic.alt.encrypt.aes192cbc_hmacsha256(message, eekey, eakey, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, eekey, eakey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4009,7 +4009,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes192cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4022,7 +4022,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4035,7 +4035,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4045,7 +4045,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha256(message).then((output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes192cbc-hmacsha256');
@@ -4057,7 +4057,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4066,7 +4066,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4085,7 +4085,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const emac  = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes192cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4099,7 +4099,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error with only encryption key on encryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha256(message, crypto.randomBytes(24), null, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, crypto.randomBytes(24), null, (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -4108,7 +4108,7 @@ nwIDAQAB
         });
 
         it('should error with only authentication key on encryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha256(message, null, crypto.randomBytes(32), (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, null, crypto.randomBytes(32), (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -4117,7 +4117,7 @@ nwIDAQAB
         });
 
         it('should error without keys on decryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -4130,7 +4130,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes192cbc_hmacsha256(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -4140,7 +4140,7 @@ nwIDAQAB
         });
 
         it('should error without encryption key on decryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -4153,7 +4153,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -4163,7 +4163,7 @@ nwIDAQAB
         });
 
         it('should error without authentication key on decryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -4176,7 +4176,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes192cbc_hmacsha256(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -4186,7 +4186,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -4201,7 +4201,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -4211,7 +4211,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -4226,7 +4226,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -4236,7 +4236,7 @@ nwIDAQAB
         });
 
         it('should fail if mac is altered', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -4251,7 +4251,7 @@ nwIDAQAB
 
             const altered = Buffer.from('1cf20c1e94ac59f3ac17e029bc05190f4f5d34d9ead66ed0315644e668dc9cab', 'hex');
 
-            magic.alt.decrypt.aes192cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -4263,7 +4263,7 @@ nwIDAQAB
     });
 
 
-    describe('aes192cbc_hmacsha384', () => {
+    describe('AES_192_CBC_HMAC_SHA384', () => {
 
       let ekey, akey;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -4278,7 +4278,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha384(message, ekey, akey, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, ekey, akey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4291,7 +4291,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes192cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4301,7 +4301,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha384(message, ekey, akey).then((output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, ekey, akey).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes192cbc-hmacsha384');
@@ -4313,7 +4313,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes192cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(ekey, akey, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4325,7 +4325,7 @@ nwIDAQAB
             const eekey = ekey.toString('hex');
             const eakey = akey.toString('hex');
 
-            magic.alt.encrypt.aes192cbc_hmacsha384(message, eekey, eakey, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, eekey, eakey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4342,7 +4342,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes192cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4355,7 +4355,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4368,7 +4368,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4378,7 +4378,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha384(message).then((output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes192cbc-hmacsha384');
@@ -4390,7 +4390,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4399,7 +4399,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4418,7 +4418,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const emac  = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes192cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4432,7 +4432,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error with only encryption key on encryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha384(message, crypto.randomBytes(24), null, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, crypto.randomBytes(24), null, (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -4441,7 +4441,7 @@ nwIDAQAB
         });
 
         it('should error with only authentication key on encryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha384(message, null, crypto.randomBytes(48), (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, null, crypto.randomBytes(48), (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -4450,7 +4450,7 @@ nwIDAQAB
         });
 
         it('should error without keys on decryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -4463,7 +4463,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes192cbc_hmacsha384(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -4473,7 +4473,7 @@ nwIDAQAB
         });
 
         it('should error without encryption key on decryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -4486,7 +4486,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -4496,7 +4496,7 @@ nwIDAQAB
         });
 
         it('should error without authentication key on decryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -4509,7 +4509,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes192cbc_hmacsha384(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -4519,7 +4519,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -4534,7 +4534,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -4544,7 +4544,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -4559,7 +4559,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -4569,7 +4569,7 @@ nwIDAQAB
         });
 
         it('should fail if mac is altered', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -4584,7 +4584,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9cba256455c5a1328cfe12578bc1558ef43974a2fa373074ed8091a6c61b63da0c58c6ee31e249a063baf0223e25c6d0', 'hex');
 
-            magic.alt.decrypt.aes192cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -4596,7 +4596,7 @@ nwIDAQAB
     });
 
 
-    describe('aes192cbc_hmacsha512', () => {
+    describe('AES_192_CBC_HMAC_SHA512', () => {
 
       let ekey, akey;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -4611,7 +4611,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha512(message, ekey, akey, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, ekey, akey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4624,7 +4624,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes192cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4634,7 +4634,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha512(message, ekey, akey).then((output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, ekey, akey).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes192cbc-hmacsha512');
@@ -4646,7 +4646,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes192cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(ekey, akey, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4658,7 +4658,7 @@ nwIDAQAB
             const eekey = ekey.toString('hex');
             const eakey = akey.toString('hex');
 
-            magic.alt.encrypt.aes192cbc_hmacsha512(message, eekey, eakey, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, eekey, eakey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4675,7 +4675,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes192cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4688,7 +4688,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4701,7 +4701,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4711,7 +4711,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha512(message).then((output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes192cbc-hmacsha512');
@@ -4723,7 +4723,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4732,7 +4732,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+            magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4751,7 +4751,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const emac  = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes192cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4765,7 +4765,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error with only encryption key on encryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha512(message, crypto.randomBytes(24), null, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, crypto.randomBytes(24), null, (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -4774,7 +4774,7 @@ nwIDAQAB
         });
 
         it('should error with only authentication key on encryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha512(message, null, crypto.randomBytes(64), (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, null, crypto.randomBytes(64), (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -4783,7 +4783,7 @@ nwIDAQAB
         });
 
         it('should error without keys on decryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -4796,7 +4796,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes192cbc_hmacsha512(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -4806,7 +4806,7 @@ nwIDAQAB
         });
 
         it('should error without encryption key on decryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -4819,7 +4819,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -4829,7 +4829,7 @@ nwIDAQAB
         });
 
         it('should error without authentication key on decryption', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -4842,7 +4842,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes192cbc_hmacsha512(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -4852,7 +4852,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -4867,7 +4867,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -4877,7 +4877,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -4892,7 +4892,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -4902,7 +4902,7 @@ nwIDAQAB
         });
 
         it('should fail if mac is altered', (done) => {
-          magic.alt.encrypt.aes192cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_192_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -4917,7 +4917,7 @@ nwIDAQAB
 
             const altered = Buffer.from('42f77f17198794a8f02480775212498a24a3d88d0e0aecabf97098bb2bcd1ac8fda5943d434e5c66f7c570a36d569439023a97c820917dd5d28dfe513756091c', 'hex');
 
-            magic.alt.decrypt.aes192cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -4929,7 +4929,7 @@ nwIDAQAB
     });
 
 
-    describe('aes256cbc_hmacsha256', () => {
+    describe('AES_256_CBC_HMAC_SHA256', () => {
 
       let ekey, akey;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -4944,7 +4944,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha256(message, ekey, akey, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, ekey, akey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -4957,7 +4957,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes256cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4967,7 +4967,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha256(message, ekey, akey).then((output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, ekey, akey).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes256cbc-hmacsha256');
@@ -4979,7 +4979,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes256cbc_hmacsha256(ekey, akey, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(ekey, akey, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -4991,7 +4991,7 @@ nwIDAQAB
             const eekey = ekey.toString('hex');
             const eakey = akey.toString('hex');
 
-            magic.alt.encrypt.aes256cbc_hmacsha256(message, eekey, eakey, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, eekey, eakey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5008,7 +5008,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes256cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5021,7 +5021,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5034,7 +5034,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5044,7 +5044,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha256(message).then((output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes256cbc-hmacsha256');
@@ -5056,7 +5056,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5065,7 +5065,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5084,7 +5084,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const emac  = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes256cbc_hmacsha256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5098,7 +5098,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error with only encryption key on encryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha256(message, crypto.randomBytes(32), null, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, crypto.randomBytes(32), null, (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -5107,7 +5107,7 @@ nwIDAQAB
         });
 
         it('should error with only authentication key on encryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha256(message, null, crypto.randomBytes(32), (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, null, crypto.randomBytes(32), (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -5116,7 +5116,7 @@ nwIDAQAB
         });
 
         it('should error without keys on decryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -5129,7 +5129,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes256cbc_hmacsha256(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -5139,7 +5139,7 @@ nwIDAQAB
         });
 
         it('should error without encryption key on decryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -5152,7 +5152,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -5162,7 +5162,7 @@ nwIDAQAB
         });
 
         it('should error without authentication key on decryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -5175,7 +5175,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes256cbc_hmacsha256(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -5185,7 +5185,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -5200,7 +5200,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -5210,7 +5210,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -5225,7 +5225,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -5235,7 +5235,7 @@ nwIDAQAB
         });
 
         it('should fail if mac is altered', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha256(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA256(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -5250,7 +5250,7 @@ nwIDAQAB
 
             const altered = Buffer.from('1cf20c1e94ac59f3ac17e029bc05190f4f5d34d9ead66ed0315644e668dc9cab', 'hex');
 
-            magic.alt.decrypt.aes256cbc_hmacsha256(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA256(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -5262,7 +5262,7 @@ nwIDAQAB
     });
 
 
-    describe('aes256cbc_hmacsha384', () => {
+    describe('AES_256_CBC_HMAC_SHA384', () => {
 
       let ekey, akey;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -5277,7 +5277,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha384(message, ekey, akey, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, ekey, akey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5290,7 +5290,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes256cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5300,7 +5300,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha384(message, ekey, akey).then((output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, ekey, akey).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes256cbc-hmacsha384');
@@ -5312,7 +5312,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes256cbc_hmacsha384(ekey, akey, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(ekey, akey, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5324,7 +5324,7 @@ nwIDAQAB
             const eekey = ekey.toString('hex');
             const eakey = akey.toString('hex');
 
-            magic.alt.encrypt.aes256cbc_hmacsha384(message, eekey, eakey, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, eekey, eakey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5341,7 +5341,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes256cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5354,7 +5354,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5367,7 +5367,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5377,7 +5377,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha384(message).then((output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes256cbc-hmacsha384');
@@ -5389,7 +5389,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5398,7 +5398,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5417,7 +5417,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const emac  = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes256cbc_hmacsha384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5431,7 +5431,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error with only encryption key on encryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha384(message, crypto.randomBytes(32), null, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, crypto.randomBytes(32), null, (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -5440,7 +5440,7 @@ nwIDAQAB
         });
 
         it('should error with only authentication key on encryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha384(message, null, crypto.randomBytes(48), (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, null, crypto.randomBytes(48), (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -5449,7 +5449,7 @@ nwIDAQAB
         });
 
         it('should error without keys on decryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -5462,7 +5462,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes256cbc_hmacsha384(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -5472,7 +5472,7 @@ nwIDAQAB
         });
 
         it('should error without encryption key on decryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -5485,7 +5485,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -5495,7 +5495,7 @@ nwIDAQAB
         });
 
         it('should error without authentication key on decryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -5508,7 +5508,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes256cbc_hmacsha384(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -5518,7 +5518,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -5533,7 +5533,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -5543,7 +5543,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -5558,7 +5558,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -5568,7 +5568,7 @@ nwIDAQAB
         });
 
         it('should fail if mac is altered', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha384(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA384(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -5583,7 +5583,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9cba256455c5a1328cfe12578bc1558ef43974a2fa373074ed8091a6c61b63da0c58c6ee31e249a063baf0223e25c6d0', 'hex');
 
-            magic.alt.decrypt.aes256cbc_hmacsha384(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA384(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -5595,7 +5595,7 @@ nwIDAQAB
     });
 
 
-    describe('aes256cbc_hmacsha512', () => {
+    describe('AES_256_CBC_HMAC_SHA512', () => {
 
       let ekey, akey;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -5610,7 +5610,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha512(message, ekey, akey, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, ekey, akey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5623,7 +5623,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes256cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(ekey, akey, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5633,7 +5633,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha512(message, ekey, akey).then((output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, ekey, akey).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes256cbc-hmacsha512');
@@ -5645,7 +5645,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes256cbc_hmacsha512(ekey, akey, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(ekey, akey, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5657,7 +5657,7 @@ nwIDAQAB
             const eekey = ekey.toString('hex');
             const eakey = akey.toString('hex');
 
-            magic.alt.encrypt.aes256cbc_hmacsha512(message, eekey, eakey, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, eekey, eakey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5674,7 +5674,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const emac = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes256cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5687,7 +5687,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5700,7 +5700,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5710,7 +5710,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha512(message).then((output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes256cbc-hmacsha512');
@@ -5722,7 +5722,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-              return magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
+              return magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, output.ciphertext, output.mac);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5731,7 +5731,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+            magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5750,7 +5750,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const emac  = output.mac.toString('hex');
 
-              magic.alt.decrypt.aes256cbc_hmacsha512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(eekey, eakey, eiv, ect, emac, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5764,7 +5764,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error with only encryption key on encryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha512(message, crypto.randomBytes(32), null, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, crypto.randomBytes(32), null, (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -5773,7 +5773,7 @@ nwIDAQAB
         });
 
         it('should error with only authentication key on encryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha512(message, null, crypto.randomBytes(64), (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, null, crypto.randomBytes(64), (err, output) => {
             assert.ok(err);
             assert.equal(err.message, 'Requires both or neither of encryption and authentication keys');
 
@@ -5782,7 +5782,7 @@ nwIDAQAB
         });
 
         it('should error without keys on decryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -5795,7 +5795,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes256cbc_hmacsha512(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(null, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -5805,7 +5805,7 @@ nwIDAQAB
         });
 
         it('should error without encryption key on decryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -5818,7 +5818,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(output.sek, null, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -5828,7 +5828,7 @@ nwIDAQAB
         });
 
         it('should error without authentication key on decryption', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
               assert.ok(output);
 
@@ -5841,7 +5841,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.mac);
 
-            magic.alt.decrypt.aes256cbc_hmacsha512(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(null, output.sak, output.iv, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without encryption and authentication keys');
 
@@ -5851,7 +5851,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -5866,7 +5866,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(output.sek, output.sak, altered, output.ciphertext, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -5876,7 +5876,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -5891,7 +5891,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, altered, output.mac, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -5901,7 +5901,7 @@ nwIDAQAB
         });
 
         it('should fail if mac is altered', (done) => {
-          magic.alt.encrypt.aes256cbc_hmacsha512(message, (err, output) => {
+          magic.alt.encrypt.AES_256_CBC_HMAC_SHA512(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -5916,7 +5916,7 @@ nwIDAQAB
 
             const altered = Buffer.from('42f77f17198794a8f02480775212498a24a3d88d0e0aecabf97098bb2bcd1ac8fda5943d434e5c66f7c570a36d569439023a97c820917dd5d28dfe513756091c', 'hex');
 
-            magic.alt.decrypt.aes256cbc_hmacsha512(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_CBC_HMAC_SHA512(output.sek, output.sak, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Invalid mac');
 
@@ -5928,7 +5928,7 @@ nwIDAQAB
     });
 
 
-    describe('aes128gcm', () => {
+    describe('AES_128_GCM', () => {
 
       let key;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -5940,7 +5940,7 @@ nwIDAQAB
           beforeEach(() => { key = crypto.randomBytes(16); });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes128gcm(message, key, (err, output) => {
+            magic.alt.encrypt.AES_128_GCM(message, key, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -5952,7 +5952,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              magic.alt.decrypt.aes128gcm(key, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_GCM(key, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5962,7 +5962,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes128gcm(message, key).then((output) => {
+            magic.alt.encrypt.AES_128_GCM(message, key).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes128gcm');
@@ -5973,7 +5973,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              return magic.alt.decrypt.aes128gcm(key, output.iv, output.ciphertext, output.tag);
+              return magic.alt.decrypt.AES_128_GCM(key, output.iv, output.ciphertext, output.tag);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -5984,7 +5984,7 @@ nwIDAQAB
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
             const ekey = key.toString('hex');
 
-            magic.alt.encrypt.aes128gcm(message, ekey, (err, output) => {
+            magic.alt.encrypt.AES_128_GCM(message, ekey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6000,7 +6000,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const etag = output.tag.toString('hex');
 
-              magic.alt.decrypt.aes128gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_GCM(ekey, eiv, ect, etag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6013,7 +6013,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes128gcm(message, (err, output) => {
+            magic.alt.encrypt.AES_128_GCM(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6025,7 +6025,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              magic.alt.decrypt.aes128gcm(output.sk, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_GCM(output.sk, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6035,7 +6035,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes128gcm(message).then((output) => {
+            magic.alt.encrypt.AES_128_GCM(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes128gcm');
@@ -6046,7 +6046,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              return magic.alt.decrypt.aes128gcm(output.sk, output.iv, output.ciphertext, output.tag);
+              return magic.alt.decrypt.AES_128_GCM(output.sk, output.iv, output.ciphertext, output.tag);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6055,7 +6055,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes128gcm(message, (err, output) => {
+            magic.alt.encrypt.AES_128_GCM(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6072,7 +6072,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const etag  = output.tag.toString('hex');
 
-              magic.alt.decrypt.aes128gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+              magic.alt.decrypt.AES_128_GCM(ekey, eiv, ect, etag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6086,7 +6086,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on decryption', (done) => {
-          magic.alt.encrypt.aes128gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_128_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6098,7 +6098,7 @@ nwIDAQAB
             assert.ok(output.ciphertext);
             assert.ok(output.tag);
 
-            magic.alt.decrypt.aes128gcm(null, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_GCM(null, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without a key');
 
@@ -6108,7 +6108,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes128gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_128_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6122,7 +6122,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1285fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes128gcm(output.sk, altered, output.ciphertext, output.tag, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_GCM(output.sk, altered, output.ciphertext, output.tag, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
 
@@ -6132,7 +6132,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes128gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_128_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6146,7 +6146,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes128gcm(output.sk, output.iv, altered, output.tag, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_GCM(output.sk, output.iv, altered, output.tag, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
 
@@ -6156,7 +6156,7 @@ nwIDAQAB
         });
 
         it('should fail if tag is altered', (done) => {
-          magic.alt.encrypt.aes128gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_128_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6170,7 +6170,7 @@ nwIDAQAB
 
             const altered = Buffer.from('773280e4c1df5869284bb570e334864e', 'hex');
 
-            magic.alt.decrypt.aes128gcm(output.sk, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_128_GCM(output.sk, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
 
@@ -6182,7 +6182,7 @@ nwIDAQAB
     });
 
 
-    describe('aes192gcm', () => {
+    describe('AES_192_GCM', () => {
 
       let key;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -6194,7 +6194,7 @@ nwIDAQAB
           beforeEach(() => { key = crypto.randomBytes(24); });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes192gcm(message, key, (err, output) => {
+            magic.alt.encrypt.AES_192_GCM(message, key, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6206,7 +6206,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              magic.alt.decrypt.aes192gcm(key, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_GCM(key, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6216,7 +6216,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes192gcm(message, key).then((output) => {
+            magic.alt.encrypt.AES_192_GCM(message, key).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes192gcm');
@@ -6227,7 +6227,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              return magic.alt.decrypt.aes192gcm(key, output.iv, output.ciphertext, output.tag);
+              return magic.alt.decrypt.AES_192_GCM(key, output.iv, output.ciphertext, output.tag);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6238,7 +6238,7 @@ nwIDAQAB
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
             const ekey = key.toString('hex');
 
-            magic.alt.encrypt.aes192gcm(message, ekey, (err, output) => {
+            magic.alt.encrypt.AES_192_GCM(message, ekey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6254,7 +6254,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const etag = output.tag.toString('hex');
 
-              magic.alt.decrypt.aes192gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_GCM(ekey, eiv, ect, etag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6267,7 +6267,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes192gcm(message, (err, output) => {
+            magic.alt.encrypt.AES_192_GCM(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6279,7 +6279,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              magic.alt.decrypt.aes192gcm(output.sk, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_GCM(output.sk, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6289,7 +6289,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes192gcm(message).then((output) => {
+            magic.alt.encrypt.AES_192_GCM(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes192gcm');
@@ -6300,7 +6300,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              return magic.alt.decrypt.aes192gcm(output.sk, output.iv, output.ciphertext, output.tag);
+              return magic.alt.decrypt.AES_192_GCM(output.sk, output.iv, output.ciphertext, output.tag);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6309,7 +6309,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes192gcm(message, (err, output) => {
+            magic.alt.encrypt.AES_192_GCM(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6326,7 +6326,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const etag  = output.tag.toString('hex');
 
-              magic.alt.decrypt.aes192gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+              magic.alt.decrypt.AES_192_GCM(ekey, eiv, ect, etag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6340,7 +6340,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on decryption', (done) => {
-          magic.alt.encrypt.aes192gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_192_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6352,7 +6352,7 @@ nwIDAQAB
             assert.ok(output.ciphertext);
             assert.ok(output.tag);
 
-            magic.alt.decrypt.aes192gcm(null, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_GCM(null, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without a key');
 
@@ -6362,7 +6362,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes192gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_192_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6376,7 +6376,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d1925fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes192gcm(output.sk, altered, output.ciphertext, output.tag, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_GCM(output.sk, altered, output.ciphertext, output.tag, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
 
@@ -6386,7 +6386,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes192gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_192_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6400,7 +6400,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes192gcm(output.sk, output.iv, altered, output.tag, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_GCM(output.sk, output.iv, altered, output.tag, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
 
@@ -6410,7 +6410,7 @@ nwIDAQAB
         });
 
         it('should fail if tag is altered', (done) => {
-          magic.alt.encrypt.aes192gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_192_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6424,7 +6424,7 @@ nwIDAQAB
 
             const altered = Buffer.from('773280e4c1df5869284bb570e334864e', 'hex');
 
-            magic.alt.decrypt.aes192gcm(output.sk, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_192_GCM(output.sk, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
 
@@ -6436,7 +6436,7 @@ nwIDAQAB
     });
 
 
-    describe('aes256gcm', () => {
+    describe('AES_256_GCM', () => {
 
       let key;
       const message = 'A screaming comes across the sky. It has happened before, but there is nothing to compare it to now.';
@@ -6448,7 +6448,7 @@ nwIDAQAB
           beforeEach(() => { key = crypto.randomBytes(32); });
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes256gcm(message, key, (err, output) => {
+            magic.alt.encrypt.AES_256_GCM(message, key, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6460,7 +6460,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              magic.alt.decrypt.aes256gcm(key, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_GCM(key, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6470,7 +6470,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes256gcm(message, key).then((output) => {
+            magic.alt.encrypt.AES_256_GCM(message, key).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes256gcm');
@@ -6481,7 +6481,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              return magic.alt.decrypt.aes256gcm(key, output.iv, output.ciphertext, output.tag);
+              return magic.alt.decrypt.AES_256_GCM(key, output.iv, output.ciphertext, output.tag);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6492,7 +6492,7 @@ nwIDAQAB
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
             const ekey = key.toString('hex');
 
-            magic.alt.encrypt.aes256gcm(message, ekey, (err, output) => {
+            magic.alt.encrypt.AES_256_GCM(message, ekey, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6508,7 +6508,7 @@ nwIDAQAB
               const ect  = output.ciphertext.toString('hex');
               const etag = output.tag.toString('hex');
 
-              magic.alt.decrypt.aes256gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_GCM(ekey, eiv, ect, etag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6521,7 +6521,7 @@ nwIDAQAB
         describe('with key generation', () => {
 
           it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-            magic.alt.encrypt.aes256gcm(message, (err, output) => {
+            magic.alt.encrypt.AES_256_GCM(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6533,7 +6533,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              magic.alt.decrypt.aes256gcm(output.sk, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_GCM(output.sk, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6543,7 +6543,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-            magic.alt.encrypt.aes256gcm(message).then((output) => {
+            magic.alt.encrypt.AES_256_GCM(message).then((output) => {
               assert.ok(output);
 
               assert.equal(output.alg, 'aes256gcm');
@@ -6554,7 +6554,7 @@ nwIDAQAB
               assert.ok(output.ciphertext);
               assert.ok(output.tag);
 
-              return magic.alt.decrypt.aes256gcm(output.sk, output.iv, output.ciphertext, output.tag);
+              return magic.alt.decrypt.AES_256_GCM(output.sk, output.iv, output.ciphertext, output.tag);
             }).then((plaintext) => {
               assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6563,7 +6563,7 @@ nwIDAQAB
           });
 
           it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-            magic.alt.encrypt.aes256gcm(message, (err, output) => {
+            magic.alt.encrypt.AES_256_GCM(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -6580,7 +6580,7 @@ nwIDAQAB
               const ect   = output.ciphertext.toString('hex');
               const etag  = output.tag.toString('hex');
 
-              magic.alt.decrypt.aes256gcm(ekey, eiv, ect, etag, (err, plaintext) => {
+              magic.alt.decrypt.AES_256_GCM(ekey, eiv, ect, etag, (err, plaintext) => {
                 assert.ok(!err);
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -6594,7 +6594,7 @@ nwIDAQAB
       describe('failure', () => {
 
         it('should error without key on decryption', (done) => {
-          magic.alt.encrypt.aes256gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_256_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6606,7 +6606,7 @@ nwIDAQAB
             assert.ok(output.ciphertext);
             assert.ok(output.tag);
 
-            magic.alt.decrypt.aes256gcm(null, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_GCM(null, output.iv, output.ciphertext, output.tag, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Cannot decrypt without a key');
 
@@ -6616,7 +6616,7 @@ nwIDAQAB
         });
 
         it('should fail if iv is altered', (done) => {
-          magic.alt.encrypt.aes256gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_256_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6630,7 +6630,7 @@ nwIDAQAB
 
             const altered = Buffer.from('4cc885d2565fa7253eaf0d8d028e9587', 'hex');
 
-            magic.alt.decrypt.aes256gcm(output.sk, altered, output.ciphertext, output.tag, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_GCM(output.sk, altered, output.ciphertext, output.tag, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
 
@@ -6640,7 +6640,7 @@ nwIDAQAB
         });
 
         it('should fail if ciphertext is altered', (done) => {
-          magic.alt.encrypt.aes256gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_256_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6654,7 +6654,7 @@ nwIDAQAB
 
             const altered = Buffer.from('9b2d363003dc9e07acccdf47766ff43378e216d5c6aec796ce0f42af11c9c370eac6e33a2c169d0c24e09310735e4cb9d036a074b3d4cd855084f68cb9ad44475927f3d0931dcac131b9396074e0191103a67c8db673fe1ce13806693f77cd205b5011bad8acf4adfd4bb8a92e900d35', 'hex');
 
-            magic.alt.decrypt.aes256gcm(output.sk, output.iv, altered, output.tag, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_GCM(output.sk, output.iv, altered, output.tag, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
 
@@ -6664,7 +6664,7 @@ nwIDAQAB
         });
 
         it('should fail if tag is altered', (done) => {
-          magic.alt.encrypt.aes256gcm(message, (err, output) => {
+          magic.alt.encrypt.AES_256_GCM(message, (err, output) => {
             assert.ok(!err);
             assert.ok(output);
 
@@ -6678,7 +6678,7 @@ nwIDAQAB
 
             const altered = Buffer.from('773280e4c1df5869284bb570e334864e', 'hex');
 
-            magic.alt.decrypt.aes256gcm(output.sk, output.iv, output.ciphertext, altered, (err, plaintext) => {
+            magic.alt.decrypt.AES_256_GCM(output.sk, output.iv, output.ciphertext, altered, (err, plaintext) => {
               assert.ok(err);
               assert.equal(err.message, 'Crypto error: Error: Unsupported state or unable to authenticate data');
 
