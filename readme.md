@@ -8,7 +8,7 @@ All public functions support both callbacks and promises (and therefore async/aw
 
 The core api implements the recommended algorithms for each cryptographic operation. When in doubt, use them.
 
-##### magic.auth.sign | magic.verify.sign
+#### magic.auth.sign | magic.verify.sign
 
 Implements `ed25519` signatures using `libsodium.js`. Efficient and without some of the concerns inherent in `ECDSA`, `ed25519` has been accepted and standardized by the [IETF](https://tools.ietf.org/html/rfc8032). By default, the api expects to be given a secret key as a seed, from which the actual keypair is derived (allowing easier, more concise storage). However, it may be used directly with a keypair, requiring only a boolean flag for the `verify` call.
 
@@ -142,7 +142,7 @@ magic.verify.sign(message, pk, signature, true)
 });
 ```
 
-##### magic.auth.mac | magic.verify.mac
+#### magic.auth.mac | magic.verify.mac
 
 Implements `HMAC-SHA384` using OpenSSL through `crypto`. The `HMAC` algorithm is the most common message authentication code construction, standardized by the [IETF](https://tools.ietf.org/html/rfc2104) and [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf). The choice of `SHA384` is due to its widespread availability and to provide a consistent hash function throughout `magic`, as `SHA256` may be susceptible to length extension attacks in certain situations. Both `HMAC-SHA256` and `HMAC-SHA512` are available in the alternative api.
 
@@ -227,7 +227,7 @@ magic.verify.mac(message, key, mac)
 });
 ```
 
-##### magic.encrypt.async | magic.decrypt.async
+#### magic.encrypt.async | magic.decrypt.async
 
 Implements `x25519` static Diffie-Hellman key exchange, and employs the resultant shared secret for `xsalsa20poly1305` authenticated encryption using `libsodium.js`. This allows for an efficient, simple symmetric authenticated encryption scheme to be used in an asymmetric setting. A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). As a static Diffie-Hellman exchange, the API is slightly different than most asymmetric encryption schemes - for encryption both the recipient public key and sender private key are required, whereas for decryption the recipient private key and sender public key are required. Usually, only the keys of the recipient are required for encryption, though `x25519-xsalsa20poly1305` has the benefit of being an authenticated scheme as well.
 
@@ -317,7 +317,7 @@ magic.decrypt.async(sk, pk, ciphertext, nonce)
 });
 ```
 
-##### magic.encrypt.sync | magic.decrypt.sync
+#### magic.encrypt.sync | magic.decrypt.sync
 
 Implements `xsalsa20poly1305` authenticated encryption using `libsodium.js`. A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). The scheme is fast, simple, and as an AEAD construction provides each of confidentiality, authentication, and integrity on the message.
 
@@ -401,7 +401,7 @@ magic.decrypt.sync(sk, ciphertext, nonce)
 });
 ```
 
-##### magic.util.hash
+#### magic.util.hash
 
 Implements `SHA2-384` (henceforth just `SHA384`) using OpenSSL through `crypto`. Unlike `SHA256` and `SHA512` - which are available through the alternative api - `SHA384` is resistant to length extension attacks, a capability which may be relevant in some circumstances. The `SHA2` family is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf), and the most commonly used fast, cryptographically secure hash function.
 
@@ -429,7 +429,7 @@ magic.util.hash(message)
 });
 ```
 
-##### magic.password.hash | magic.verify.password
+#### magic.password.hash | magic.verify.password
 
 Implements `argon2id` password hashing using `libsodium.js`. The winner of the [Password Hashing Competition](https://password-hashing.net/) and now the [OWASP recommendation](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet#Leverage_an_adaptive_one-way_function), `argon2id` is robust against both memory tradeoff and side-channel attacks. The output of the `argon2id` function is encoded with a prefix and other metadata, and so `output.hash` is encoded as a string, not a raw binary buffer as is normal for the rest of the `magic` api. Nor is the raw password itself returned.
 
@@ -482,7 +482,7 @@ magic.verify.password(password, hash)
 });
 ```
 
-##### magic.util.rand
+#### magic.util.rand
 
 Employs OpenSSL through `crypto` to return the requested number of random bytes, generated in a cryptographically secure manner.
 
@@ -505,7 +505,7 @@ magic.util.rand(length)
 });
 ```
 
-##### magic.util.uid
+#### magic.util.uid
 
 Employs OpenSSL through `crypto` to return a base64url encoded uid. The input is not the length of the returned uid, but rather a security parameter taken as the unencoded byte length of the identifer. The returned string will be roughly a third longer than it. The default security parameter (if one is not provided) is 32 bytes, returning a uid of 43 chars.
 
@@ -553,15 +553,9 @@ magic.util.uid(24)
 
 The alt api implements alternative algorithms for each cryptographic operation. They should only be used over the core api when required by an external specification or interoperability concerns.
 
-#### alternative cryptosystems
+#### magic.alt.auth.RSASSA\_PSS\_SHA{256,384,512} | magic.alt.verify.RSASSA\_PSS\_SHA{256,384,512}
 
-The following cryptosystems are alternatives for `magic.auth` and `magic.encrypt` (as well as `magic.verify`, `magic.decrypt`), either employing different primitives or variants of the same primitive as the accordant function in the core api.
-
-##### magic.alt.auth.RSASSA_PSS_SHA256 | magic.alt.verify.RSASSA_PSS_SHA256
-##### magic.alt.auth.RSASSA_PSS_SHA384 | magic.alt.verify.RSASSA_PSS_SHA384
-##### magic.alt.auth.RSASSA_PSS_SHA512 | magic.alt.verify.RSASSA_PSS_SHA512
-
-Implements `RSA PKCS#1 v2.1` over `SHA2`, better known as `RSAPSS-SHA`. Available with each of the `SHA256`, `SHA384`, of `SHA512` variants of `SHA2`. The protocol is standardized by the [IETF](https://tools.ietf.org/html/rfc3447). The `PSS` acronym stands for probablistic signature scheme, a construction which is theoretically more robust than the older `RSA PKCS#1 v1.5` protocol also available in the alternative api. When possible, this is the preferred RSA variant, although the `ed25519` signature scheme in the core api is preferred above any use of RSA at all. For key generation, the key (private only) is returned in PEM encoding.
+Implements `RSA PKCS#1 v2.1` over `SHA2`, better known as `RSAPSS-SHA`. Available with each of the `SHA256`, `SHA384`, or `SHA512` variants of `SHA2`. The protocol is standardized by the [IETF](https://tools.ietf.org/html/rfc3447). The `PSS` acronym stands for probablistic signature scheme, a construction which is theoretically more robust than the older `RSA PKCS#1 v1.5` protocol also available in the alternative api. When possible, this is the preferred RSA variant, although the `ed25519` signature scheme in the core api is preferred above any use of RSA at all. For key generation, the key (private only) is returned in PEM encoding.
 
 ```js
 // key generation
@@ -664,26 +658,15 @@ magic.alt.verify.RSASSA_PSS_SHA256(message, pk)
 });
 ```
 
-##### magic.alt.auth.RSASSA_PKCS1V1_5_SHA256 | magic.alt.verify.RSASSA_PKCS1V1_5_SHA256
-##### magic.alt.auth.RSASSA_PKCS1V1_5_SHA384 | magic.alt.verify.RSASSA_PKCS1V1_5_SHA384
-##### magic.alt.auth.RSASSA_PKCS1V1_5_SHA512 | magic.alt.verify.RSASSA_PKCS1V1_5_SHA512
+#### magic.alt.auth.RSASSA\_PKCS1V1\_5\_SHA{256,384,512} | magic.alt.verify.RSASSA_PKCS1V1\_5\_SHA{256,384,512}
 
-Implements `RSA PKCS#1 v1.5` over `SHA{256,384,512}`, standardized by the [IETF](https://tools.ietf.org/html/rfc2313). An alternative to `magic.alt.verify.RSASSA_PSS_SHA{256,384,512}`.
+Implements `RSA PKCS#1 v1.5` over `SHA2`, standardized by the [IETF](https://tools.ietf.org/html/rfc2313). Available with each of the `SHA256`, `SHA384`, or `SHA512` variants of `SHA2`. An alternative to `magic.alt.verify.RSASSA_PSS_SHA{256,384,512}`.
 
-##### magic.alt.auth.HMAC_SHA256 | magic.alt.verify.HMAC_SHA256
-##### magic.alt.auth.HMAC_SHA512 | magic.alt.verify.HMAC_SHA512
+#### magic.alt.auth.HMAC\_SHA{256,512} | magic.alt.verify.HMAC\_SHA{256,512}
 
-Implements `HMAC-SHA256` using OpenSSL through `crypto`. An alterative to `magic.auth.mac`.
+Implements `HMAC-SHA2` using OpenSSL through `crypto`. Available with each of the `SHA256`, `SHA384` (as `magic.auth.mac`), or `SHA512` variants of `SHA2`. An alterative to `magic.auth.mac`.
 
-##### magic.alt.encrypt.AES_128_CBC_HMAC_SHA256 | magic.alt.encrypt.AES_128_CBC_HMAC_SHA256
-##### magic.alt.encrypt.AES_128_CBC_HMAC_SHA384 | magic.alt.encrypt.AES_128_CBC_HMAC_SHA384
-##### magic.alt.encrypt.AES_128_CBC_HMAC_SHA512 | magic.alt.encrypt.AES_128_CBC_HMAC_SHA512
-##### magic.alt.encrypt.AES_192_CBC_HMAC_SHA256 | magic.alt.encrypt.AES_192_CBC_HMAC_SHA256
-##### magic.alt.encrypt.AES_192_CBC_HMAC_SHA384 | magic.alt.encrypt.AES_192_CBC_HMAC_SHA384
-##### magic.alt.encrypt.AES_192_CBC_HMAC_SHA512 | magic.alt.encrypt.AES_192_CBC_HMAC_SHA512
-##### magic.alt.encrypt.AES_256_CBC_HMAC_SHA256 | magic.alt.encrypt.AES_256_CBC_HMAC_SHA256
-##### magic.alt.encrypt.AES_256_CBC_HMAC_SHA384 | magic.alt.encrypt.AES_256_CBC_HMAC_SHA384
-##### magic.alt.encrypt.AES_256_CBC_HMAC_SHA512 | magic.alt.encrypt.AES_256_CBC_HMAC_SHA512
+#### magic.alt.encrypt.AES\_{128,192,256}\_CBC\_HMAC\_SHA{256,384,512} | magic.alt.decrypt.AES\_{128,192,256}\_CBC\_HMAC\_SHA{256,384,512}
 
 Implements `AES{128,192,256}CBC-SHA2` using OpenSSL through `crypto`. Available with a large number of variants; any key size of `AES` - `AES128`, `AES192`, or `AES256`, and any digest size of `SHA2` - `SHA256`, `SHA384`, or `SHA512`. The protocol is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf) and provides authenticated eencryption using the industry standard symmetric encryption and authentication schemes, in an encrypt-than-authenticate construction.
 
@@ -777,9 +760,7 @@ magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(sek, sak, iv, ciphertext, mac)
 });
 ```
 
-##### magic.alt.encrypt.AES_128_GCM | magic.alt.decrypt.AES_128_GCM
-##### magic.alt.encrypt.AES_192_GCM | magic.alt.decrypt.AES_192_GCM
-##### magic.alt.encrypt.AES_256_GCM | magic.alt.decrypt.AES_256_GCM
+#### magic.alt.encrypt.AES\_{128,192,256}\_GCM | magic.alt.decrypt.AES\_{128,192,256}\_GCM
 
 Implements `AES{128,192,256}GCM` using OpenSSL through `crypto`. AES-GCM is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf) and provides authenticated encryption using the industry standard symmetric encryption scheme with an authenticated block cipher mode, a clean and simple construction.
 
@@ -867,18 +848,13 @@ magic.alt.decrypt.AES_128_GCM(sk, iv, ciphertext, tag)
 });
 ```
 
-### alternative utilities
-
-In addition, the alt api contains other options for hashing, both of passwords and arbitrary inputs.
-
-##### magic.alt.password.bcrypt | magic.alt.verify.bcrypt
+#### magic.alt.password.bcrypt | magic.alt.verify.bcrypt
 
 Implements `bcrypt` using [node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js/), wrapping the OpenBSD implementation of the algorithm. An alterative to `magic.util.pwhash`. The security parameter (rounds) is set to 13, to bring the computational time in line with that of `magic.util.pwhash` on a development machine - they may not scale equivalently, but it provides a sensible default.
 
-##### magic.alt.util.sha256
-##### magic.alt.util.sha512
+#### magic.alt.util.sha{256,512}
 
-Implements `SHA2` using OpenSSL through `crypto`. Both the `SHA256` and `SHA512` digest length variatns are available. An alterative to `magic.util.hash`.
+Implements `SHA2` using OpenSSL through `crypto`. Each of the `SHA256`, `SHA384` (as `magic.util.hash`), and `SHA512` digest length variatns are available. An alterative to `magic.util.hash`.
 
 ### Notes
 
