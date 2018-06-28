@@ -674,7 +674,7 @@ Implements `AES{128,192,256}CBC-SHA2` using OpenSSL through `crypto`. Available 
 // key generation
 
 // callback
-magic.alt.encrypt.AES_128_CBC_HMAC_SHA256_hmacsha256(message, (err, output) => {
+magic.alt.encrypt.AES_128_CBC_HMAC_SHA256(message, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
   // { alg:        'aes128cbc-hmacsha256',

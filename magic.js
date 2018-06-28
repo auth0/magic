@@ -1164,7 +1164,7 @@ module.exports.alt.util     = new Object();
 
 
 /***
- * alt.auth.rsapsssha256
+ * alt.auth.RSASSA_PSS_SHA256
  *
  * sign a payload
  *
@@ -1180,7 +1180,7 @@ module.exports.alt.auth.RSASSA_PSS_SHA256 = rsasign('sha256', 'pss');
 
 
 /***
- * alt.verify.rsapsssha256
+ * alt.verify.RSASSA_PSS_SHA256
  *
  * verify a payload
  *
@@ -1197,7 +1197,7 @@ module.exports.alt.verify.RSASSA_PSS_SHA256 = rsaverify('sha256', 'pss');
 
 
 /***
- * alt.auth.rsapsssha384
+ * alt.auth.RSASSA_PSS_SHA384
  *
  * sign a payload
  *
@@ -1213,7 +1213,7 @@ module.exports.alt.auth.RSASSA_PSS_SHA384 = rsasign('sha384', 'pss');
 
 
 /***
- * alt.verify.rsapsssha384
+ * alt.verify.RSASSA_PSS_SHA384
  *
  * verify a payload
  *
@@ -1230,7 +1230,7 @@ module.exports.alt.verify.RSASSA_PSS_SHA384 = rsaverify('sha384', 'pss');
 
 
 /***
- * alt.auth.rsapsssha512
+ * alt.auth.RSASSA_PSS_SHA512
  *
  * sign a payload
  *
@@ -1246,7 +1246,7 @@ module.exports.alt.auth.RSASSA_PSS_SHA512 = rsasign('sha512', 'pss');
 
 
 /***
- * alt.verify.rsapsssha512
+ * alt.verify.RSASSA_PSS_SHA512
  *
  * verify a payload
  *
@@ -1263,7 +1263,7 @@ module.exports.alt.verify.RSASSA_PSS_SHA512 = rsaverify('sha512', 'pss');
 
 
 /***
- * alt.auth.rsav1_5sha256
+ * alt.auth.RSASSA_PKCS1V1_5_SHA256
  *
  * sign a payload
  *
@@ -1279,7 +1279,7 @@ module.exports.alt.auth.RSASSA_PKCS1V1_5_SHA256 = rsasign('sha256', 'v1_5');
 
 
 /***
- * alt.verify.rsav1_5sha256
+ * alt.verify.RSASSA_PKCS1V1_5_SHA256
  *
  * verify a payload
  *
@@ -1296,7 +1296,7 @@ module.exports.alt.verify.RSASSA_PKCS1V1_5_SHA256 = rsaverify('sha256', 'v1_5');
 
 
 /***
- * alt.auth.rsav1_5sha384
+ * alt.auth.RSASSA_PKCS1V1_5_SHA384
  *
  * sign a payload
  *
@@ -1312,7 +1312,7 @@ module.exports.alt.auth.RSASSA_PKCS1V1_5_SHA384 = rsasign('sha384', 'v1_5');
 
 
 /***
- * alt.verify.rsav1_5sha384
+ * alt.verify.RSASSA_PKCS1V1_5_SHA384
  *
  * verify a payload
  *
@@ -1329,7 +1329,7 @@ module.exports.alt.verify.RSASSA_PKCS1V1_5_SHA384 = rsaverify('sha384', 'v1_5');
 
 
 /***
- * alt.auth.rsav1_5sha512
+ * alt.auth.RSASSA_PKCS1V1_5_SHA512
  *
  * sign a payload
  *
@@ -1345,7 +1345,7 @@ module.exports.alt.auth.RSASSA_PKCS1V1_5_SHA512 = rsasign('sha512', 'v1_5');
 
 
 /***
- * alt.verify.rsav1_5sha512
+ * alt.verify.RSASSA_PKCS1V1_5_SHA512
  *
  * verify a payload
  *
@@ -1362,7 +1362,7 @@ module.exports.alt.verify.RSASSA_PKCS1V1_5_SHA512 = rsaverify('sha512', 'v1_5');
 
 
 /***
- * alt.auth.hmacsha256
+ * alt.auth.HMAC_SHA256
  *
  * mac a payload
  *
@@ -1378,7 +1378,7 @@ module.exports.alt.auth.HMAC_SHA256 = mac('sha256');
 
 
 /***
- * alt.verify.hmacsha256
+ * alt.verify.HMAC_SHA256
  *
  * verify a mac
  *
@@ -1395,7 +1395,7 @@ module.exports.alt.verify.HMAC_SHA256 = vmac('sha256');
 
 
 /***
- * alt.auth.hmacsha512
+ * alt.auth.HMAC_SHA512
  *
  * mac a payload
  *
@@ -1411,7 +1411,7 @@ module.exports.alt.auth.HMAC_SHA512 = mac('sha512');
 
 
 /***
- * alt.verify.hmacsha512
+ * alt.verify.HMAC_SHA512
  *
  * verify a mac
  *
@@ -1428,7 +1428,7 @@ module.exports.alt.verify.HMAC_SHA512 = vmac('sha512');
 
 
 /***
- * alt.encrypt.aes128cbc_hmacsha256
+ * alt.encrypt.AES_128_CBC_HMAC_SHA256
  *
  * encrypt-then-authenticate a plaintext
  *
@@ -1445,7 +1445,7 @@ module.exports.alt.encrypt.AES_128_CBC_HMAC_SHA256 = cbc('sha256', 128);
 
 
 /***
- * alt.decrypt.aes128cbc_hmacsha256
+ * alt.decrypt.AES_128_CBC_HMAC_SHA256
  *
  * verify-then-decrypt a ciphertext
  *
@@ -1464,7 +1464,7 @@ module.exports.alt.decrypt.AES_128_CBC_HMAC_SHA256 = dcbc('sha256', 128);
 
 
 /***
- * alt.encrypt.aes128cbc_hmacsha384
+ * alt.encrypt.AES_128_CBC_HMAC_SHA384
  *
  * encrypt-then-authenticate a plaintext
  *
@@ -1481,7 +1481,7 @@ module.exports.alt.encrypt.AES_128_CBC_HMAC_SHA384 = cbc('sha384', 128);
 
 
 /***
- * alt.decrypt.aes128cbc_hmacsha384
+ * alt.decrypt.AES_128_CBC_HMAC_SHA384
  *
  * verify-then-decrypt a ciphertext
  *
@@ -1500,7 +1500,7 @@ module.exports.alt.decrypt.AES_128_CBC_HMAC_SHA384 = dcbc('sha384', 128);
 
 
 /***
- * alt.encrypt.aes128cbc_hmacsha512
+ * alt.encrypt.AES_128_CBC_HMAC_SHA512
  *
  * encrypt-then-authenticate a plaintext
  *
@@ -1517,7 +1517,7 @@ module.exports.alt.encrypt.AES_128_CBC_HMAC_SHA512 = cbc('sha512', 128);
 
 
 /***
- * alt.decrypt.aes128cbc_hmacsha512
+ * alt.decrypt.AES_128_CBC_HMAC_SHA512
  *
  * verify-then-decrypt a ciphertext
  *
@@ -1536,7 +1536,7 @@ module.exports.alt.decrypt.AES_128_CBC_HMAC_SHA512 = dcbc('sha512', 128);
 
 
 /***
- * alt.encrypt.aes192cbc_hmacsha256
+ * alt.encrypt.AES_192_CBC_HMAC_SHA256
  *
  * encrypt-then-authenticate a plaintext
  *
@@ -1553,7 +1553,7 @@ module.exports.alt.encrypt.AES_192_CBC_HMAC_SHA256 = cbc('sha256', 192);
 
 
 /***
- * alt.decrypt.aes192cbc_hmacsha256
+ * alt.decrypt.AES_192_CBC_HMAC_SHA256
  *
  * verify-then-decrypt a ciphertext
  *
@@ -1572,7 +1572,7 @@ module.exports.alt.decrypt.AES_192_CBC_HMAC_SHA256 = dcbc('sha256', 192);
 
 
 /***
- * alt.encrypt.aes192cbc_hmacsha384
+ * alt.encrypt.AES_192_CBC_HMAC_SHA384
  *
  * encrypt-then-authenticate a plaintext
  *
@@ -1589,7 +1589,7 @@ module.exports.alt.encrypt.AES_192_CBC_HMAC_SHA384 = cbc('sha384', 192);
 
 
 /***
- * alt.decrypt.aes192cbc_hmacsha384
+ * alt.decrypt.AES_192_CBC_HMAC_SHA384
  *
  * verify-then-decrypt a ciphertext
  *
@@ -1608,7 +1608,7 @@ module.exports.alt.decrypt.AES_192_CBC_HMAC_SHA384 = dcbc('sha384', 192);
 
 
 /***
- * alt.encrypt.aes192cbc_hmacsha512
+ * alt.encrypt.AES_192_CBC_HMAC_SHA512
  *
  * encrypt-then-authenticate a plaintext
  *
@@ -1625,7 +1625,7 @@ module.exports.alt.encrypt.AES_192_CBC_HMAC_SHA512 = cbc('sha512', 192);
 
 
 /***
- * alt.decrypt.aes192cbc_hmacsha512
+ * alt.decrypt.AES_192_CBC_HMAC_SHA512
  *
  * verify-then-decrypt a ciphertext
  *
@@ -1644,7 +1644,7 @@ module.exports.alt.decrypt.AES_192_CBC_HMAC_SHA512 = dcbc('sha512', 192);
 
 
 /***
- * alt.encrypt.aes256cbc_hmacsha256
+ * alt.encrypt.AES_256_CBC_HMAC_SHA256
  *
  * encrypt-then-authenticate a plaintext
  *
@@ -1661,7 +1661,7 @@ module.exports.alt.encrypt.AES_256_CBC_HMAC_SHA256 = cbc('sha256', 256);
 
 
 /***
- * alt.decrypt.aes256cbc_hmacsha256
+ * alt.decrypt.AES_256_CBC_HMAC_SHA256
  *
  * verify-then-decrypt a ciphertext
  *
@@ -1680,7 +1680,7 @@ module.exports.alt.decrypt.AES_256_CBC_HMAC_SHA256 = dcbc('sha256', 256);
 
 
 /***
- * alt.encrypt.aes256cbc_hmacsha384
+ * alt.encrypt.AES_256_CBC_HMAC_SHA384
  *
  * encrypt-then-authenticate a plaintext
  *
@@ -1697,7 +1697,7 @@ module.exports.alt.encrypt.AES_256_CBC_HMAC_SHA384 = cbc('sha384', 256);
 
 
 /***
- * alt.decrypt.aes256cbc_hmacsha384
+ * alt.decrypt.AES_256_CBC_HMAC_SHA384
  *
  * verify-then-decrypt a ciphertext
  *
@@ -1716,7 +1716,7 @@ module.exports.alt.decrypt.AES_256_CBC_HMAC_SHA384 = dcbc('sha384', 256);
 
 
 /***
- * alt.encrypt.aes256cbc_hmacsha512
+ * alt.encrypt.AES_256_CBC_HMAC_SHA512
  *
  * encrypt-then-authenticate a plaintext
  *
@@ -1733,7 +1733,7 @@ module.exports.alt.encrypt.AES_256_CBC_HMAC_SHA512 = cbc('sha512', 256);
 
 
 /***
- * alt.decrypt.aes256cbc_hmacsha512
+ * alt.decrypt.AES_256_CBC_HMAC_SHA512
  *
  * verify-then-decrypt a ciphertext
  *
@@ -1752,7 +1752,7 @@ module.exports.alt.decrypt.AES_256_CBC_HMAC_SHA512 = dcbc('sha512', 256);
 
 
 /***
- * alt.encrypt.aes128gcm
+ * alt.encrypt.AES_128_GCM
  *
  * aead encrypt a plaintext
  *
@@ -1768,7 +1768,7 @@ module.exports.alt.encrypt.AES_128_GCM = gcm(128);
 
 
 /***
- * alt.decrypt.aes128gcm
+ * alt.decrypt.AES_128_GCM
  *
  * aead decrypt a ciphertext
  *
@@ -1785,7 +1785,7 @@ module.exports.alt.decrypt.AES_128_GCM = dgcm(128);
 
 
 /***
- * alt.encrypt.aes192gcm
+ * alt.encrypt.AES_192_GCM
  *
  * aead encrypt a plaintext
  *
@@ -1801,7 +1801,7 @@ module.exports.alt.encrypt.AES_192_GCM = gcm(192);
 
 
 /***
- * alt.decrypt.aes192gcm
+ * alt.decrypt.AES_192_GCM
  *
  * aead decrypt a ciphertext
  *
@@ -1818,7 +1818,7 @@ module.exports.alt.decrypt.AES_192_GCM = dgcm(192);
 
 
 /***
- * alt.encrypt.aes256gcm
+ * alt.encrypt.AES_256_GCM
  *
  * aead encrypt a plaintext
  *
@@ -1834,7 +1834,7 @@ module.exports.alt.encrypt.AES_256_GCM = gcm(256);
 
 
 /***
- * alt.decrypt.aes256gcm
+ * alt.decrypt.AES_256_GCM
  *
  * aead decrypt a ciphertext
  *
