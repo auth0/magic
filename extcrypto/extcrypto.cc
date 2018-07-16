@@ -60,7 +60,10 @@ namespace extcrypto {
     RSA_free(rsa);
     BN_free(exp);
 
-    return ret(isolate, cb, String::NewFromUtf8(isolate, key));
+    Local<String> rval = String::NewFromUtf8(isolate, key);
+    free(key);
+
+    return ret(isolate, cb, rval);
   }
 
 
@@ -88,7 +91,10 @@ namespace extcrypto {
     BIO_vfree(bio);
     RSA_free(rsa);
 
-    return ret(isolate, cb, String::NewFromUtf8(isolate, pkey));
+    Local<String> rval = String::NewFromUtf8(isolate, pkey);
+    free(pkey);
+
+    return ret(isolate, cb, rval);
   }
 
 
