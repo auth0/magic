@@ -1,7 +1,7 @@
 // extcrypto.cc - some openssl wrappers to extend RSA support
 #include <node.h>
 #include <string.h>
-#include <inttypes.h>
+#include <stdint.h>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/bio.h>
@@ -52,7 +52,11 @@ namespace extcrypto {
 
     uint64_t kl = BIO_pending(bio);
     char* key   = (char *) calloc(kl + 1, 1);
-    if (!key) { return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key")); }
+
+    if (!key || (kl == UINT64_MAX)) {
+      free(key); // in case overflow has calloc return a non-null pointer to zero memory
+      return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key"));
+    }
 
     BIO_read(bio, key, kl);
 
@@ -84,7 +88,11 @@ namespace extcrypto {
 
     uint64_t kl = BIO_pending(bio);
     char* pkey  = (char *) calloc(kl + 1, 1);
-    if (!pkey) { return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to extract key")); }
+
+    if (!pkey || (kl == UINT64_MAX)) {
+      free(pkey); // in case overflow has calloc return a non-null pointer to zero memory
+      return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key"));
+    }
 
     BIO_read(bio, pkey, kl);
 
