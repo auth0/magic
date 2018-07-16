@@ -43,7 +43,7 @@ namespace extcrypto {
     BIGNUM* exp = BN_new();
     BN_set_word(exp, RSA_F4); // 65537
 
-    RSA* rsa    = RSA_new();
+    RSA* rsa   = RSA_new();
     int64_t kg = RSA_generate_key_ex(rsa, 2048, exp, NULL);
     if (!kg) { return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key")); }
 
