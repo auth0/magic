@@ -45,7 +45,6 @@ namespace extcrypto {
 
     RSA* rsa    = RSA_new();
     int64_t kg = RSA_generate_key_ex(rsa, 2048, exp, NULL);
-
     if (!kg) { return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key")); }
 
     BIO* bio = BIO_new(BIO_s_mem());
@@ -53,6 +52,8 @@ namespace extcrypto {
 
     uint64_t kl = BIO_pending(bio);
     char* key   = (char *) calloc(kl + 1, 1);
+    if (!key) { return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key")); }
+
     BIO_read(bio, key, kl);
 
     BIO_vfree(bio);
@@ -80,6 +81,8 @@ namespace extcrypto {
 
     uint64_t kl = BIO_pending(bio);
     char* pkey  = (char *) calloc(kl + 1, 1);
+    if (!pkey) { return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to extract key")); }
+
     BIO_read(bio, pkey, kl);
 
     BIO_vfree(bio);
