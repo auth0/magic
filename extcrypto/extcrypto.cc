@@ -1,6 +1,7 @@
 // extcrypto.cc - some openssl wrappers to extend RSA support
 #include <node.h>
 #include <string.h>
+#include <inttypes.h>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/bio.h>
@@ -20,7 +21,7 @@ namespace extcrypto {
 
 
   void ret(Isolate* isolate, Local<Function> cb, Local<String> statement) {
-    const unsigned argc = 2;
+    const uint64_t argc = 2;
     Local<Value> argv[argc] = { Null(isolate), statement };
 
     cb->Call(Null(isolate), argc, argv);
@@ -28,7 +29,7 @@ namespace extcrypto {
 
 
   void eret(Isolate* isolate, Local<Function> cb, Local<String> statement) {
-    const unsigned argc = 1;
+    const uint64_t argc = 1;
     Local<Value> argv[argc] = { Exception::Error(statement) };
 
     cb->Call(Null(isolate), argc, argv);
@@ -43,14 +44,14 @@ namespace extcrypto {
     BN_set_word(exp, RSA_F4); // 65537
 
     RSA* rsa    = RSA_new();
-    unsigned kg = RSA_generate_key_ex(rsa, 2048, exp, NULL);
+    int64_t kg = RSA_generate_key_ex(rsa, 2048, exp, NULL);
 
     if (!kg) { return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key")); }
 
     BIO* bio = BIO_new(BIO_s_mem());
     PEM_write_bio_RSAPrivateKey(bio, rsa, NULL, NULL, 0, NULL, NULL);
 
-    unsigned kl = BIO_pending(bio);
+    uint64_t kl = BIO_pending(bio);
     char* key   = (char *) calloc(kl + 1, 1);
     BIO_read(bio, key, kl);
 
@@ -77,7 +78,7 @@ namespace extcrypto {
     PEM_read_bio_RSAPrivateKey(bio, &rsa, NULL, NULL);
     PEM_write_bio_RSAPublicKey(bio, rsa);
 
-    unsigned kl = BIO_pending(bio);
+    uint64_t kl = BIO_pending(bio);
     char* pkey  = (char *) calloc(kl + 1, 1);
     BIO_read(bio, pkey, kl);
 
