@@ -1,6 +1,6 @@
 # magic
 
-A lightweight wrapper around the `crypto` interface to OpenSSL and the `libsodium` library to provide a standard cryptography API for internal use, consistent with [best current practices](https://auth0team.atlassian.net/wiki/spaces/AUTHSEC/pages/30998532/Cryptography) of the product security team. Named not for what it is intended to do, but for [what it is intended to prevent](https://en.wikipedia.org/wiki/Magic_(cryptography)).
+A lightweight wrapper around the `crypto` interface to OpenSSL and the `libsodium` library to provide a standard cryptography API for internal use, consistent with best current practices recommended by the product security team at Auth0. Named not for what it is intended to do, but for [what it is intended to prevent](https://en.wikipedia.org/wiki/Magic_(cryptography)).
 
 All public functions support both callbacks and promises (and therefore async/await), allowing easy integration into any preexisting codebase. All constructions requiring secret keys will generate them as necessary if they are not supplied, and return them for future use.
 
