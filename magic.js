@@ -1868,7 +1868,7 @@ function hbcrypt(password, cb) {
 
   if (!password) { return done(new Error('Empty password')); }
 
-  return bcrypt.hash(password, 13)
+  return bcrypt.hash(password, 10)
     .then((hash) => {
       return done(null, convert({
         alg:  'bcrypt',
