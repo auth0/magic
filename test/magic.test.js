@@ -6703,7 +6703,7 @@ nwIDAQAB
             assert.ok(output.hash);
 
             assert.equal(output.alg, 'bcrypt');
-            assert.equal(output.hash.slice(0, 7), '$2b$13$');
+            assert.equal(output.hash.slice(0, 7), '$2b$10$');
 
             magic.alt.verify.bcrypt(password, output.hash, (err) => {
               assert.ok(!err);
@@ -6718,7 +6718,7 @@ nwIDAQAB
             assert.ok(output.hash);
 
             assert.equal(output.alg, 'bcrypt');
-            assert.equal(output.hash.slice(0, 7), '$2b$13$');
+            assert.equal(output.hash.slice(0, 7), '$2b$10$');
 
             return magic.alt.verify.bcrypt(password, output.hash);
           }).then(() => { done(); }).catch((err) => { assert.ok(!err); });
@@ -6734,7 +6734,7 @@ nwIDAQAB
             assert.ok(output.hash);
 
             assert.equal(output.alg, 'bcrypt');
-            assert.equal(output.hash.slice(0, 7), '$2b$13$');
+            assert.equal(output.hash.slice(0, 7), '$2b$10$');
 
             magic.alt.verify.bcrypt('someotherpassword', output.hash, (err) => {
               assert.ok(err);
