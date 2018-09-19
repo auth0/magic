@@ -850,7 +850,7 @@ magic.alt.decrypt.AES_128_GCM(sk, iv, ciphertext, tag)
 
 #### magic.alt.password.bcrypt | magic.alt.verify.bcrypt
 
-Implements `bcrypt` using [node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js/), wrapping the OpenBSD implementation of the algorithm. An alterative to `magic.util.pwhash`. The security parameter (rounds) is set to 13, to bring the computational time in line with that of `magic.util.pwhash` on a development machine - they may not scale equivalently, but it provides a sensible default.
+Implements `bcrypt` using [node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js/), wrapping the OpenBSD implementation of the algorithm. An alterative to `magic.util.pwhash`. The security parameter (rounds) is set to 10.
 
 #### magic.alt.util.sha{256,512}
 
