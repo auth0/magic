@@ -1,10 +1,13 @@
 {
-  "name": "@auth0/magic",
+  "name": "auth0-magic",
   "version": "1.0.3",
   "description": "Auth0 Internal Cryptography Toolkit",
   "main": "magic.js",
   "license": "MIT",
-  "repository": "auth0/magic",
+  "repository": {
+	  "type": "git",
+	  "url": "https://github.com/auth0/magic.git"
+  },
   "dependencies": {
     "bcrypt": "3.0.0",
     "libsodium-wrappers-sumo": "0.7.3"
