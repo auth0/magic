@@ -1,6 +1,6 @@
 {
-  "name": "magic",
-  "version": "1.0.2",
+  "name": "@auth0/magic",
+  "version": "1.0.3",
   "description": "Auth0 Internal Cryptography Toolkit",
   "main": "magic.js",
   "license": "MIT",
