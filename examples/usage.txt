@@ -1,0 +1,33 @@
+Usage: node magicApp.js [command] [arguments]
+
+commands:
+- passwordhash <password>
+- passwordcompare <password> <hash>
+- prng <length>
+- hash <message>
+- uid
+- hmacauth <message>
+- hmacverify <message> <key> <auth>
+- signauth <message>
+- signverify <message> <key> <signature>
+- encrasync <message>
+- decrasync <secret key> <public key> <ciphertext> <nonce>
+- encrsync <message>
+- decrsync <secret key> <ciphertext> <nonce>
+ 
+
+| ---- command --- | --- magic function --- |
+------------------------------------------
+| passwordhash     | magic.hash.password    |
+| passwordcompare  | magic.verify.password  |
+| prng             | magic.util.random      |
+| hash             | magic.util.hash        |
+| uid              | magic.util.uid         |
+| hmacauth         | magic.auth.mac         |
+| hmacverify       | magic.verify.mac       |
+| signauth         | magic.auth.sign        |
+| signverify       | magic.verify.sign      |
+| encrasync        | magic.encrypt.async    |
+| decrasync        | magic.decrypt.async    |
+| encrsync         | magic.encrypt.sync     |
+| decrsync         | magic.decrypt.sync     |

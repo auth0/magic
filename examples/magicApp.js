@@ -1,5 +1,6 @@
 const magic = require('../magic')
 const sodium = require('libsodium-wrappers-sumo');
+const fs  = require('fs')
 
 const args = process.argv.slice(2)
 
@@ -243,5 +244,8 @@ switch(args[0]) {
 	}
     break;
   default:
-    console.log('Usage: ...')
+    fs.readFile('./usage.txt', function (err, data) {
+      if (err) throw err;
+      console.log(data.toString('utf-8'));
+    });
 }
