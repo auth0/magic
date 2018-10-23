@@ -1,0 +1,11 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.12.0
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  chownr@1.0.1:
+    - '*':
+        reason: >-
+          It does not affect us. bcrypt doesnt use the vulnerable dependency in
+          runtime, just when installing
+        expires: 2020-01-01T00:00:00.000Z
+patch: {}
