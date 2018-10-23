@@ -2,10 +2,10 @@
 version: v1.12.0
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  chownr@1.0.1:
-    - '*':
+  'npm:chownr:20180731':
+    - bcrypt > node-pre-gyp > tar > chownr:
         reason: >-
           It does not affect us. bcrypt doesnt use the vulnerable dependency in
           runtime, just when installing
-        expires: 2020-01-01T00:00:00.000Z
+        expires: '2020-01-01T00:00:00.000Z'
 patch: {}

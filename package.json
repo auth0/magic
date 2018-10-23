@@ -5,17 +5,18 @@
   "main": "magic.js",
   "license": "MIT",
   "repository": {
-	  "type": "git",
-	  "url": "https://github.com/auth0/magic.git"
+    "type": "git",
+    "url": "https://github.com/auth0/magic.git"
   },
   "dependencies": {
     "bcrypt": "3.0.0",
     "libsodium-wrappers-sumo": "0.7.3"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --delay ./test/magic.test.js ./test/magic.test.vectors.js"
+    "test": "snyk test && ./node_modules/.bin/mocha --delay ./test/magic.test.js ./test/magic.test.vectors.js"
   },
   "devDependencies": {
-    "mocha": "^5.1.1"
+    "mocha": "^5.1.1",
+    "snyk": "^1.104.2"
   }
 }
