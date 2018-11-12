@@ -478,7 +478,7 @@ describe('magic tests', () => {
             });
 
             it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-              magic.encrypt.async(message, sk, pk, (err, output) => {
+              magic.encrypt.pki(message, sk, pk, (err, output) => {
                 assert.ok(!err);
                 assert.ok(output);
 
@@ -490,7 +490,7 @@ describe('magic tests', () => {
                 assert.ok(output.ciphertext);
                 assert.ok(output.nonce);
 
-                magic.decrypt.async(sk, pk, output.ciphertext, output.nonce, (err, plaintext) => {
+                magic.decrypt.pki(sk, pk, output.ciphertext, output.nonce, (err, plaintext) => {
                   assert.ok(!err);
                   assert.equal(plaintext.toString('utf-8'), message);
 
@@ -500,7 +500,7 @@ describe('magic tests', () => {
             });
 
             it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-              magic.encrypt.async(message, sk, pk).then((output) => {
+              magic.encrypt.pki(message, sk, pk).then((output) => {
                 assert.ok(output);
 
                 assert.equal(output.alg, 'x25519-xsalsa20poly1305');
@@ -511,7 +511,7 @@ describe('magic tests', () => {
                 assert.ok(output.ciphertext);
                 assert.ok(output.nonce);
 
-                return magic.decrypt.async(sk, pk, output.ciphertext, output.nonce);
+                return magic.decrypt.pki(sk, pk, output.ciphertext, output.nonce);
               }).then((plaintext) => {
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -523,7 +523,7 @@ describe('magic tests', () => {
               const esk = sk.toString('hex');
               const epk = pk.toString('hex');
 
-              magic.encrypt.async(message, esk, epk, (err, output) => {
+              magic.encrypt.pki(message, esk, epk, (err, output) => {
                 assert.ok(!err);
                 assert.ok(output);
 
@@ -538,7 +538,7 @@ describe('magic tests', () => {
                 const ect = output.ciphertext.toString('hex');
                 const en  = output.nonce.toString('hex');
 
-                magic.decrypt.async(esk, epk, ect, en, (err, plaintext) => {
+                magic.decrypt.pki(esk, epk, ect, en, (err, plaintext) => {
                   assert.ok(!err);
                   assert.equal(plaintext.toString('utf-8'), message);
 
@@ -551,7 +551,7 @@ describe('magic tests', () => {
           describe('with key generation', () => {
 
             it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-              magic.encrypt.async(message, (err, output) => {
+              magic.encrypt.pki(message, (err, output) => {
                 assert.ok(!err);
                 assert.ok(output);
 
@@ -563,7 +563,7 @@ describe('magic tests', () => {
                 assert.ok(output.ciphertext);
                 assert.ok(output.nonce);
 
-                magic.decrypt.async(output.sk, output.pk, output.ciphertext, output.nonce, (err, plaintext) => {
+                magic.decrypt.pki(output.sk, output.pk, output.ciphertext, output.nonce, (err, plaintext) => {
                   assert.ok(!err);
                   assert.equal(plaintext.toString('utf-8'), message);
 
@@ -573,7 +573,7 @@ describe('magic tests', () => {
             });
 
             it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-              magic.encrypt.async(message).then((output) => {
+              magic.encrypt.pki(message).then((output) => {
                 assert.ok(output);
 
                 assert.equal(output.alg, 'x25519-xsalsa20poly1305');
@@ -584,7 +584,7 @@ describe('magic tests', () => {
                 assert.ok(output.ciphertext);
                 assert.ok(output.nonce);
 
-                return magic.decrypt.async(output.sk, output.pk, output.ciphertext, output.nonce);
+                return magic.decrypt.pki(output.sk, output.pk, output.ciphertext, output.nonce);
               }).then((plaintext) => {
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -593,7 +593,7 @@ describe('magic tests', () => {
             });
 
             it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-              magic.encrypt.async(message, (err, output) => {
+              magic.encrypt.pki(message, (err, output) => {
                 assert.ok(!err);
                 assert.ok(output);
 
@@ -610,7 +610,7 @@ describe('magic tests', () => {
                 const ect = output.ciphertext.toString('hex');
                 const en  = output.nonce.toString('hex');
 
-                magic.decrypt.async(esk, epk, ect, en, (err, plaintext) => {
+                magic.decrypt.pki(esk, epk, ect, en, (err, plaintext) => {
                   assert.ok(!err);
                   assert.equal(plaintext.toString('utf-8'), message);
 
@@ -624,7 +624,7 @@ describe('magic tests', () => {
         describe('failure', () => {
 
           it('should error with only private key on encryption', (done) => {
-            magic.encrypt.async(message, sodium.crypto_box_keypair().privateKey, null, (err, output) => {
+            magic.encrypt.pki(message, sodium.crypto_box_keypair().privateKey, null, (err, output) => {
               assert.ok(err);
               assert.equal(err.message, 'Requires both or neither of private and public keys');
 
@@ -633,7 +633,7 @@ describe('magic tests', () => {
           });
 
           it('should error with only public key on encryption', (done) => {
-            magic.encrypt.async(message, null, sodium.crypto_box_keypair().publicKey, (err, output) => {
+            magic.encrypt.pki(message, null, sodium.crypto_box_keypair().publicKey, (err, output) => {
               assert.ok(err);
               assert.equal(err.message, 'Requires both or neither of private and public keys');
 
@@ -642,7 +642,7 @@ describe('magic tests', () => {
           });
 
           it('should error without keys on decryption', (done) => {
-            magic.encrypt.async(message, (err, output) => {
+            magic.encrypt.pki(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -654,7 +654,7 @@ describe('magic tests', () => {
               assert.ok(output.ciphertext);
               assert.ok(output.nonce);
 
-              magic.decrypt.async(null, null, output.ciphertext, output.nonce, (err, plaintext) => {
+              magic.decrypt.pki(null, null, output.ciphertext, output.nonce, (err, plaintext) => {
                 assert.ok(err);
                 assert.equal(err.message, 'Cannot decrypt without both private and public keys');
 
@@ -664,7 +664,7 @@ describe('magic tests', () => {
           });
 
           it('should error without private key on decryption', (done) => {
-            magic.encrypt.async(message, (err, output) => {
+            magic.encrypt.pki(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -676,7 +676,7 @@ describe('magic tests', () => {
               assert.ok(output.ciphertext);
               assert.ok(output.nonce);
 
-              magic.decrypt.async(null, output.pk, output.ciphertext, output.nonce, (err, plaintext) => {
+              magic.decrypt.pki(null, output.pk, output.ciphertext, output.nonce, (err, plaintext) => {
                 assert.ok(err);
                 assert.equal(err.message, 'Cannot decrypt without both private and public keys');
 
@@ -686,7 +686,7 @@ describe('magic tests', () => {
           });
 
           it('should error without public key on decryption', (done) => {
-            magic.encrypt.async(message, (err, output) => {
+            magic.encrypt.pki(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -698,7 +698,7 @@ describe('magic tests', () => {
               assert.ok(output.ciphertext);
               assert.ok(output.nonce);
 
-              magic.decrypt.async(output.sk, null, output.ciphertext, output.nonce, (err, plaintext) => {
+              magic.decrypt.pki(output.sk, null, output.ciphertext, output.nonce, (err, plaintext) => {
                 assert.ok(err);
                 assert.equal(err.message, 'Cannot decrypt without both private and public keys');
 
@@ -708,7 +708,7 @@ describe('magic tests', () => {
           });
 
           it('should fail if ciphertext is altered', (done) => {
-            magic.encrypt.async(message, (err, output) => {
+            magic.encrypt.pki(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -722,7 +722,7 @@ describe('magic tests', () => {
 
               const altered = Buffer.from('b16da2bec401fc7a1d4723025ed2fa122f400631018cae837bade02289ee4e187541f57ee6efbc33ad4e08b5465bb6534d3edc7305c27fa6f61dc165f57f0ef79b64bb3d7409a83d2f196ad2496284d2caf934ad8047a17dfefe5c318afc96cda61e71e06d3ebcb60140a97666d7a0cc2512aa31', 'hex');
 
-              magic.decrypt.async(output.sk, output.pk, altered, output.nonce, (err, plaintext) => {
+              magic.decrypt.pki(output.sk, output.pk, altered, output.nonce, (err, plaintext) => {
                 assert.ok(err);
                 assert.equal(err.message, 'Libsodium error: Error: incorrect key pair for the given ciphertext');
 
@@ -732,7 +732,7 @@ describe('magic tests', () => {
           });
 
           it('should fail if nonce is altered', (done) => {
-            magic.encrypt.async(message, (err, output) => {
+            magic.encrypt.pki(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -746,7 +746,7 @@ describe('magic tests', () => {
 
               const altered = Buffer.from('f5319d1c72f6019683fa7992bb5acf3f540a9ae870f3806f', 'hex');
 
-              magic.decrypt.async(output.sk, output.pk, output.ciphertext, altered, (err, plaintext) => {
+              magic.decrypt.pki(output.sk, output.pk, output.ciphertext, altered, (err, plaintext) => {
                 assert.ok(err);
                 assert.equal(err.message, 'Libsodium error: Error: incorrect key pair for the given ciphertext');
 
@@ -770,7 +770,7 @@ describe('magic tests', () => {
             beforeEach(() => { sk = Buffer.from(sodium.crypto_secretbox_keygen()); });
 
             it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-              magic.encrypt.sync(message, sk, (err, output) => {
+              magic.encrypt.aead(message, sk, (err, output) => {
                 assert.ok(!err);
                 assert.ok(output);
 
@@ -781,7 +781,7 @@ describe('magic tests', () => {
                 assert.ok(output.ciphertext);
                 assert.ok(output.nonce);
 
-                magic.decrypt.sync(sk, output.ciphertext, output.nonce, (err, plaintext) => {
+                magic.decrypt.aead(sk, output.ciphertext, output.nonce, (err, plaintext) => {
                   assert.ok(!err);
                   assert.equal(plaintext.toString('utf-8'), message);
 
@@ -791,7 +791,7 @@ describe('magic tests', () => {
             });
 
             it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-              magic.encrypt.sync(message, sk).then((output) => {
+              magic.encrypt.aead(message, sk).then((output) => {
                 assert.ok(output);
 
                 assert.equal(output.alg, 'xsalsa20poly1305');
@@ -801,7 +801,7 @@ describe('magic tests', () => {
                 assert.ok(output.ciphertext);
                 assert.ok(output.nonce);
 
-                return magic.decrypt.sync(sk, output.ciphertext, output.nonce);
+                return magic.decrypt.aead(sk, output.ciphertext, output.nonce);
               }).then((plaintext) => {
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -812,7 +812,7 @@ describe('magic tests', () => {
             it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
               const esk = sk.toString('hex');
 
-              magic.encrypt.sync(message, esk, (err, output) => {
+              magic.encrypt.aead(message, esk, (err, output) => {
                 assert.ok(!err);
                 assert.ok(output);
 
@@ -826,7 +826,7 @@ describe('magic tests', () => {
                 const ect = output.ciphertext.toString('hex');
                 const en  = output.nonce.toString('hex');
 
-                magic.decrypt.sync(esk, ect, en, (err, plaintext) => {
+                magic.decrypt.aead(esk, ect, en, (err, plaintext) => {
                   assert.ok(!err);
                   assert.equal(plaintext.toString('utf-8'), message);
 
@@ -839,7 +839,7 @@ describe('magic tests', () => {
           describe('with key generation', () => {
 
             it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-              magic.encrypt.sync(message, (err, output) => {
+              magic.encrypt.aead(message, (err, output) => {
                 assert.ok(!err);
                 assert.ok(output);
 
@@ -850,7 +850,7 @@ describe('magic tests', () => {
                 assert.ok(output.ciphertext);
                 assert.ok(output.nonce);
 
-                magic.decrypt.sync(output.sk, output.ciphertext, output.nonce, (err, plaintext) => {
+                magic.decrypt.aead(output.sk, output.ciphertext, output.nonce, (err, plaintext) => {
                   assert.ok(!err);
                   assert.equal(plaintext.toString('utf-8'), message);
 
@@ -860,7 +860,7 @@ describe('magic tests', () => {
             });
 
             it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-              magic.encrypt.sync(message).then((output) => {
+              magic.encrypt.aead(message).then((output) => {
                 assert.ok(output);
 
                 assert.equal(output.alg, 'xsalsa20poly1305');
@@ -870,7 +870,7 @@ describe('magic tests', () => {
                 assert.ok(output.ciphertext);
                 assert.ok(output.nonce);
 
-                return magic.decrypt.sync(output.sk, output.ciphertext, output.nonce);
+                return magic.decrypt.aead(output.sk, output.ciphertext, output.nonce);
               }).then((plaintext) => {
                 assert.equal(plaintext.toString('utf-8'), message);
 
@@ -879,7 +879,7 @@ describe('magic tests', () => {
             });
 
             it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-              magic.encrypt.sync(message, (err, output) => {
+              magic.encrypt.aead(message, (err, output) => {
                 assert.ok(!err);
                 assert.ok(output);
 
@@ -894,7 +894,7 @@ describe('magic tests', () => {
                 const ect = output.ciphertext.toString('hex');
                 const en  = output.nonce.toString('hex');
 
-                magic.decrypt.sync(esk, ect, en, (err, plaintext) => {
+                magic.decrypt.aead(esk, ect, en, (err, plaintext) => {
                   assert.ok(!err);
                   assert.equal(plaintext.toString('utf-8'), message);
 
@@ -908,7 +908,7 @@ describe('magic tests', () => {
         describe('failure', () => {
 
           it('should error without key on decryption', (done) => {
-            magic.encrypt.sync(message, (err, output) => {
+            magic.encrypt.aead(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -919,7 +919,7 @@ describe('magic tests', () => {
               assert.ok(output.ciphertext);
               assert.ok(output.nonce);
 
-              magic.decrypt.sync(null, output.ciphertext, output.nonce, (err, plaintext) => {
+              magic.decrypt.aead(null, output.ciphertext, output.nonce, (err, plaintext) => {
                 assert.ok(err);
                 assert.equal(err.message, 'Cannot decrypt without a key');
 
@@ -929,7 +929,7 @@ describe('magic tests', () => {
           });
 
           it('should fail if ciphertext is altered', (done) => {
-            magic.encrypt.sync(message, (err, output) => {
+            magic.encrypt.aead(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -942,7 +942,7 @@ describe('magic tests', () => {
 
               const altered = Buffer.from('b16da2bec401fc7a1d4723025ed2fa122f400631018cae837bade02289ee4e187541f57ee6efbc33ad4e08b5465bb6534d3edc7305c27fa6f61dc165f57f0ef79b64bb3d7409a83d2f196ad2496284d2caf934ad8047a17dfefe5c318afc96cda61e71e06d3ebcb60140a97666d7a0cc2512aa31', 'hex');
 
-              magic.decrypt.sync(output.sk, altered, output.nonce, (err, plaintext) => {
+              magic.decrypt.aead(output.sk, altered, output.nonce, (err, plaintext) => {
                 assert.ok(err);
                 assert.equal(err.message, 'Libsodium error: Error: wrong secret key for the given ciphertext');
 
@@ -952,7 +952,7 @@ describe('magic tests', () => {
           });
 
           it('should fail if nonce is altered', (done) => {
-            magic.encrypt.sync(message, (err, output) => {
+            magic.encrypt.aead(message, (err, output) => {
               assert.ok(!err);
               assert.ok(output);
 
@@ -965,7 +965,7 @@ describe('magic tests', () => {
 
               const altered = Buffer.from('f5319d1c72f6019683fa7992bb5acf3f540a9ae870f3806f', 'hex');
 
-              magic.decrypt.sync(output.sk, output.ciphertext, altered, (err, plaintext) => {
+              magic.decrypt.aead(output.sk, output.ciphertext, altered, (err, plaintext) => {
                 assert.ok(err);
                 assert.equal(err.message, 'Libsodium error: Error: wrong secret key for the given ciphertext');
 
