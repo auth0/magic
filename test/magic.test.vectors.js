@@ -99,7 +99,7 @@ function mac(cont) {
 /***
  * async
  *
- * test vectors for magic.encrypt.async()
+ * test vectors for magic.encrypt.pki()
  *
  */
 function async(cont) {
@@ -119,8 +119,8 @@ function async(cont) {
     const n = Buffer.from(sec[2], 'hex');
     const m = Buffer.from(sec[3], 'hex');
 
-    it('magic.encrypt.async - Test Vector #' + c, (done) => {
-      magic.encrypt.async(m, { key: sk, nonce: n }, pk, (err, out) => {
+    it('magic.encrypt.pki - Test Vector #' + c, (done) => {
+      magic.encrypt.pki(m, { key: sk, nonce: n }, pk, (err, out) => {
         if (err) { return done(err); }
 
         const c = out.ciphertext;
@@ -138,7 +138,7 @@ function async(cont) {
 /***
  * sync
  *
- * test vectors for magic.encrypt.sync()
+ * test vectors for magic.encrypt.aead()
  *
  */
 function sync(cont) {
@@ -157,8 +157,8 @@ function sync(cont) {
     const n = Buffer.from(sec[1], 'hex');
     const m = Buffer.from(sec[2], 'hex');
 
-    it('magic.encrypt.sync - Test Vector #' + c, (done) => {
-      magic.encrypt.sync(m, { key: sk, nonce: n }, (err, out) => {
+    it('magic.encrypt.aead - Test Vector #' + c, (done) => {
+      magic.encrypt.aead(m, { key: sk, nonce: n }, (err, out) => {
         if (err) { return done(err); }
 
         const c = out.ciphertext;

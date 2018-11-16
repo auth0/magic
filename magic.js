@@ -817,7 +817,7 @@ module.exports.verify.mac = vmac('sha384');
 
 
 /***
- * encrypt.async
+ * encrypt.pki
  *
  * symmetric authenticated encryption of a payload
  *
@@ -830,7 +830,7 @@ module.exports.verify.mac = vmac('sha384');
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.encrypt.async = (m, s, p, cb) => { return sodium.ready.then(() => { return async(m, s, p, cb); } ) };
+module.exports.encrypt.pki = (m, s, p, cb) => { return sodium.ready.then(() => { return async(m, s, p, cb); } ) };
 function async(message, sk, pk, cb) {
   if (typeof sk === 'function') {
     cb = sk;
@@ -881,7 +881,7 @@ function async(message, sk, pk, cb) {
 
 
 /***
- * decrypt.async
+ * decrypt.pki
  *
  * asymmetric authenticated decryption of a payload
  *
@@ -895,7 +895,7 @@ function async(message, sk, pk, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.decrypt.async = (s, p, c, n, cb) => { return sodium.ready.then(() => { return dasync(s, p, c, n, cb); } ) };
+module.exports.decrypt.pki = (s, p, c, n, cb) => { return sodium.ready.then(() => { return dasync(s, p, c, n, cb); } ) };
 function dasync(sk, pk, ciphertext, nonce, cb) {
   const done = ret(cb);
 
@@ -919,7 +919,7 @@ function dasync(sk, pk, ciphertext, nonce, cb) {
 
 
 /***
- * encrypt.sync
+ * encrypt.aead
  *
  * symmetric authenticated encryption of a payload
  *
@@ -931,7 +931,7 @@ function dasync(sk, pk, ciphertext, nonce, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.encrypt.sync = (m, s, cb) => { return sodium.ready.then(() => { return sync(m, s, cb); } ) };
+module.exports.encrypt.aead = (m, s, cb) => { return sodium.ready.then(() => { return sync(m, s, cb); } ) };
 function sync(message, sk, cb) {
   if (typeof sk === 'function') {
     cb = sk;
@@ -973,7 +973,7 @@ function sync(message, sk, cb) {
 
 
 /***
- * decrypt.sync
+ * decrypt.aead
  *
  * symmetric authenticated decryption of a payload
  *
@@ -987,7 +987,7 @@ function sync(message, sk, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.decrypt.sync = (s, c, n, cb) => { return sodium.ready.then(() => { return dsync(s, c, n, cb); } ) };;
+module.exports.decrypt.aead = (s, c, n, cb) => { return sodium.ready.then(() => { return dsync(s, c, n, cb); } ) };;
 function dsync(sk, ciphertext, nonce, cb) {
   const done = ret(cb);
 

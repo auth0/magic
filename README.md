@@ -235,7 +235,7 @@ magic.verify.mac(message, key, mac)
 });
 ```
 
-#### magic.encrypt.async | magic.decrypt.async
+#### magic.encrypt.pki | magic.decrypt.pki
 
 Implements `x25519` static Diffie-Hellman key exchange, and employs the resultant shared secret for `xsalsa20poly1305` authenticated encryption using `libsodium.js`. This allows for an efficient, simple symmetric authenticated encryption scheme to be used in an asymmetric setting. A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). As a static Diffie-Hellman exchange, the API is slightly different than most asymmetric encryption schemes - for encryption both the recipient public key and sender private key are required, whereas for decryption the recipient private key and sender public key are required. Usually, only the keys of the recipient are required for encryption, though `x25519-xsalsa20poly1305` has the benefit of being an authenticated scheme as well.
 
@@ -243,7 +243,7 @@ Implements `x25519` static Diffie-Hellman key exchange, and employs the resultan
 // key generation
 
 // callback
-magic.encrypt.async(message, (err, output) => {
+magic.encrypt.pki(message, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
   // { alg:        'x25519-xsalsa20poly1305',
@@ -255,7 +255,7 @@ magic.encrypt.async(message, (err, output) => {
 });
 
 // promise
-magic.encrypt.async(message)
+magic.encrypt.pki(message)
   .then((output) => {
     console.log(output);
     // { alg:        'x25519-xsalsa20poly1305',
@@ -274,7 +274,7 @@ const sk = 'd7d5dd...';
 const pk = 'd2b2e2...';
 
 // callback
-magic.encrypt.async(message, sk, pk, (err, output) => {
+magic.encrypt.pki(message, sk, pk, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
   // { alg:        'x25519-xsalsa20poly1305',
@@ -286,7 +286,7 @@ magic.encrypt.async(message, sk, pk, (err, output) => {
 });
 
 // promise
-magic.encrypt.async(message, sk, pk)
+magic.encrypt.pki(message, sk, pk)
   .then((output) => {
     console.log(output);
     // { alg:        'x25519-xsalsa20poly1305',
@@ -308,14 +308,14 @@ const sk = 'e5e5c6...';
 const pk = 'fea66a...';
 
 // callback
-magic.decrypt.async(sk, pk, ciphertext, nonce, (err, plaintext) => {
+magic.decrypt.pki(sk, pk, ciphertext, nonce, (err, plaintext) => {
   if (err) { return cb(err); }
   console.log(plaintext);
   // <Buffer 41 20 73 63 72 65 61 ... >
 });
 
 // promise
-magic.decrypt.async(sk, pk, ciphertext, nonce)
+magic.decrypt.pki(sk, pk, ciphertext, nonce)
   .then((plaintext) => {
     console.log(plaintext);
     // <Buffer 41 20 73 63 72 65 61 ... >
@@ -325,7 +325,7 @@ magic.decrypt.async(sk, pk, ciphertext, nonce)
 });
 ```
 
-#### magic.encrypt.sync | magic.decrypt.sync
+#### magic.encrypt.aead | magic.decrypt.aead
 
 Implements `xsalsa20poly1305` authenticated encryption using `libsodium.js`. A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). The scheme is fast, simple, and as an AEAD construction provides each of confidentiality, authentication, and integrity on the message.
 
@@ -333,7 +333,7 @@ Implements `xsalsa20poly1305` authenticated encryption using `libsodium.js`. A v
 // key generation
 
 // callback
-magic.encrypt.sync(message, (err, output) => {
+magic.encrypt.aead(message, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
   // { alg:        'xsalsa20poly1305',
@@ -344,7 +344,7 @@ magic.encrypt.sync(message, (err, output) => {
 });
 
 // promise
-magic.encrypt.sync(message)
+magic.encrypt.aead(message)
   .then((output) => {
     console.log(output);
     // { alg:        'xsalsa20poly1305',
@@ -361,7 +361,7 @@ magic.encrypt.sync(message)
 const sk = 'd7d5dd...';
 
 // callback
-magic.encrypt.sync(message, sk, (err, output) => {
+magic.encrypt.aead(message, sk, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
   // { alg:        'xsalsa20poly1305',
@@ -372,7 +372,7 @@ magic.encrypt.sync(message, sk, (err, output) => {
 });
 
 // promise
-magic.encrypt.sync(message, sk)
+magic.encrypt.aead(message, sk)
   .then((output) => {
     console.log(output);
     // { alg:        'xsalsa20poly1305',
@@ -392,14 +392,14 @@ Decryption then returns the plaintext directly, without the metadata.
 const sk = 'e5e5c6...';
 
 // callback
-magic.decrypt.sync(sk, ciphertext, nonce, (err, plaintext) => {
+magic.decrypt.aead(sk, ciphertext, nonce, (err, plaintext) => {
   if (err) { return cb(err); }
   console.log(plaintext);
   // <Buffer 41 20 73 63 72 65 61 ... >
 });
 
 // promise
-magic.decrypt.sync(sk, ciphertext, nonce)
+magic.decrypt.aead(sk, ciphertext, nonce)
   .then((plaintext) => {
     console.log(plaintext);
     // <Buffer 41 20 73 63 72 65 61 ... >
