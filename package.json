@@ -1,6 +1,6 @@
 {
   "name": "auth0-magic",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Auth0 Internal Cryptography Toolkit",
   "main": "magic.js",
   "license": "MIT",
@@ -16,7 +16,6 @@
     "test": "./node_modules/.bin/mocha --delay ./test/magic.test.js ./test/magic.test.vectors.js"
   },
   "devDependencies": {
-    "mocha": "^5.1.1",
-    "snyk": "^1.104.2"
+    "mocha": "^5.1.1"
   }
 }

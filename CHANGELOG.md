@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.1.0 - 2019-01-04
+
+### Adds
+
+- Adds support for stream encryption/decryption
+
 ## v2.0.0 - 2018-11-12
 
 ### Changes
