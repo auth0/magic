@@ -556,6 +556,52 @@ magic.util.uid(24)
     return reject(err);
 });
 ```
+#### magic.EncryptStream || magic.DecryptStream
+
+Implements `xchacha20poly1305` authenticated encryption using `libsodium.js`. The ChaCha20-Poly1305 symmetric authenticated encryption scheme been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). The scheme is fast, simple, and as an AEAD construction provides confidentiality, authentication, and integrity on the message.
+
+```js
+  // key generation
+
+  const readStream = fs.createReadStream('./plaintext.txt');
+  const writeStream = fs.createWriteStream('./ciphertext.txt');
+  const encryptStream = new magic.EncryptStream()
+  readStream
+    .pipe(encryptStream)
+    .pipe(writeStream)
+    .on('finish', function() {
+      console.log('encrypted file written')
+    })
+```
+The generated key is found in `encryptStream.key`.
+
+
+```js
+  let key = 'a0c4..' // supplied key; 32-bytes hex encoded string or 32-bytes Buffer
+
+  const readStream = fs.createReadStream('./plaintext.txt');
+  const writeStream = fs.createWriteStream('./ciphertext.txt');
+  const encryptStream = new magic.EncryptStream(key)
+  readStream
+    .pipe(encryptStream)
+    .pipe(writeStream)
+    .on('finish', function() {
+      console.log('encrypted file written')
+    })
+```
+
+For decryption, the `encryptStream.key` should be passed to `magic.DecryptStream`.
+
+```js
+  const decryptStream = new magic.DecryptStream(encryptStream.key)
+  readStream
+    .pipe(decryptStream)
+    .pipe(writeStream)
+    .on('finish', function() {
+      console.log('decrypted file written')
+    })
+```
+
 
 ### alt api
 

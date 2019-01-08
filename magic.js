@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
+const { Transform } = require('stream');
 
 const extcrypto = require('./extcrypto');
 
@@ -1146,6 +1147,201 @@ function uid(sec, cb) {
   }).catch((err) => { return done(err); })
 }
 
+
+/*****************
+ *    Streams    *
+ *****************/
+/* The libsodium library expects to decrypt the stream in the same chunks it
+ * encrypted it. I've set the stream chunk size in 4KB, so that libsodium
+ * encrypts/decrypts stream chunks of 4KB each time except from the last one. The
+ * 4KB chunk is ok for most scenarios (e.g. encrypting/decrypting files) but not
+ * ideal for real time stream manipulation. Adding support for that would require
+ * to store the length of each received chunk in the encrypted stream. This means
+ * additional implementation work and thus is omitted for now.
+ */
+const STREAM_CHUNK_SIZE = exports.STREAM_CHUNK_SIZE = 4096;
+
+/* The first byte of the encrypted stream will always indicate the version of the
+ * EncryptStream. For now it's set to 1. This will allow us to modify the data we
+ * store in the EncryptStream in the future and mark the change with a new
+ * version.
+ */
+const STREAM_VERSION = 1;
+const KEY_SIZE = 32;
+
+/* A lot of the initialisation in the stream implementations is deferred to run
+ * during the transform phase because we need to be in an async context in
+ * order to be able to use sodiium.ready.
+ */
+
+/***
+ * EncryptStream
+ *
+ * symmetric authenticated encryption of a stream
+ *
+ * @api public
+ *
+ * @param {String|Buffer} key
+ * @returns {Stream}
+ */
+module.exports.EncryptStream = class EncryptStream extends Transform {
+  constructor(key) {
+    super();
+    if (key) {
+      [key] = cparse(key);
+      this.key = new Uint8Array(key);
+    } else {
+      key = crypto.randomBytes(KEY_SIZE);
+      this.key = new Uint8Array(key);
+    }
+    this.init = false;
+    this.dataOffset = 0;
+    this.data = Buffer.alloc(STREAM_CHUNK_SIZE);
+  }
+
+  _transform(data, encoding, callback) {
+    sodium.ready.then(() => {
+      if (!this.init) {
+        const res = sodium.crypto_secretstream_xchacha20poly1305_init_push(this.key);
+        this.state = res.state;
+        this.push(Buffer.from([STREAM_VERSION]))
+        this.push(res.header);
+        this.init = true;
+      }
+
+      while (this.dataOffset + data.length >= STREAM_CHUNK_SIZE) {
+        let dataCopied  = data.copy(this.data, this.dataOffset)
+
+        data = data.slice(dataCopied)
+        this.dataOffset = 0
+
+        try {
+          let c = sodium.crypto_secretstream_xchacha20poly1305_push(
+            this.state,
+            this.data,
+            null,
+            sodium.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE
+          );
+          this.push(c);
+        } catch(ex) {
+          return callback(new Error('Libsodium error: ' + ex));
+        };
+      }
+      this.dataOffset += data.copy(this.data, this.dataOffset)
+      return callback(null, null)
+    });
+  }
+
+  _flush(callback) {
+    sodium.ready.then(() => {
+      try {
+        let c = sodium.crypto_secretstream_xchacha20poly1305_push(
+          this.state,
+          this.data.slice(0, this.dataOffset),
+          null,
+          sodium.crypto_secretstream_xchacha20poly1305_TAG_FINAL
+        )
+        return callback(null, c);
+      } catch(ex) {
+        return callback(new Error('Libsodium error: ' + ex));
+      }
+   });
+  }
+}
+
+/***
+ * DecryptStream
+ *
+ * symmetric authenticated decryption of a stream
+ *
+ * @api public
+ *
+ * @param {String|Buffer} key
+ * @returns {Stream}
+ */
+module.exports.DecryptStream = class DecryptStream extends Transform {
+  constructor(key) {
+    super();
+    this.init = false;
+    this.headerOffset = 0;
+    this.header = null
+    this.dataOffset = 0;
+
+    if (!key) {
+      throw new Error('Missing key for DecryptStream')
+    }
+    [key] = cparse(key);
+    this.key = new Uint8Array(key);
+  }
+
+  _transform(data, encoding, callback) {
+    sodium.ready.then(() => {
+      if (!this.init) {
+        if (!this.header) {
+          this.header = Buffer.alloc(sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES + 1);
+        }
+        const bytesCopied = data.copy(this.header, this.headerOffset);
+        this.headerOffset += bytesCopied;
+
+        if (this.headerOffset < sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES) {
+          return callback(null, null);
+        }
+        if (this.header[0] !== STREAM_VERSION) {
+          return callback(new Error('Unsupported version'))
+        }
+        this.state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(this.header.slice(1), this.key);
+        this.init = true;
+
+        this.chunkSize = STREAM_CHUNK_SIZE + sodium.crypto_secretstream_xchacha20poly1305_ABYTES
+        this.data = Buffer.alloc(this.chunkSize);
+        data = data.slice(bytesCopied)
+      }
+      while (this.dataOffset + data.length > this.chunkSize) {
+        const dataCopied = data.copy(this.data, this.dataOffset)
+
+        data = data.slice(dataCopied)
+        this.dataOffset = 0
+
+        try {
+          const res = sodium.crypto_secretstream_xchacha20poly1305_pull(this.state, this.data);
+          if (!res) {
+            return callback(new Error('Corrupted chunk'))
+          }
+          this.push(res.message);
+        } catch(ex) {
+          return callback(new Error('Libsodium error: ' + ex));
+        }
+      }
+
+      this.dataOffset += data.copy(this.data, this.dataOffset)
+      return callback(null, null)
+    });
+  }
+
+  _flush(callback) {
+    sodium.ready.then(() => {
+      if (this.dataOffset) {
+        try {
+          const res = sodium.crypto_secretstream_xchacha20poly1305_pull(
+            this.state,
+            this.data.slice(0, this.dataOffset)
+          )
+          if (!res) {
+            return callback(new Error('Corrupted chunk'))
+          }
+          // avoid truncation attacks
+          if (res.tag !== sodium.crypto_secretstream_xchacha20poly1305_TAG_FINAL) {
+            return callback(new Error('Premature stream close'));
+          }
+          return callback(null, res.message);
+        } catch(ex) {
+          return callback(new Error('Libsodium error: ' + ex));
+        }
+      };
+      return callback(null, null)
+    });
+  }
+}
 
 
 /*****************

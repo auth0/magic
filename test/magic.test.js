@@ -3,6 +3,7 @@ const magic = require('../magic');
 const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
 const assert = require('assert');
+const fs = require('fs');
 
 
 describe('magic tests', () => {
@@ -1162,6 +1163,156 @@ describe('magic tests', () => {
 
               done();
             });
+          });
+        });
+      });
+
+      describe('stream encryption/decryption', () => {
+        before(() => {
+          this.HEADER_BYTES = sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES + 1;
+        })
+
+        beforeEach(() => {
+          readStream = fs.createReadStream('./test/plaintext.txt');
+          writeStream = fs.createWriteStream('./test/decryptedtext.txt');
+        });
+
+        it('should encrypt and decrypt a stream with a given key', (done) => {
+          const encryptStream = new magic.EncryptStream('012345678901234567890123456789ab012345678901234567890123456789ab')
+          const decryptStream = new magic.DecryptStream('012345678901234567890123456789ab012345678901234567890123456789ab')
+          readStream
+            .pipe(encryptStream)
+            .pipe(decryptStream)
+            .pipe(writeStream)
+            .on('finish', function() {
+              fs.readFile('./test/plaintext.txt', (err, plaindata) => {
+                if (err) {
+                  throw err;
+                }
+                fs.readFile('./test/decryptedtext.txt', (err, decrdata) => {
+                  if (err) {
+                    throw err;
+                  }
+                  assert.equal(plaindata.toString(), decrdata.toString())
+                  done()
+                });
+              });
+            });
+        });
+
+        it('should encrypt and decrypt a stream with an aytogenerated key ', (done) => {
+          const encryptStream = new magic.EncryptStream()
+          const decryptStream = new magic.DecryptStream(encryptStream.key)
+          readStream
+            .pipe(encryptStream)
+            .pipe(decryptStream)
+            .pipe(writeStream)
+            .on('finish', function() {
+              fs.readFile('./test/plaintext.txt', (err, plaindata) => {
+                if (err) {
+                  throw err;
+                }
+                fs.readFile('./test/decryptedtext.txt', (err, decrdata) => {
+                  if (err) {
+                    throw err;
+                  }
+                  assert.equal(plaindata.toString(), decrdata.toString())
+                  done()
+                });
+              });
+            });
+        });
+
+        it('should throw an error if no key is passed to DecryptStream', () => {
+          try {
+           const decryptStream = new magic.DecryptStream()
+          } catch(err) {
+            assert.ok(err)
+            assert.equal(err.message, 'Missing key for DecryptStream')
+          }
+        });
+
+        it('should encrypt the plaintext in a file and then decrypt it in a new file (asynchronous encryption/decryption)', (done) => {
+          const encryptStream = new magic.EncryptStream()
+          const decryptStream = new magic.DecryptStream(encryptStream.key)
+          const encTextStream = fs.createWriteStream('./test/encryptedtext.txt');
+          readStream
+            .pipe(encryptStream)
+            .pipe(encTextStream)
+            .on('finish', function() {
+              fs.createReadStream('./test/encryptedtext.txt')
+              .pipe(decryptStream)
+              .pipe(writeStream)
+              .on('close', function() {
+                fs.readFile('./test/plaintext.txt', (err, plaindata) => {
+                  if (err) {
+                    throw err;
+                  }
+                  fs.readFile('./test/decryptedtext.txt', (err, decrdata) => {
+                    if (err) {
+                      throw err;
+                    }
+                    assert.equal(plaindata.toString(), decrdata.toString())
+                    done()
+                  });
+                });
+              });
+            });
+        });
+
+        it('should return an error when decrypting a truncated encrypted file', (done) => {
+          const encryptStream = new magic.EncryptStream('012345678901234567890123456789ab012345678901234567890123456789ab')
+          const decryptStream = new magic.DecryptStream('012345678901234567890123456789ab012345678901234567890123456789ab')
+          const encTextStream = fs.createWriteStream('./test/encryptedtext.txt');
+          readStream
+            .pipe(encryptStream)
+            .pipe(encTextStream)
+            .on('finish', () => {
+              fs.readFile('./test/encryptedtext.txt', (err, data) => {
+                let lastEncrChunk = (data.length - this.HEADER_BYTES) % (magic.STREAM_CHUNK_SIZE + sodium.crypto_secretstream_xchacha20poly1305_ABYTES)
+                decryptStream.write(data.slice(0, data.length - lastEncrChunk))
+                decryptStream.end()
+                decryptStream
+                  .on('error', function(err) {
+                    assert.ok(err)
+                    assert.equal(err.message, 'Premature stream close')
+                    done();
+                  })
+              })
+            })
+        });
+
+        it('should return an error when decrypting a spliced stream', (done) => {
+          const STREAM_CHUNK_SIZE = 4096
+          const encryptStream = new magic.EncryptStream('012345678901234567890123456789ab012345678901234567890123456789ab')
+          const decryptStream = new magic.DecryptStream('012345678901234567890123456789ab012345678901234567890123456789ab')
+          const encTextStream = fs.createWriteStream('./test/encryptedtext.txt');
+          readStream
+            .pipe(encryptStream)
+            .pipe(encTextStream)
+            .on('finish', function() {
+              fs.readFile('./test/encryptedtext.txt', (err, data) => {
+                const secChunkStart = sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES + 1
+                const secChunkEnd = secChunkStart + magic.STREAM_CHUNK_SIZE + sodium.crypto_secretstream_xchacha20poly1305_ABYTES
+                let dataNoSecChunk = Buffer.concat([data.slice(0, secChunkStart), data.slice(secChunkEnd)])
+                decryptStream.write(dataNoSecChunk)
+                decryptStream.end()
+                decryptStream
+                  .on('error', function(err) {
+                    assert.ok(err)
+                    assert.equal(err.message, 'Corrupted chunk')
+                    done();
+                  })
+              })
+            })
+        });
+
+        after(() => {
+          fs.unlink('./test/decryptedtext.txt', (err) => {
+            if (err) throw err
+            fs.unlink('./test/encryptedtext.txt', (err) => {
+              if (err) throw err
+            })
           });
         });
       });
