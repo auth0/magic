@@ -1,8 +1,8 @@
 pipeline {
   agent {
-    label 'prodsec' 
+    label 'prodsec'
   }
-   
+
   tools {
     nodejs '8.9.1'
   }
@@ -12,11 +12,11 @@ pipeline {
   }
 
   options {
-    timeout(time: 10, unit: 'MINUTES') 
+    timeout(time: 10, unit: 'MINUTES')
   }
- 
+
   stages {
-    stage('Build') { 
+    stage('Build') {
       steps {
         sh 'npm install --build-from-source'
         lastPublishedVersion = sh(script: 'npm view auth0-magic version', returnStdout: true).trim()
@@ -31,14 +31,14 @@ pipeline {
     }
 
     stage('Deploy') {
-      when { not { equals expected: lastPublishedVersion, actual: currentVersion }
+      when { not { equals expected: lastPublishedVersion, actual: currentVersion } }
       steps {
         sh "echo //registry.npmjs.org/:_authToken=${env.NPM_TOKEN} > .npmrc"
         sh "npm publish"
       }
     }
   }
-   
+
   post {
     always{
       deleteDir()
