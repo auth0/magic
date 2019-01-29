@@ -1307,6 +1307,28 @@ describe('magic tests', () => {
             })
         });
 
+        it('should return an error when stream version is incorrect', (done) => {
+          const encryptStream = new magic.EncryptStream('012345678901234567890123456789ab012345678901234567890123456789ab')
+          const decryptStream = new magic.DecryptStream('012345678901234567890123456789ab012345678901234567890123456789ab')
+          const encTextStream = fs.createWriteStream('./test/encryptedtext.txt');
+          readStream
+            .pipe(encryptStream)
+            .pipe(encTextStream)
+            .on('finish', function() {
+              fs.readFile('./test/encryptedtext.txt', (err, data) => {
+                let dataWrongStreamVersion = Buffer.concat([Buffer.from([10]), data.slice(1)])
+                decryptStream.write(dataWrongStreamVersion)
+                decryptStream.end()
+                decryptStream
+                  .on('error', function(err) {
+                    assert.ok(err)
+                    assert.equal(err.message, 'Unsupported version')
+                    done();
+                  })
+              })
+            })
+        });
+
         after(() => {
           fs.unlink('./test/decryptedtext.txt', (err) => {
             if (err) throw err

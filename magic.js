@@ -1174,26 +1174,12 @@ const KEY_SIZE = 32;
  * order to be able to use sodiium.ready.
  */
 
-/***
- * EncryptStream
- *
- * symmetric authenticated encryption of a stream
- *
- * @api public
- *
- * @param {String|Buffer} key
- * @returns {Stream}
- */
-module.exports.EncryptStream = class EncryptStream extends Transform {
-  constructor(key) {
+
+// AbstractEncryptStream format:  STREAM_VERSION | libsodium header | encrypted data
+
+class AbstractEncryptStream extends Transform {
+  constructor() {
     super();
-    if (key) {
-      [key] = cparse(key);
-      this.key = new Uint8Array(key);
-    } else {
-      key = crypto.randomBytes(KEY_SIZE);
-      this.key = new Uint8Array(key);
-    }
     this.init = false;
     this.dataOffset = 0;
     this.data = Buffer.alloc(STREAM_CHUNK_SIZE);
@@ -1204,15 +1190,15 @@ module.exports.EncryptStream = class EncryptStream extends Transform {
       if (!this.init) {
         const res = sodium.crypto_secretstream_xchacha20poly1305_init_push(this.key);
         this.state = res.state;
-        this.push(Buffer.from([STREAM_VERSION]))
+        this.push(Buffer.from([STREAM_VERSION]));
         this.push(res.header);
         this.init = true;
       }
 
       while (this.dataOffset + data.length >= STREAM_CHUNK_SIZE) {
-        let dataCopied  = data.copy(this.data, this.dataOffset)
+        let dataCopied  = data.copy(this.data, this.dataOffset);
 
-        data = data.slice(dataCopied)
+        data = data.slice(dataCopied);
         this.dataOffset = 0
 
         try {
@@ -1227,8 +1213,9 @@ module.exports.EncryptStream = class EncryptStream extends Transform {
           return callback(new Error('Libsodium error: ' + ex));
         };
       }
-      this.dataOffset += data.copy(this.data, this.dataOffset)
-      return callback(null, null)
+
+      this.dataOffset += data.copy(this.data, this.dataOffset);
+      return callback(null, null);
     });
   }
 
@@ -1245,33 +1232,17 @@ module.exports.EncryptStream = class EncryptStream extends Transform {
       } catch(ex) {
         return callback(new Error('Libsodium error: ' + ex));
       }
-   });
+    });
   }
 }
 
-/***
- * DecryptStream
- *
- * symmetric authenticated decryption of a stream
- *
- * @api public
- *
- * @param {String|Buffer} key
- * @returns {Stream}
- */
-module.exports.DecryptStream = class DecryptStream extends Transform {
-  constructor(key) {
+class AbstractDecryptStream extends Transform {
+  constructor() {
     super();
     this.init = false;
-    this.headerOffset = 0;
-    this.header = null
     this.dataOffset = 0;
-
-    if (!key) {
-      throw new Error('Missing key for DecryptStream')
-    }
-    [key] = cparse(key);
-    this.key = new Uint8Array(key);
+    this.headerOffset = 0;
+    this.header = null;
   }
 
   _transform(data, encoding, callback) {
@@ -1292,15 +1263,16 @@ module.exports.DecryptStream = class DecryptStream extends Transform {
         this.state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(this.header.slice(1), this.key);
         this.init = true;
 
-        this.chunkSize = STREAM_CHUNK_SIZE + sodium.crypto_secretstream_xchacha20poly1305_ABYTES
+        this.chunkSize = STREAM_CHUNK_SIZE + sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
         this.data = Buffer.alloc(this.chunkSize);
-        data = data.slice(bytesCopied)
+        data = data.slice(bytesCopied);
       }
+
       while (this.dataOffset + data.length > this.chunkSize) {
         const dataCopied = data.copy(this.data, this.dataOffset)
 
-        data = data.slice(dataCopied)
-        this.dataOffset = 0
+        data = data.slice(dataCopied);
+        this.dataOffset = 0;
 
         try {
           const res = sodium.crypto_secretstream_xchacha20poly1305_pull(this.state, this.data);
@@ -1313,8 +1285,8 @@ module.exports.DecryptStream = class DecryptStream extends Transform {
         }
       }
 
-      this.dataOffset += data.copy(this.data, this.dataOffset)
-      return callback(null, null)
+      this.dataOffset += data.copy(this.data, this.dataOffset);
+      return callback(null, null);
     });
   }
 
@@ -1338,11 +1310,63 @@ module.exports.DecryptStream = class DecryptStream extends Transform {
           return callback(new Error('Libsodium error: ' + ex));
         }
       };
-      return callback(null, null)
+      return callback(null, null);
     });
   }
 }
 
+
+/***
+ * EncryptStream
+ *
+ * symmetric authenticated encryption of a stream
+ *
+ * @api public
+ *
+ * @param {String|Buffer} key
+ * @returns {Stream}
+ */
+
+// EncryptStream format:  AbstractEncryptStream
+
+class EncryptStream extends AbstractEncryptStream {
+  constructor(key) {
+    super();
+    if (key) {
+      [key] = cparse(key);
+      this.key = new Uint8Array(key);
+    } else {
+      key = crypto.randomBytes(KEY_SIZE);
+      this.key = new Uint8Array(key);
+    }
+  }
+
+
+}
+
+module.exports.EncryptStream = EncryptStream;
+
+/***
+ * DecryptStream
+ *
+ * symmetric authenticated decryption of a stream
+ *
+ * @api public
+ *
+ * @param {String|Buffer} key
+ * @returns {Stream}
+ */
+class DecryptStream extends AbstractDecryptStream {
+  constructor(key) {
+    super();
+    if (!key) {
+      throw new Error('Missing key for DecryptStream')
+    }
+    [key] = cparse(key);
+    this.key = new Uint8Array(key);
+  }
+}
+module.exports.DecryptStream = DecryptStream;
 
 /*****************
  * Alternate API *
