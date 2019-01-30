@@ -1167,6 +1167,7 @@ const STREAM_CHUNK_SIZE = exports.STREAM_CHUNK_SIZE = 4096;
  * version.
  */
 const STREAM_VERSION = 1;
+const PWD_STREAM_VERSION = 1;
 const KEY_SIZE = 32;
 
 /* A lot of the initialisation in the stream implementations is deferred to run
@@ -1367,6 +1368,93 @@ class DecryptStream extends AbstractDecryptStream {
   }
 }
 module.exports.DecryptStream = DecryptStream;
+
+// PwdEncryptStream format:  PWD_STREAM_VERSION | salt | AbstractEncryptStream
+
+module.exports.PwdEncryptStream = class PwdEncryptStream extends AbstractEncryptStream {
+  constructor(pwd) {
+    super();
+    if (!pwd) {
+      return new Error('Missing password for PwdEncryptStream');
+    }
+    this.pwd = pwd;
+    this.key = null;
+  }
+
+  _transform(data, encoding, callback) {
+    sodium.ready.then(() => {
+      if (!this.key) {
+        let key;
+        const salt = crypto.randomBytes(sodium.crypto_pwhash_SALTBYTES)
+        try {
+          this.key = sodium.crypto_pwhash(
+            KEY_SIZE,
+            this.pwd,
+            salt,
+            sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+            sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+            sodium.crypto_pwhash_ALG_DEFAULT
+          );
+        } catch(ex) {
+          return callback(new Error('Libsodium error: ' +  ex))
+        }
+        this.push(Buffer.from([PWD_STREAM_VERSION]));
+        this.push(salt);
+      }
+      super._transform(data, encoding, callback);
+    });
+  };
+};
+
+module.exports.PwdDecryptStream = class PwdDecryptStream extends AbstractDecryptStream {
+  constructor(pwd) {
+    super();
+    this.initPwd = false;
+    this.pwdHeaderOffset = 0;
+    this.pwdHeader = null;
+
+    if (!pwd) {
+      throw new Error('Missing password for PwdDecryptStream')
+    }
+    this.pwd = pwd;
+    this.key = null;
+  }
+
+  _transform(data, encoding, callback) {
+    sodium.ready.then(() => {
+      if (!this.initPwd) {
+        // Get salt from stream to re-generate key
+        if (!this.pwdHeader) {
+          this.pwdHeader = Buffer.alloc(sodium.crypto_pwhash_SALTBYTES + 1);
+        }
+
+        if (!this.key) {
+          const saltBytesCopied = data.copy(this.pwdHeader, this.pwdHeaderOffset);
+          this.pwdHeaderOffset += saltBytesCopied;
+
+          if (this.pwdHeaderOffset < sodium.crypto_pwhash_SALTBYTES) {
+            return callback(null, null);
+          }
+          if (this.pwdHeader[0] !== PWD_STREAM_VERSION) {
+            return callback(new Error('Unsupported PwdEncryptionStream version'));
+          }
+
+          this.key = sodium.crypto_pwhash(
+            KEY_SIZE,
+            this.pwd,
+            this.pwdHeader.slice(1),
+            sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+            sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+            sodium.crypto_pwhash_ALG_DEFAULT
+          );
+          this.initPwd = true;
+          data = data.slice(saltBytesCopied);
+        }
+      }
+      super._transform(data, encoding, callback);
+    });
+  }
+}
 
 /*****************
  * Alternate API *
