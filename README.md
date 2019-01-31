@@ -602,6 +602,34 @@ For decryption, the `encryptStream.key` should be passed to `magic.DecryptStream
     })
 ```
 
+#### magic.PwdEncryptStream || magic.PwdDecryptStream
+
+Implements the same cryptographic protocols as magic.EncryptStream/magic.DecryptStream. The only difference is that PwdEncryptStream and PwdDecryptStream derive a key from a given password instead of requiring the key as an input
+
+```js
+  // key generation
+
+  const readStream = fs.createReadStream('./plaintext.txt');
+  const writeStream = fs.createWriteStream('./ciphertext.txt');
+  const encryptStream = new magic.PwdEncryptStream('a password')
+  readStream
+    .pipe(encryptStream)
+    .pipe(writeStream)
+    .on('finish', function() {
+      console.log('encrypted file written')
+    })
+```
+
+
+```js
+  const decryptStream = new magic.PwdDecryptStream('a password')
+  readStream
+    .pipe(decryptStream)
+    .pipe(writeStream)
+    .on('finish', function() {
+      console.log('decrypted file written')
+    })
+```
 
 ### alt api
 
