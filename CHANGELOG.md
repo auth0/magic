@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.2.0 - 2019-01-31
+
+### Adds
+
+- Adds support for stream encryption/decryption with user supplied password
+
+### Misc
+
+- Fixes race condition issue in magic.util.uid()
+
 ## v2.1.0 - 2019-01-04
 
 ### Adds
