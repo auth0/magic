@@ -1132,7 +1132,7 @@ function rand(len, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.util.uid = uid;
+module.exports.util.uid = (sec, cb) => { return sodium.ready.then(() => { return uid(sec, cb); } ) };
 function uid(sec, cb) {
   if (typeof sec === 'function') {
     cb  = sec;
