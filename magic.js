@@ -678,13 +678,15 @@ function hash(algorithm) {
 
 
 
-exports = module.exports = new Object();
-module.exports.auth      = new Object();
-module.exports.verify    = new Object();
-module.exports.encrypt   = new Object();
-module.exports.decrypt   = new Object();
-module.exports.password  = new Object();
-module.exports.util      = new Object();
+exports = module.exports  = new Object();
+module.exports.auth       = new Object();
+module.exports.verify     = new Object();
+module.exports.encrypt    = new Object();
+module.exports.decrypt    = new Object();
+module.exports.password   = new Object();
+module.exports.util       = new Object();
+module.exports.pwdEncrypt = new Object();
+module.exports.pwdDecrypt = new Object();
 
 
 /***
@@ -988,11 +990,18 @@ function sync(message, sk, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.decrypt.aead = (s, c, n, cb) => { return sodium.ready.then(() => { return dsync(s, c, n, cb); } ) };;
+module.exports.decrypt.aead = (s, c, n, cb) => {
+  return sodium.ready.then(() => {
+    if (!s) {
+      const done = ret(cb);
+      return done(new Error('Cannot decrypt without a key'));
+    }
+    return dsync(s, c, n, cb);
+  } )
+};
+
 function dsync(sk, ciphertext, nonce, cb) {
   const done = ret(cb);
-
-  if (!sk) { return done(new Error('Cannot decrypt without a key')); }
 
   let isk;
   [ ciphertext, nonce, sk ] = cparse(ciphertext, nonce, sk);
