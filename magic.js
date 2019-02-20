@@ -1018,6 +1018,71 @@ function dsync(sk, ciphertext, nonce, cb) {
   return done(null, convert(plaintext));
 }
 
+module.exports.pwdDecrypt.aead = (p, c, n, cb) => {
+  return sodium.ready.then(() => {
+    if (typeof p === 'function') {
+      cb = p;
+      p = null;
+    }
+    const done = ret(cb);
+
+    if (!p) { return done(new Error('Cannot decrypt without a password')); }
+
+    let s;
+    [ c ] = cparse(c);
+    salt = c.slice(0, sodium.crypto_pwhash_SALTBYTES);
+    try {
+      s = sodium.crypto_pwhash(
+        KEY_SIZE,
+        p,
+        salt,
+        sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+        sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+        sodium.crypto_pwhash_ALG_DEFAULT
+      );
+    } catch(ex) {
+      return done(new Error('Libsodium error: ' +  ex))
+    }
+    c = c.slice(sodium.crypto_pwhash_SALTBYTES);
+    return dsync(s, c, n, cb);
+  })
+};
+
+module.exports.pwdEncrypt.aead = (m, p, cb) => {
+  return sodium.ready.then(() => {
+    if (typeof p === 'function') {
+      cb = p;
+      p = null;
+    }
+    const done = ret(cb);
+
+    if (!p) { return done(new Error('Cannot encrypt without a password')); }
+    let sk;
+    const salt = crypto.randomBytes(sodium.crypto_pwhash_SALTBYTES)
+
+    try {
+      sk = sodium.crypto_pwhash(
+        KEY_SIZE,
+        p,
+        salt,
+        sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+        sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+        sodium.crypto_pwhash_ALG_DEFAULT
+      );
+    } catch(ex) {
+      return done(new Error('Libsodium error: ' +  ex))
+    }
+
+    return sync(m, Buffer.from(sk), (err, aead) => {
+      const done = ret(cb);
+      if (err) {
+        return err;
+      }
+      aead.ciphertext = Buffer.concat([salt, aead.ciphertext])
+      return done(null, aead);
+    })
+  });
+};
 
 /***
  * password.hash

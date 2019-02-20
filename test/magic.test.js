@@ -766,81 +766,153 @@ describe('magic tests', () => {
 
         describe('success', () => {
 
-          describe('without key generation', () => {
+          describe('with key required', () => {
 
-            beforeEach(() => { sk = Buffer.from(sodium.crypto_secretbox_keygen()); });
+            describe('without key generation', () => {
 
-            it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-              magic.encrypt.aead(message, sk, (err, output) => {
-                assert.ok(!err);
-                assert.ok(output);
+              beforeEach(() => { sk = Buffer.from(sodium.crypto_secretbox_keygen()); });
 
-                assert.equal(output.alg, 'xsalsa20poly1305');
-                assert.equal(output.payload.toString('utf-8'), message);
-                assert.ok(Buffer.compare(output.sk, sk) === 0);
-
-                assert.ok(output.ciphertext);
-                assert.ok(output.nonce);
-
-                magic.decrypt.aead(sk, output.ciphertext, output.nonce, (err, plaintext) => {
+              it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+                magic.encrypt.aead(message, sk, (err, output) => {
                   assert.ok(!err);
+                  assert.ok(output);
+
+                  assert.equal(output.alg, 'xsalsa20poly1305');
+                  assert.equal(output.payload.toString('utf-8'), message);
+                  assert.ok(Buffer.compare(output.sk, sk) === 0);
+
+                  assert.ok(output.ciphertext);
+                  assert.ok(output.nonce);
+
+                  magic.decrypt.aead(sk, output.ciphertext, output.nonce, (err, plaintext) => {
+                    assert.ok(!err);
+                    assert.equal(plaintext.toString('utf-8'), message);
+
+                    done();
+                  });
+                });
+              });
+
+              it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+                magic.encrypt.aead(message, sk).then((output) => {
+                  assert.ok(output);
+
+                  assert.equal(output.alg, 'xsalsa20poly1305');
+                  assert.equal(output.payload.toString('utf-8'), message);
+                  assert.ok(Buffer.compare(output.sk, sk) === 0);
+
+                  assert.ok(output.ciphertext);
+                  assert.ok(output.nonce);
+
+                  return magic.decrypt.aead(sk, output.ciphertext, output.nonce);
+                }).then((plaintext) => {
                   assert.equal(plaintext.toString('utf-8'), message);
 
                   done();
+                }).catch((err) => { assert.ok(!err); });
+              });
+
+              it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+                const esk = sk.toString('hex');
+
+                magic.encrypt.aead(message, esk, (err, output) => {
+                  assert.ok(!err);
+                  assert.ok(output);
+
+                  assert.equal(output.alg, 'xsalsa20poly1305');
+                  assert.equal(output.payload.toString('utf-8'), message);
+                  assert.ok(Buffer.compare(output.sk, sk) === 0);
+
+                  assert.ok(output.ciphertext);
+                  assert.ok(output.nonce);
+
+                  const ect = output.ciphertext.toString('hex');
+                  const en  = output.nonce.toString('hex');
+
+                  magic.decrypt.aead(esk, ect, en, (err, plaintext) => {
+                    assert.ok(!err);
+                    assert.equal(plaintext.toString('utf-8'), message);
+
+                    done();
+                  });
                 });
               });
             });
 
-            it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-              magic.encrypt.aead(message, sk).then((output) => {
-                assert.ok(output);
+            describe('with key generation', () => {
 
-                assert.equal(output.alg, 'xsalsa20poly1305');
-                assert.equal(output.payload.toString('utf-8'), message);
-                assert.ok(Buffer.compare(output.sk, sk) === 0);
-
-                assert.ok(output.ciphertext);
-                assert.ok(output.nonce);
-
-                return magic.decrypt.aead(sk, output.ciphertext, output.nonce);
-              }).then((plaintext) => {
-                assert.equal(plaintext.toString('utf-8'), message);
-
-                done();
-              }).catch((err) => { assert.ok(!err); });
-            });
-
-            it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-              const esk = sk.toString('hex');
-
-              magic.encrypt.aead(message, esk, (err, output) => {
-                assert.ok(!err);
-                assert.ok(output);
-
-                assert.equal(output.alg, 'xsalsa20poly1305');
-                assert.equal(output.payload.toString('utf-8'), message);
-                assert.ok(Buffer.compare(output.sk, sk) === 0);
-
-                assert.ok(output.ciphertext);
-                assert.ok(output.nonce);
-
-                const ect = output.ciphertext.toString('hex');
-                const en  = output.nonce.toString('hex');
-
-                magic.decrypt.aead(esk, ect, en, (err, plaintext) => {
+              it('should encrypt and decrypt an authenticated message - callback api', (done) => {
+                magic.encrypt.aead(message, (err, output) => {
                   assert.ok(!err);
+                  assert.ok(output);
+
+                  assert.equal(output.alg, 'xsalsa20poly1305');
+                  assert.equal(output.payload.toString('utf-8'), message);
+
+                  assert.ok(output.sk);
+                  assert.ok(output.ciphertext);
+                  assert.ok(output.nonce);
+
+                  magic.decrypt.aead(output.sk, output.ciphertext, output.nonce, (err, plaintext) => {
+                    assert.ok(!err);
+                    assert.equal(plaintext.toString('utf-8'), message);
+
+                    done();
+                  });
+                });
+              });
+
+              it('should encrypt and decrypt an authenticated message - promise api', (done) => {
+                magic.encrypt.aead(message).then((output) => {
+                  assert.ok(output);
+
+                  assert.equal(output.alg, 'xsalsa20poly1305');
+                  assert.equal(output.payload.toString('utf-8'), message);
+
+                  assert.ok(output.sk);
+                  assert.ok(output.ciphertext);
+                  assert.ok(output.nonce);
+
+                  return magic.decrypt.aead(output.sk, output.ciphertext, output.nonce);
+                }).then((plaintext) => {
                   assert.equal(plaintext.toString('utf-8'), message);
 
                   done();
+                }).catch((err) => { assert.ok(!err); });
+              });
+
+              it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
+                magic.encrypt.aead(message, (err, output) => {
+                  assert.ok(!err);
+                  assert.ok(output);
+
+                  assert.equal(output.alg, 'xsalsa20poly1305');
+                  assert.equal(output.payload.toString('utf-8'), message);
+
+                  assert.ok(output.sk);
+                  assert.ok(output.ciphertext);
+                  assert.ok(output.nonce);
+
+                  const esk = output.sk.toString('hex');
+                  const ect = output.ciphertext.toString('hex');
+                  const en  = output.nonce.toString('hex');
+
+                  magic.decrypt.aead(esk, ect, en, (err, plaintext) => {
+                    assert.ok(!err);
+                    assert.equal(plaintext.toString('utf-8'), message);
+
+                    done();
+                  });
                 });
               });
             });
           });
 
-          describe('with key generation', () => {
+          describe('with password required', () => {
+            before(() => { pwd = 'secretpassword'; });
 
             it('should encrypt and decrypt an authenticated message - callback api', (done) => {
-              magic.encrypt.aead(message, (err, output) => {
+              magic.pwdEncrypt.aead(message, pwd, (err, output) => {
                 assert.ok(!err);
                 assert.ok(output);
 
@@ -851,7 +923,7 @@ describe('magic tests', () => {
                 assert.ok(output.ciphertext);
                 assert.ok(output.nonce);
 
-                magic.decrypt.aead(output.sk, output.ciphertext, output.nonce, (err, plaintext) => {
+                magic.pwdDecrypt.aead(pwd, output.ciphertext, output.nonce, (err, plaintext) => {
                   assert.ok(!err);
                   assert.equal(plaintext.toString('utf-8'), message);
 
@@ -861,7 +933,7 @@ describe('magic tests', () => {
             });
 
             it('should encrypt and decrypt an authenticated message - promise api', (done) => {
-              magic.encrypt.aead(message).then((output) => {
+              magic.pwdEncrypt.aead(message, pwd).then((output) => {
                 assert.ok(output);
 
                 assert.equal(output.alg, 'xsalsa20poly1305');
@@ -871,37 +943,12 @@ describe('magic tests', () => {
                 assert.ok(output.ciphertext);
                 assert.ok(output.nonce);
 
-                return magic.decrypt.aead(output.sk, output.ciphertext, output.nonce);
+                return magic.pwdDecrypt.aead(pwd, output.ciphertext, output.nonce);
               }).then((plaintext) => {
                 assert.equal(plaintext.toString('utf-8'), message);
 
                 done();
               }).catch((err) => { assert.ok(!err); });
-            });
-
-            it('should encrypt and decrypt an authenticated message w/ hex encoding', (done) => {
-              magic.encrypt.aead(message, (err, output) => {
-                assert.ok(!err);
-                assert.ok(output);
-
-                assert.equal(output.alg, 'xsalsa20poly1305');
-                assert.equal(output.payload.toString('utf-8'), message);
-
-                assert.ok(output.sk);
-                assert.ok(output.ciphertext);
-                assert.ok(output.nonce);
-
-                const esk = output.sk.toString('hex');
-                const ect = output.ciphertext.toString('hex');
-                const en  = output.nonce.toString('hex');
-
-                magic.decrypt.aead(esk, ect, en, (err, plaintext) => {
-                  assert.ok(!err);
-                  assert.equal(plaintext.toString('utf-8'), message);
-
-                  done();
-                });
-              });
             });
           });
         });
@@ -969,6 +1016,59 @@ describe('magic tests', () => {
               magic.decrypt.aead(output.sk, output.ciphertext, altered, (err, plaintext) => {
                 assert.ok(err);
                 assert.equal(err.message, 'Libsodium error: Error: wrong secret key for the given ciphertext');
+
+                done();
+              });
+            });
+          });
+
+          it('should error without password on encryption', (done) => {
+            let pwd = 'secretpassword';
+            magic.pwdEncrypt.aead(message, (err, output) => {
+              assert.ok(err);
+              assert.equal(err.message, 'Cannot encrypt without a password');
+              done();
+            });
+          });
+
+          it('should error without password on decryption', (done) => {
+            let pwd = 'secretpassword';
+            magic.pwdEncrypt.aead(message, pwd, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'xsalsa20poly1305');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              magic.pwdDecrypt.aead(null, output.ciphertext, output.nonce, (err, plaintext) => {
+                assert.ok(err);
+                assert.equal(err.message, 'Cannot decrypt without a password');
+
+                done();
+              });
+            });
+          });
+
+          it('should error with invalid nonce on decryption', (done) => {
+            let pwd = 'secretpassword';
+            magic.pwdEncrypt.aead(message, pwd, (err, output) => {
+              assert.ok(!err);
+              assert.ok(output);
+
+              assert.equal(output.alg, 'xsalsa20poly1305');
+              assert.equal(output.payload.toString('utf-8'), message);
+
+              assert.ok(output.sk);
+              assert.ok(output.ciphertext);
+              assert.ok(output.nonce);
+
+              magic.pwdDecrypt.aead(pwd, output.ciphertext, output.nonce.slice(1), (err, plaintext) => {
+                assert.ok(err);
+                assert.equal(err.message, 'Libsodium error: TypeError: invalid nonce length');
 
                 done();
               });
