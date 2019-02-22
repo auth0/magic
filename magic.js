@@ -678,13 +678,15 @@ function hash(algorithm) {
 
 
 
-exports = module.exports = new Object();
-module.exports.auth      = new Object();
-module.exports.verify    = new Object();
-module.exports.encrypt   = new Object();
-module.exports.decrypt   = new Object();
-module.exports.password  = new Object();
-module.exports.util      = new Object();
+exports = module.exports  = new Object();
+module.exports.auth       = new Object();
+module.exports.verify     = new Object();
+module.exports.encrypt    = new Object();
+module.exports.decrypt    = new Object();
+module.exports.password   = new Object();
+module.exports.util       = new Object();
+module.exports.pwdEncrypt = new Object();
+module.exports.pwdDecrypt = new Object();
 
 
 /***
@@ -988,11 +990,18 @@ function sync(message, sk, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.decrypt.aead = (s, c, n, cb) => { return sodium.ready.then(() => { return dsync(s, c, n, cb); } ) };;
+module.exports.decrypt.aead = (s, c, n, cb) => {
+  return sodium.ready.then(() => {
+    if (!s) {
+      const done = ret(cb);
+      return done(new Error('Cannot decrypt without a key'));
+    }
+    return dsync(s, c, n, cb);
+  } )
+};
+
 function dsync(sk, ciphertext, nonce, cb) {
   const done = ret(cb);
-
-  if (!sk) { return done(new Error('Cannot decrypt without a key')); }
 
   let isk;
   [ ciphertext, nonce, sk ] = cparse(ciphertext, nonce, sk);
@@ -1009,6 +1018,71 @@ function dsync(sk, ciphertext, nonce, cb) {
   return done(null, convert(plaintext));
 }
 
+module.exports.pwdDecrypt.aead = (p, c, n, cb) => {
+  return sodium.ready.then(() => {
+    if (typeof p === 'function') {
+      cb = p;
+      p = null;
+    }
+    const done = ret(cb);
+
+    if (!p) { return done(new Error('Cannot decrypt without a password')); }
+
+    let s;
+    [ c ] = cparse(c);
+    salt = c.slice(0, sodium.crypto_pwhash_SALTBYTES);
+    try {
+      s = sodium.crypto_pwhash(
+        KEY_SIZE,
+        p,
+        salt,
+        sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+        sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+        sodium.crypto_pwhash_ALG_DEFAULT
+      );
+    } catch(ex) {
+      return done(new Error('Libsodium error: ' +  ex))
+    }
+    c = c.slice(sodium.crypto_pwhash_SALTBYTES);
+    return dsync(s, c, n, cb);
+  })
+};
+
+module.exports.pwdEncrypt.aead = (m, p, cb) => {
+  return sodium.ready.then(() => {
+    if (typeof p === 'function') {
+      cb = p;
+      p = null;
+    }
+    const done = ret(cb);
+
+    if (!p) { return done(new Error('Cannot encrypt without a password')); }
+    let sk;
+    const salt = crypto.randomBytes(sodium.crypto_pwhash_SALTBYTES)
+
+    try {
+      sk = sodium.crypto_pwhash(
+        KEY_SIZE,
+        p,
+        salt,
+        sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+        sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+        sodium.crypto_pwhash_ALG_DEFAULT
+      );
+    } catch(ex) {
+      return done(new Error('Libsodium error: ' +  ex))
+    }
+
+    return sync(m, Buffer.from(sk), (err, aead) => {
+      const done = ret(cb);
+      if (err) {
+        return err;
+      }
+      aead.ciphertext = Buffer.concat([salt, aead.ciphertext])
+      return done(null, aead);
+    })
+  });
+};
 
 /***
  * password.hash

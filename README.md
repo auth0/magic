@@ -409,6 +409,63 @@ magic.decrypt.aead(sk, ciphertext, nonce)
 });
 ```
 
+#### magic.pwdEncrypt.aead | magic.pwdDecrypt.aead
+Implements the same cryptographic protocols as magic.encrypt.aead/magic.decrypt.aead. The only difference is that pwdEncrypt.aead/pwdDecrypt.aead derive a key from a given password instead of requiring the key as an input.
+
+```js
+// password
+const pwd = 'randomPassword';
+
+// callback
+magic.pwdEncrypt.aead(message, pwd, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:        'xsalsa20poly1305',
+  //   sk:         <Buffer d7 d5 dd 2c 2a eb f1 ... >,
+  //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+  //   nonce:      <Buffer b3 4f 59 af 96 e4 4c ... >,
+  //   ciphertext: <Buffer 3c 3d 0e 8b c6 34 83 ... > }
+});
+
+// promise
+magic.pwdEncrypt.aead(message, pwd)
+  .then((output) => {
+    console.log(output);
+    // { alg:        'xsalsa20poly1305',
+    //   sk:         <Buffer d7 d5 dd 2c 2a eb f1 ... >,
+    //   payload:    <Buffer 41 20 73 63 72 65 61 ... >,
+    //   nonce:      <Buffer b3 4f 59 af 96 e4 4c ... >,
+    //   ciphertext: <Buffer 3c 3d 0e 8b c6 34 83 ... > }
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+Decryption then returns the plaintext directly, without the metadata.
+
+```js
+// password
+const pwd = 'randomPassword';
+
+// callback
+magic.pwdDecrypt.aead(pwd, ciphertext, nonce, (err, plaintext) => {
+  if (err) { return cb(err); }
+  console.log(plaintext);
+  // <Buffer 41 20 73 63 72 65 61 ... >
+});
+
+// promise
+magic.pwdDecrypt.aead(pwd, ciphertext, nonce)
+  .then((plaintext) => {
+    console.log(plaintext);
+    // <Buffer 41 20 73 63 72 65 61 ... >
+  }).catch((err) => {
+    return reject(err);
+  });
+});
+```
+
 #### magic.util.hash
 
 Implements `SHA2-384` (henceforth just `SHA384`) using OpenSSL through `crypto`. Unlike `SHA256` and `SHA512` - which are available through the alternative api - `SHA384` is resistant to length extension attacks, a capability which may be relevant in some circumstances. The `SHA2` family is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf), and the most commonly used fast, cryptographically secure hash function.
