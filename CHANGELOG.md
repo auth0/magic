@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.3.0 - 2019-02-21
+
+### Adds
+
+- Adds support for encryption/decryption with user supplied password with two
+  new functions: pwdEncrypt.aead(), pwdDecrypt.aead()
+
 ## v2.2.0 - 2019-01-31
 
 ### Adds
