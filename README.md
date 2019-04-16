@@ -661,7 +661,7 @@ For decryption, the `encryptStream.key` should be passed to `magic.DecryptStream
 
 #### magic.PwdEncryptStream || magic.PwdDecryptStream
 
-Implements the same cryptographic protocols as magic.EncryptStream/magic.DecryptStream. The only difference is that PwdEncryptStream and PwdDecryptStream derive a key from a given password instead of requiring the key as an input
+Implements the same cryptographic protocols as magic.EncryptStream/magic.DecryptStream. The only difference is that PwdEncryptStream and PwdDecryptStream derive a key from a given password instead of requiring the key as an input. Only use these functions when encryption derived from a password is required. Otherwise, magic.EncryptStream/magic.DecryptStream is a more secure choice.
 
 ```js
   // key generation
