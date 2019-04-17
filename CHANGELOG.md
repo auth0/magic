@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.3.1 - 2019-04-17
+
+### Misc
+
+- Updates README
+- Updates bcrypt to v3.0.6
+
 ## v2.3.0 - 2019-02-21
 
 ### Adds
