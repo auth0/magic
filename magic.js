@@ -1221,6 +1221,41 @@ function uid(sec, cb) {
   }).catch((err) => { return done(err); })
 }
 
+/**
+ * Provides timing safe comparisons of two strings to prevent
+ * timing based attacks. Returns true if the strings are the
+ * same and false if not.
+ * @function
+ * @api public
+ * 
+ * @param {string} input - The first string to check
+ * @param {string} ref - The reference string to check against
+ * @returns {Boolean} - true if they match, false otherwise
+ */
+module.exports.util.timingSafeCompare = (input, ref) => {
+  inputIsString = typeof input === 'string' || input instanceof String;
+  refIsString = typeof ref === 'string' || ref instanceof String;
+  if (!inputIsString || !refIsString) throw new TypeError('Inputs must be Strings');
+  
+  let inputLength = Buffer.byteLength(input);
+  let refLength = Buffer.byteLength(ref);
+
+  /*  Allocate two buffers, making the input buffer the length. 
+  Continue the comparison of the two buffers 
+  with the length evaluation failing at the end to not give
+  away the length of the reference string.  
+  */
+  let inputBuffer = Buffer.alloc(inputLength);
+  inputBuffer.write(input, 0, inputLength);
+  let refBuffer = Buffer.alloc(inputLength);
+
+  // write the reference string, to the size of the inputString
+  // this could lead to false positives, but we'll catch that with a length
+  // check at the end. 
+  refBuffer.write(ref, 0, inputLength);
+  // check buffers and their lengths
+  return cnstcomp(inputBuffer, refBuffer) && inputLength === refLength;
+};
 
 /*****************
  *    Streams    *
