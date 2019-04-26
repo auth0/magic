@@ -1221,6 +1221,23 @@ function uid(sec, cb) {
   }).catch((err) => { return done(err); })
 }
 
+/**
+ * Provides timing safe comparisons of two strings to prevent
+ * timing based attacks. Returns a Promise of a true Boolean
+ * value if strings are the same.
+ * @function
+ * @api public
+ * 
+ * @param {string} inputString - The first string to check
+ * @param {string} referenceString - The reference string to check against
+ * @returns {Promise} Returns a promise of a Boolean value
+ */
+module.exports.util.timingSafeCompare = async function (inputString, referenceString) {
+  let referencePromise = module.exports.util.hash(referenceString);
+  let inputPromise = module.exports.util.hash(inputString);
+  const hashes = await Promise.all([referencePromise, inputPromise]);
+  return cnstcomp(hashes[0].hash, hashes[1].hash);
+};
 
 /*****************
  *    Streams    *

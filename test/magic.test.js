@@ -1168,6 +1168,42 @@ describe('magic tests', () => {
         });
       });
 
+      describe('timingSafeCompare', () => {
+        it('should return true when strings are the same', (done) => {
+          const str1 = 'This is the same input';
+          const str2 = str1;
+
+          magic.util.timingSafeCompare(str1, str2).then(function (result) {
+            assert(result);
+            done();
+          });
+        });
+
+        it('should return false when strings are not the same', (done) => {
+          const str1 = 'This is the same input';
+          const str2 = 'other string';
+
+          magic.util.timingSafeCompare(str1, str2).then(function (result) {
+            assert(!result);
+            done();
+          });
+        });
+
+        it('should work for a large number of unicode characters', (done) => {
+          var str1;
+          // 500 was chosen to cover many unicode characters, even though a much
+          // smaller subset is likely to be used.
+          for (i=0; i < 500; i++) {
+            str1 += String.fromCharCode(i);
+          }
+          const str2 = str1;
+
+          magic.util.timingSafeCompare(str1, str2).then(function (result) {
+            assert(result);
+            done();
+          });
+        });
+      });
 
       describe('rand', () => {
 

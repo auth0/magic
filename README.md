@@ -494,6 +494,35 @@ magic.util.hash(message)
 });
 ```
 
+#### magic.util.timingSafeCompare
+
+Implements a timing safe comparision between two strings.  The comparison is completed through hashing both strings using the core `magic.util.hash` function in parallel. The two hash buffers are then compared using the timing safe buffer comparision using `crypto` module (falling back to `libsodium` if `crypto` is not available). 
+
+*Recommended use: Best used when comparing sensitive information that is transmitted in clear text but is not practical to store, and encrypt or hash. An example would be to check whether an input string matches an environment variable. When in doubt, use encryption and hashing functions.*
+
+```js
+//promise
+magic.util.timingSafeCompare(inputString, referenceString).then((result) => {
+  // result: 'true' or 'false'
+  // do stuff based on true/false
+  }).catch((err) => {
+    // handle error
+  });
+
+// async/await
+try {
+  let stringsAreTheSame = await timingSafeCompare(inputString, referenceString);
+  if (stringsAreTheSame) {
+    // do stuff based on true/false
+  }
+} catch (err) {
+  // handle error
+}
+
+
+```
+
+
 #### magic.password.hash | magic.verify.password
 
 Implements `argon2id` password hashing using `libsodium.js`. The winner of the [Password Hashing Competition](https://password-hashing.net/) and now the [OWASP recommendation](https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet#Leverage_an_adaptive_one-way_function), `argon2id` is robust against both memory tradeoff and side-channel attacks. The output of the `argon2id` function is encoded with a prefix and other metadata, and so `output.hash` is encoded as a string, not a raw binary buffer as is normal for the rest of the `magic` api. Nor is the raw password itself returned.
