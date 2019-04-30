@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.4.0 - 2019-04-30
+
+### Adds
+- Adds support for timing safe string comparisons via the new function
+  magic.util.timingSafeCompare()
+
 ## v2.3.1 - 2019-04-17
 
 ### Misc
