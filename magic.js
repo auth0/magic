@@ -1240,19 +1240,22 @@ module.exports.util.timingSafeCompare = (input, ref) => {
   let inputLength = Buffer.byteLength(input);
   let refLength = Buffer.byteLength(ref);
 
-  /*  Allocate two buffers, making the input buffer the length. 
+  /* 
+  Allocate two buffers, making the input buffer the length. 
   Continue the comparison of the two buffers 
   with the length evaluation failing at the end to not give
   away the length of the reference string.  
   */
   let inputBuffer = Buffer.alloc(inputLength);
-  inputBuffer.write(input, 0, inputLength);
+  inputBuffer.write(input);
   let refBuffer = Buffer.alloc(inputLength);
 
-  // write the reference string, to the size of the inputString
-  // this could lead to false positives, but we'll catch that with a length
-  // check at the end. 
-  refBuffer.write(ref, 0, inputLength);
+  /* 
+  Write the reference string, to the size of the inputString.
+  This could lead to false positives, when substrings are 
+  involved but we'll catch those with a length check at the end. 
+  */  
+  refBuffer.write(ref);
   // check buffers and their lengths
   return cnstcomp(inputBuffer, refBuffer) && inputLength === refLength;
 };

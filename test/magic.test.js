@@ -1256,10 +1256,10 @@ describe('magic tests', () => {
           var values = performanceMatrix.concat();
           values.sort();
           var lowerq = values[Math.floor((values.length / 4))];
-          var upperq = values[Math.ceil((values.length * (3/4)))];
+          var upperq = values[Math.ceil((values.length * (3 / 4)))];
           var iqr = upperq - lowerq;
-          var maxValue = upperq + iqr*1.5;
-          var minValue = lowerq - iqr*1.5;
+          var maxValue = upperq + iqr * 1.5;
+          var minValue = lowerq - iqr * 1.5;
 
           var outliers = values.filter((x) => {
             return (x >= maxValue) || (x <= minValue);
