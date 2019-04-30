@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
 const assert = require('assert');
 const fs = require('fs');
-
+const { performance } = require('perf_hooks');
 
 describe('magic tests', () => {
 
@@ -1168,6 +1168,108 @@ describe('magic tests', () => {
         });
       });
 
+      describe('timingSafeCompare', () => {
+        it('should return true when strings are the same', (done) => {
+          const str1 = 'This is the same input';
+          const str2 = str1;
+          assert(magic.util.timingSafeCompare(str1, str2));
+          done();
+        });
+
+        it('should return true when strings are the same literals', (done) => {
+          const str1 = 'This is the same input';
+          const str2 = 'This is the same input';
+          assert(magic.util.timingSafeCompare(str1, str2));
+          done();
+        });
+
+        it('should return false when strings are not the same', (done) => {
+          const str1 = 'This is the same input';
+          const str2 = 'other string';
+          assert(!magic.util.timingSafeCompare(str1, str2));
+          done();
+        });
+
+        it('should return false when ref string is a substring of the input', (done) => {
+          const str1 = 'This is the same input';
+          const str2 = 'This is the same';
+          assert(!magic.util.timingSafeCompare(str1, str2));
+          done();
+        });
+
+        it('should return false when input string is a substring of the ref', (done) => {
+          const str1 = 'This is the ';
+          const str2 = 'This is the same';
+          assert(!magic.util.timingSafeCompare(str1, str2));
+          done();
+        });
+
+        it('should return false when strings are not the same but are of the same length', (done) => {
+          const str1 = 'This is the same input';
+          const str2 = 'This isnt the same tho';
+          assert(!magic.util.timingSafeCompare(str1, str2));
+          done();
+        });
+
+        it('should work for a large number of unicode characters', (done) => {
+          var str1;
+          // Iterate over all UTF-16 characters
+          for (i=0; i < 65535; i++) {
+            str1 += String.fromCharCode(i);
+          }
+          const str2 = str1;
+          assert(magic.util.timingSafeCompare(str1, str2));
+          done();
+        });
+
+        it('should work with a null terminated character', (done) => {
+          const str1 = 'This is the same\0\0\0';
+          const str2 = 'This is the same yo';
+          assert(str1.length === str2.length);
+          assert(!magic.util.timingSafeCompare(str1, str2));
+          done();
+        });
+
+        it('should not make the length easily discoverable', (done) => {
+          var performanceMatrix = [];
+          var str1 = 'abcdefghijklmnopqrstuvwxyz';
+          var str2 = '';
+
+          // Check the timing of each string and 
+          // compare with the reference timing to see
+          // if it is easily discernable
+          for (i=0; i < 1000; i++) {
+            var t0 = performance.now();
+            magic.util.timingSafeCompare(str2, str1);
+            var t1 = performance.now();
+            performanceMatrix[i] = t1-t0;
+            // Any character is fine
+            str2 += String.fromCharCode(i);
+          }
+          var reference = performanceMatrix[str1.length];
+
+          // We will assume items that are outside of the whiskers
+          // of a normal distribution is considered discernable
+          // (0.7% of the values in a normal distribution)
+          // https://en.wikipedia.org/wiki/Interquartile_range
+           
+          var values = performanceMatrix.concat();
+          values.sort();
+          var lowerq = values[Math.floor((values.length / 4))];
+          var upperq = values[Math.ceil((values.length * (3 / 4)))];
+          var iqr = upperq - lowerq;
+          var maxValue = upperq + iqr * 1.5;
+          var minValue = lowerq - iqr * 1.5;
+
+          var outliers = values.filter((x) => {
+            return (x >= maxValue) || (x <= minValue);
+          });
+
+          assert(!outliers.includes(reference));
+          done();
+        });
+
+      });
 
       describe('rand', () => {
 
