@@ -16,6 +16,7 @@
     "test": "./node_modules/.bin/mocha --delay ./test/magic.test.js ./test/magic.test.vectors.js"
   },
   "devDependencies": {
+    "eslint-plugin-security": "^1.4.0",
     "mocha": "^5.1.1"
   }
 }
