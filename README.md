@@ -494,9 +494,38 @@ magic.util.hash(message)
 });
 ```
 
+#### magic.util.rsaKeypairGen
+
+Generates an RSA public/private key pair. The public key is encoded using a SubjectPublicKeyInfo(SPKI) structure. For node 10+, it uses the built-in `generateKeyPair` from `crypto` library. For older node versions, it generates the keypair using OpenSSL directly.
+
+```js
+// callback
+magic.util.rsaKeypairGen((err, keypair) => {
+  if (err) { return cb(err); }
+  console.log(keypair)
+  // {
+  //   sk: '-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBi...6gA=\n-----END RSA PRIVATE KEY-----\n',
+  //   pk: '-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQE...ApIDAQAB\n-----END RSA PUBLIC KEY-----\n'
+  //  }
+});
+
+// promise
+magic.util.rsaKeypairGen()
+.then((keypair) => {
+  console.log(keypair)
+  // {
+  //   sk: '-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBi...6gA=\n-----END RSA PRIVATE KEY-----\n',
+  //   pk: '-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQE...ApIDAQAB\n-----END RSA PUBLIC KEY-----\n'
+  //  }
+})
+.catch((err) => {
+  return reject(err);
+});
+```
+
 #### magic.util.timingSafeCompare
 
-Implements a timing safe comparision between two strings. The comparision is completed using the timing safe buffer comparision using `crypto` module (falling back to `libsodium` if `crypto` is not available) and string length checks. 
+Implements a timing safe comparision between two strings. The comparision is completed using the timing safe buffer comparision using `crypto` module (falling back to `libsodium` if `crypto` is not available) and string length checks.
 
 *Recommended use: Best used when comparing sensitive information that is transmitted in clear text but is not practical to store, and encrypt or hash. An example would be to check whether an input string matches an environment variable. When in doubt, use encryption and hashing functions.*
 

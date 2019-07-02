@@ -1260,6 +1260,53 @@ module.exports.util.timingSafeCompare = (input, ref) => {
   return cnstcomp(inputBuffer, refBuffer) && inputLength === refLength;
 };
 
+
+/*
+ * rsaKeypairGen
+ *
+ * Get an RSA private/public keypair
+ *
+ * @function
+ * @api public
+ *
+ * @param {Function} cb
+ * @returns {Callback|Promise}
+ */
+
+module.exports.util.rsaKeypairGen = (cb) => {
+  const done  = ret(cb)
+
+  if (crypto.generateKeyPair) { // node >= 10
+    return new Promise((resolve, reject) => {
+      crypto.generateKeyPair('rsa', {
+        modulusLength: 2048,
+        publicExponent: 65537,
+        publicKeyEncoding: {
+          type: 'spki',
+          format: 'pem'
+        },
+        privateKeyEncoding: {
+          type: 'pkcs1',
+          format: 'pem'
+        }
+      }, (err, publicKey, privateKey) => {
+        return resolve(done(null, {sk: privateKey, pk: publicKey}));
+      });
+    })
+  } else {
+    return new Promise((resolve, reject) => {
+      extcrypto.keygen((err, sk, pk) => {
+        if (err) { return reject(done(new Error(err.message))); }
+
+        extcrypto.extractSPKI(sk, (err, pk) => {
+          if (err) { return reject(done(new Error(err.message))); }
+          return resolve(done(null, {sk: sk, pk: pk}));
+        });
+      });
+    })
+  }
+};
+
 /*****************
  *    Streams    *
  *****************/

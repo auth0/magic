@@ -1235,7 +1235,7 @@ describe('magic tests', () => {
           var str1 = 'abcdefghijklmnopqrstuvwxyz';
           var str2 = '';
 
-          // Check the timing of each string and 
+          // Check the timing of each string and
           // compare with the reference timing to see
           // if it is easily discernable
           for (i=0; i < 1000; i++) {
@@ -1252,7 +1252,7 @@ describe('magic tests', () => {
           // of a normal distribution is considered discernable
           // (0.7% of the values in a normal distribution)
           // https://en.wikipedia.org/wiki/Interquartile_range
-           
+
           var values = performanceMatrix.concat();
           values.sort();
           var lowerq = values[Math.floor((values.length / 4))];
@@ -1269,6 +1269,35 @@ describe('magic tests', () => {
           done();
         });
 
+      });
+
+      describe('rsaKeypairGen', () => {
+
+        it('should return an object containing a public and a private key - callback api', (done) => {
+          magic.util.rsaKeypairGen((err, keypair) => {
+            assert.ok(!err);
+            assert.ok(keypair);
+            assert.ok(keypair.sk)
+            assert.ok(keypair.pk)
+
+            assert.ok(keypair.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'))
+            assert.ok(keypair.pk.startsWith('-----BEGIN PUBLIC KEY-----'))
+
+            done();
+          });
+        });
+
+        it('should return an object containing a public and a private key - promise api', (done) => {
+          magic.util.rsaKeypairGen().then((keypair) => {
+            assert.ok(keypair);
+            assert.ok(keypair.sk)
+            assert.ok(keypair.pk)
+            assert.ok(keypair.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'))
+            assert.ok(keypair.pk.startsWith('-----BEGIN PUBLIC KEY-----'))
+
+            done();
+          }).catch((err) => { assert.ok(!err); });
+        });
       });
 
       describe('rand', () => {
