@@ -105,10 +105,44 @@ namespace extcrypto {
     return ret(isolate, cb, rval);
   }
 
+  void extractSPKI(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate   = args.GetIsolate();
+    Local<String> pem  = Local<String>::Cast(args[0]);
+    Local<Function> cb = Local<Function>::Cast(args[1]);
+
+    String::Utf8Value ipem(pem);
+    char* skey(*ipem);
+
+    BIO* bio = BIO_new(BIO_s_mem());
+    RSA* rsa = RSA_new();
+
+    BIO_write(bio, skey, strlen(skey));
+    PEM_read_bio_RSAPrivateKey(bio, &rsa, NULL, NULL);
+    PEM_write_bio_RSA_PUBKEY(bio, rsa);
+
+    uint64_t kl = BIO_pending(bio);
+    char* pkey  = (char *) calloc(kl + 1, 1);
+
+    if (!pkey || (kl == UINT64_MAX)) {
+      free(pkey); // in case overflow has calloc return a non-null pointer to zero memory
+      return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key"));
+    }
+
+    BIO_read(bio, pkey, kl);
+
+    BIO_vfree(bio);
+    RSA_free(rsa);
+
+    Local<String> rval = String::NewFromUtf8(isolate, pkey);
+    free(pkey);
+
+    return ret(isolate, cb, rval);
+  }
 
   void init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "keygen", keygen);
     NODE_SET_METHOD(exports, "extract", extract);
+    NODE_SET_METHOD(exports, "extractSPKI", extractSPKI);
   }
 
 
