@@ -55,6 +55,9 @@ namespace extcrypto {
 
     if (!key || (kl == UINT64_MAX)) {
       free(key); // in case overflow has calloc return a non-null pointer to zero memory
+      BIO_vfree(bio);
+      RSA_free(rsa);
+      BN_free(exp);
       return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key"));
     }
 
@@ -91,6 +94,8 @@ namespace extcrypto {
 
     if (!pkey || (kl == UINT64_MAX)) {
       free(pkey); // in case overflow has calloc return a non-null pointer to zero memory
+      BIO_vfree(bio);
+      RSA_free(rsa);
       return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key"));
     }
 
@@ -125,6 +130,8 @@ namespace extcrypto {
 
     if (!pkey || (kl == UINT64_MAX)) {
       free(pkey); // in case overflow has calloc return a non-null pointer to zero memory
+      BIO_vfree(bio);
+      RSA_free(rsa);
       return eret(isolate, cb, String::NewFromUtf8(isolate, "Unable to generate key"));
     }
 
