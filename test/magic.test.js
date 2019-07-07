@@ -1277,11 +1277,11 @@ describe('magic tests', () => {
           magic.util.rsaKeypairGen((err, keypair) => {
             assert.ok(!err);
             assert.ok(keypair);
-            assert.ok(keypair.sk)
-            assert.ok(keypair.pk)
+            assert.ok(keypair.privateKey)
+            assert.ok(keypair.publicKey)
 
-            assert.ok(keypair.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'))
-            assert.ok(keypair.pk.startsWith('-----BEGIN PUBLIC KEY-----'))
+            assert.ok(keypair.privateKey.startsWith('-----BEGIN RSA PRIVATE KEY-----'))
+            assert.ok(keypair.publicKey.startsWith('-----BEGIN PUBLIC KEY-----'))
 
             done();
           });
@@ -1290,10 +1290,11 @@ describe('magic tests', () => {
         it('should return an object containing a public and a private key - promise api', (done) => {
           magic.util.rsaKeypairGen().then((keypair) => {
             assert.ok(keypair);
-            assert.ok(keypair.sk)
-            assert.ok(keypair.pk)
-            assert.ok(keypair.sk.startsWith('-----BEGIN RSA PRIVATE KEY-----'))
-            assert.ok(keypair.pk.startsWith('-----BEGIN PUBLIC KEY-----'))
+            assert.ok(keypair.privateKey)
+            assert.ok(keypair.publicKey)
+
+            assert.ok(keypair.privateKey.startsWith('-----BEGIN RSA PRIVATE KEY-----'))
+            assert.ok(keypair.publicKey.startsWith('-----BEGIN PUBLIC KEY-----'))
 
             done();
           }).catch((err) => { assert.ok(!err); });
