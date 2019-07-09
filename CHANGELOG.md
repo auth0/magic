@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v3.0.0 - 2019-07-09
+
+### Changes
+- Renames the output of magic.util.rsaKeypairGen() from
+{ sk: ... , pk ...} to { privateKey: ... , publicKey: ...}
+
 ## v2.5.0 - 2019-07-03
 
 ### Adds
