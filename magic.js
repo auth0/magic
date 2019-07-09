@@ -1290,17 +1290,17 @@ module.exports.util.rsaKeypairGen = (cb) => {
           format: 'pem'
         }
       }, (err, publicKey, privateKey) => {
-        return resolve(done(null, {sk: privateKey, pk: publicKey}));
+        return resolve(done(null, {privateKey, publicKey}));
       });
     })
   } else {
     return new Promise((resolve, reject) => {
-      extcrypto.keygen((err, sk, pk) => {
+      extcrypto.keygen((err, privateKey) => {
         if (err) { return reject(done(new Error(err.message))); }
 
-        extcrypto.extractSPKI(sk, (err, pk) => {
+        extcrypto.extractSPKI(privateKey, (err, publicKey) => {
           if (err) { return reject(done(new Error(err.message))); }
-          return resolve(done(null, {sk: sk, pk: pk}));
+          return resolve(done(null, {privateKey, publicKey}));
         });
       });
     })

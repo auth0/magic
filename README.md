@@ -504,8 +504,8 @@ magic.util.rsaKeypairGen((err, keypair) => {
   if (err) { return cb(err); }
   console.log(keypair)
   // {
-  //   sk: '-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBi...6gA=\n-----END RSA PRIVATE KEY-----\n',
-  //   pk: '-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQE...ApIDAQAB\n-----END RSA PUBLIC KEY-----\n'
+  //   privateKey: '-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBi...6gA=\n-----END RSA PRIVATE KEY-----\n',
+  //   publicKey: '-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQE...ApIDAQAB\n-----END RSA PUBLIC KEY-----\n'
   //  }
 });
 
@@ -514,8 +514,8 @@ magic.util.rsaKeypairGen()
 .then((keypair) => {
   console.log(keypair)
   // {
-  //   sk: '-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBi...6gA=\n-----END RSA PRIVATE KEY-----\n',
-  //   pk: '-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQE...ApIDAQAB\n-----END RSA PUBLIC KEY-----\n'
+  //   privateKey: '-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBi...6gA=\n-----END RSA PRIVATE KEY-----\n',
+  //   publicKey: '-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQE...ApIDAQAB\n-----END RSA PUBLIC KEY-----\n'
   //  }
 })
 .catch((err) => {
