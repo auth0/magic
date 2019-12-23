@@ -1,0 +1,36 @@
+version: 2.1
+workflows:
+  main:
+    jobs:
+      - unit-tests:
+          version: 8
+      - unit-tests:
+          version: 10
+jobs:
+  unit-tests:
+    parameters:
+      version:
+        type: integer
+    docker:
+      - image: circleci/node:<< parameters.version >>
+    steps:
+      - checkout
+      - run:
+          name: Update NPM
+          command: 'sudo npm update -g npm'
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: Install Dependencies
+          command: npm install --build-from-source
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run:
+          name: Run Tests
+          command: npm test
+          when: always
