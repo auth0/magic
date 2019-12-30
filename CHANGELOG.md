@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## v3.1.0 - 2019-12-31
+
+### Adds
+- Adds support for Node 12
+
+### Misc
+
+- Updates the libsodium library to v0.7.6. The previous version was removing
+  the unhandledRejection listener which was causing process.exit(1) without any
+  logging
+
+
 ## v3.0.0 - 2019-07-09
 
 ### Changes
