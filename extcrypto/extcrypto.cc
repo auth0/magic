@@ -6,12 +6,19 @@
 #include <openssl/pem.h>
 #include <openssl/bio.h>
 #include <openssl/bn.h>
+#include <nan.h>
 
 namespace extcrypto {
 
+  using Nan::Callback;
+  using Nan::FunctionCallbackInfo;
+  using Nan::GetFunction;
+  using Nan::New;
+  using Nan::Set;
+  using Nan::Utf8String;
+
   using v8::Exception;
   using v8::Function;
-  using v8::FunctionCallbackInfo;
   using v8::Isolate;
   using v8::Local;
   using v8::Null;
@@ -23,20 +30,22 @@ namespace extcrypto {
   void ret(Isolate* isolate, Local<Function> cb, Local<String> statement) {
     const uint64_t argc = 2;
     Local<Value> argv[argc] = { Null(isolate), statement };
+    Nan::Callback callback(cb);
 
-    cb->Call(Null(isolate), argc, argv);
+    callback.Call(v8::Object::New(isolate), argc, argv);
   }
 
 
   void eret(Isolate* isolate, Local<Function> cb, Local<String> statement) {
     const uint64_t argc = 1;
     Local<Value> argv[argc] = { Exception::Error(statement) };
+    Nan::Callback callback(cb);
 
-    cb->Call(Null(isolate), argc, argv);
+    callback.Call(v8::Object::New(isolate), argc, argv);
   }
 
 
-  void keygen(const FunctionCallbackInfo<Value>& args) {
+  void keygen(const Nan::FunctionCallbackInfo<Value>& args) {
     Isolate* isolate   = args.GetIsolate();
     Local<Function> cb = Local<Function>::Cast(args[0]);
 
@@ -74,12 +83,12 @@ namespace extcrypto {
   }
 
 
-  void extract(const FunctionCallbackInfo<Value>& args) {
+  void extract(const Nan::FunctionCallbackInfo<Value>& args) {
     Isolate* isolate   = args.GetIsolate();
     Local<String> pem  = Local<String>::Cast(args[0]);
     Local<Function> cb = Local<Function>::Cast(args[1]);
 
-    String::Utf8Value ipem(pem);
+    Nan::Utf8String ipem(pem);
     char* skey(*ipem);
 
     BIO* bio = BIO_new(BIO_s_mem());
@@ -110,12 +119,12 @@ namespace extcrypto {
     return ret(isolate, cb, rval);
   }
 
-  void extractSPKI(const FunctionCallbackInfo<Value>& args) {
+  void extractSPKI(const Nan::FunctionCallbackInfo<Value>& args) {
     Isolate* isolate   = args.GetIsolate();
     Local<String> pem  = Local<String>::Cast(args[0]);
     Local<Function> cb = Local<Function>::Cast(args[1]);
 
-    String::Utf8Value ipem(pem);
+    Nan::Utf8String ipem(pem);
     char* skey(*ipem);
 
     BIO* bio = BIO_new(BIO_s_mem());
@@ -146,12 +155,26 @@ namespace extcrypto {
     return ret(isolate, cb, rval);
   }
 
-  void init(Local<Object> exports) {
-    NODE_SET_METHOD(exports, "keygen", keygen);
-    NODE_SET_METHOD(exports, "extract", extract);
-    NODE_SET_METHOD(exports, "extractSPKI", extractSPKI);
-  }
+  void init(v8::Local<v8::Object> exports) {
+    v8::Local<v8::Context> context = exports->CreationContext();
+    exports->Set(context,
+                 Nan::New("keygen").ToLocalChecked(),
+                 Nan::New<v8::FunctionTemplate>(keygen)
+                     ->GetFunction(context)
+                     .ToLocalChecked());
 
+    exports->Set(context,
+                 Nan::New("extract").ToLocalChecked(),
+                 Nan::New<v8::FunctionTemplate>(extract)
+                     ->GetFunction(context)
+                     .ToLocalChecked());
+
+    exports->Set(context,
+                 Nan::New("extractSPKI").ToLocalChecked(),
+                 Nan::New<v8::FunctionTemplate>(extractSPKI)
+                     ->GetFunction(context)
+                     .ToLocalChecked());
+  }
 
   NODE_MODULE(NODE_GYP_MODULE_NAME, init)
 }
