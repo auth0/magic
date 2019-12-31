@@ -203,8 +203,7 @@ function rsaverify(digest, padding) {
 
     if (!pk) { return done(new Error('Cannot verify without a key')); }
 
-    let payload, received, ipk;
-    [ payload ]  = iparse(message);
+    let received;
     [ received ] = cparse(signature);
 
     return keying(pk).then((ipk) => {
@@ -325,8 +324,7 @@ function vmac(algorithm) {
 
     if (!sk) { return done(new Error('Cannot verify without a key')); }
 
-    let payload, received, isk;
-    [ payload ]      = iparse(message);
+    let received, isk;
     [ sk, received ] = cparse(sk, tag);
 
     isk = sk;
@@ -549,7 +547,7 @@ function gcm(keysize) {
     try {
       iv = iv || crypto.randomBytes(12);
 
-      const cipher = crypto.createCipheriv('aes-' + keysize + '-gcm', sk, iv);
+      const cipher = crypto.createCipheriv('aes-' + keysize + '-gcm', isk, iv);
       ciphertext   = Buffer.concat([ cipher.update(payload), cipher.final() ]);
       tag          = cipher.getAuthTag();
     } catch (ex) {
@@ -558,7 +556,7 @@ function gcm(keysize) {
 
     return done(null, convert({
       alg:        'aes' + keysize + 'gcm',
-      sk:         sk,
+      sk:         isk,
       payload:    payload,
       iv:         iv,
       ciphertext: ciphertext,
@@ -702,7 +700,7 @@ module.exports.pwdDecrypt = new Object();
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.auth.sign = (m, s, cb) => { return sodium.ready.then(() => { return sign(m, s, cb); } ) }
+module.exports.auth.sign = (m, s, cb) => { return sodium.ready.then(() => { return sign(m, s, cb); } ) };
 function sign(message, sk, cb) {
   if (typeof sk === 'function') {
     cb = sk;
@@ -757,7 +755,7 @@ function sign(message, sk, cb) {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-module.exports.verify.sign = (m, p, s, i, cb) => { return sodium.ready.then(() => { return vsign(m, p, s, i, cb); } ) }
+module.exports.verify.sign = (m, p, s, i, cb) => { return sodium.ready.then(() => { return vsign(m, p, s, i, cb); } ) };
 function vsign(message, pk, signature, ispk, cb) {
   if (typeof ispk === 'function') {
     cb   = ispk;
@@ -1028,7 +1026,7 @@ module.exports.pwdDecrypt.aead = (p, c, n, cb) => {
 
     if (!p) { return done(new Error('Cannot decrypt without a password')); }
 
-    let s;
+    let s, salt;
     [ c ] = cparse(c);
     salt = c.slice(0, sodium.crypto_pwhash_SALTBYTES);
     try {
@@ -1041,7 +1039,7 @@ module.exports.pwdDecrypt.aead = (p, c, n, cb) => {
         sodium.crypto_pwhash_ALG_DEFAULT
       );
     } catch(ex) {
-      return done(new Error('Libsodium error: ' +  ex))
+      return done(new Error('Libsodium error: ' +  ex));
     }
     c = c.slice(sodium.crypto_pwhash_SALTBYTES);
     return dsync(s, c, n, cb);
@@ -1227,34 +1225,36 @@ function uid(sec, cb) {
  * same and false if not.
  * @function
  * @api public
- * 
+ *
  * @param {string} input - The first string to check
  * @param {string} ref - The reference string to check against
  * @returns {Boolean} - true if they match, false otherwise
  */
 module.exports.util.timingSafeCompare = (input, ref) => {
+  let inputString, refIsString;
+
   inputIsString = typeof input === 'string' || input instanceof String;
   refIsString = typeof ref === 'string' || ref instanceof String;
   if (!inputIsString || !refIsString) throw new TypeError('Inputs must be Strings');
-  
+
   let inputLength = Buffer.byteLength(input);
   let refLength = Buffer.byteLength(ref);
 
-  /* 
-  Allocate two buffers, making the input buffer the length. 
-  Continue the comparison of the two buffers 
+  /*
+  Allocate two buffers, making the input buffer the length.
+  Continue the comparison of the two buffers
   with the length evaluation failing at the end to not give
-  away the length of the reference string.  
+  away the length of the reference string.
   */
   let inputBuffer = Buffer.alloc(inputLength);
   inputBuffer.write(input);
   let refBuffer = Buffer.alloc(inputLength);
 
-  /* 
+  /*
   Write the reference string, to the size of the inputString.
-  This could lead to false positives, when substrings are 
-  involved but we'll catch those with a length check at the end. 
-  */  
+  This could lead to false positives, when substrings are
+  involved but we'll catch those with a length check at the end.
+  */
   refBuffer.write(ref);
   // check buffers and their lengths
   return cnstcomp(inputBuffer, refBuffer) && inputLength === refLength;
@@ -1359,7 +1359,7 @@ class AbstractEncryptStream extends Transform {
         let dataCopied  = data.copy(this.data, this.dataOffset);
 
         data = data.slice(dataCopied);
-        this.dataOffset = 0
+        this.dataOffset = 0;
 
         try {
           let c = sodium.crypto_secretstream_xchacha20poly1305_push(
@@ -1543,7 +1543,6 @@ module.exports.PwdEncryptStream = class PwdEncryptStream extends AbstractEncrypt
   _transform(data, encoding, callback) {
     sodium.ready.then(() => {
       if (!this.key) {
-        let key;
         const salt = crypto.randomBytes(sodium.crypto_pwhash_SALTBYTES)
         try {
           this.key = sodium.crypto_pwhash(
@@ -1613,7 +1612,7 @@ module.exports.PwdDecryptStream = class PwdDecryptStream extends AbstractDecrypt
       super._transform(data, encoding, callback);
     });
   }
-}
+};
 
 /*****************
  * Alternate API *
