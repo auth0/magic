@@ -1231,7 +1231,7 @@ function uid(sec, cb) {
  * @returns {Boolean} - true if they match, false otherwise
  */
 module.exports.util.timingSafeCompare = (input, ref) => {
-  let inputString, refIsString;
+  let inputIsString, refIsString;
 
   inputIsString = typeof input === 'string' || input instanceof String;
   refIsString = typeof ref === 'string' || ref instanceof String;
