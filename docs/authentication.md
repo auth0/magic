@@ -1,0 +1,356 @@
+# Authentication
+
+magic supports the following authentcation functions in its core API:
+* [magic.auth.sign | magic.verify.sign](#magicauthsign--magicverifysign): Implements `ed25519` signatures
+* [magic.auth.mac | magic.verify.mac](#magicauthmac--magicverifymac): Implements `HMAC-SHA384`
+
+The alt API also supports the following functions:
+* [magic.alt.auth.RSASSA\_PSS\_SHA{256,384,512} | magic.alt.verify.RSASSA\_PSS\_SHA{256,384,512}](#magicaltauthrsassa_pss_sha256384512--magicaltverifyrsassa_pss_sha256384512): Implements `RSA PKCS#1 v2.1` over `SHA2`, better known as `RSAPSS-SHA`
+* [magic.alt.auth.RSASSA\_PKCS1V1\_5\_SHA{256,384,512} | magic.alt.verify.RSASSA\_PKCS1V1\_5\_SHA{256,384,512}](#magicaltauthrsassa_pkcs1v1_5_sha256384512--magicaltverifyrsassa_pkcs1v1_5_sha256384512): Implements `RSA PKCS#1 v1.5` over `SHA2`
+* [magic.alt.auth.HMAC\_SHA{256,512} | magic.alt.verify.HMAC\_SHA{256,512}](#magicaltauthhmac_sha256512--magicaltverifyhmac_sha256512): Implements `HMAC-SHA2` 
+
+Remember that the alt API should only be used over the core API when required by an external specification or interoperability concerns.
+
+## Core API
+
+### magic.auth.sign | magic.verify.sign
+
+Implements `ed25519` signatures using `libsodium.js`.
+
+ By default, the API expects to be given a secret key as a seed, from which the actual keypair is derived (allowing easier, more concise storage). However, it may be used directly with a keypair, requiring only a boolean flag for the `verify` call.
+
+ Efficient and without some of the concerns inherent in `ECDSA`, `ed25519` has been accepted and standardized by the [IETF](https://tools.ietf.org/html/rfc8032).
+
+```js
+// seed generation
+
+// callback
+magic.auth.sign(message, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:       'ed25519',
+  //   sk:        <Buffer af b4 b8 a8 2f 59 cb  ... >,
+  //   payload:   <Buffer 41 20 73 63 72 65 61  ... >,
+  //   signature: <Buffer e5 b7 ce 0e 92 71 0c  ... > }
+});
+
+// promise
+magic.auth.sign(message)
+  .then((output) => {
+    console.log(output);
+    // { alg:       'ed25519',
+    //   sk:        <Buffer af b4 b8 a8 2f 59 cb  ... >,
+    //   payload:   <Buffer 41 20 73 63 72 65 61  ... >,
+    //   signature: <Buffer e5 b7 ce 0e 92 71 0c  ... > }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied seed
+const seed = '0d05d0...';
+
+// callback
+magic.auth.sign(message, seed, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:       'ed25519',
+  //   sk:        <Buffer 0d 05 d0 99 d3 2d 00  ... >,
+  //   payload:   <Buffer 41 20 73 63 72 65 61  ... >,
+  //   signature: <Buffer 54 4a d1 ab a9 c7 19  ... > }
+});
+
+// promise
+magic.auth.sign(message, seed)
+  .then((output) => {
+    console.log(output);
+    // { alg:       'ed25519',
+    //   sk:        <Buffer 0d 05 d0 99 d3 2d 00  ... >,
+    //   payload:   <Buffer 41 20 73 63 72 65 61  ... >,
+    //   signature: <Buffer 54 4a d1 ab a9 c7 19  ... > }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied key
+const sk = 'bf288a...';
+
+// callback
+magic.auth.sign(message, sk, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:       'ed25519',
+  //   sk:        <Buffer bf 28 8a 58 28 36 37  ... >,
+  //   payload:   <Buffer 41 20 73 63 72 65 61  ... >,
+  //   signature: <Buffer b9 ca 8e 69 12 34 35  ... > }
+});
+
+// promise
+magic.auth.sign(message, sk)
+  .then((output) => {
+    console.log(output);
+   // { alg:       'ed25519',
+   //   sk:        <Buffer bf 28 8a 58 28 36 37  ... >,
+   //   payload:   <Buffer 41 20 73 63 72 65 61  ... >,
+   //   signature: <Buffer b9 ca 8e 69 12 34 35  ... > }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+Verification has a very similar interface, requiring only the additional flag if the public key is presented directly, and returning without error if the signature is valid.
+
+```js
+// supplied seed
+const seed      = '0d05d0...';
+const signature = '544ad1...';
+
+// callback
+magic.verify.sign(message, seed, signature, (err) => {
+  if (err) { return cb(err); }
+  console.log('verified');
+  // verified
+});
+
+// promise
+magic.verify.sign(message, seed, signature)
+  .then(() => {
+    console.log('verified');
+    // verified
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied key
+const pk        = 'bf288a...';
+const signature = 'b9ca8e...';
+
+// callback
+magic.verify.sign(message, pk, signature, true, (err) => {
+  if (err) { return cb(err); }
+  console.log('verified');
+  // verified
+});
+
+// promise
+magic.verify.sign(message, pk, signature, true)
+  .then(() => {
+    console.log('verified');
+    // verified
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+### magic.auth.mac | magic.verify.mac
+
+Implements `HMAC-SHA384` using OpenSSL through `crypto`.
+
+The `HMAC` algorithm is the most common message authentication code construction, standardized by the [IETF](https://tools.ietf.org/html/rfc2104) and [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf). The choice of `SHA384` is due to its widespread availability and to provide a consistent hash function throughout `magic`, as `SHA256` may be susceptible to length extension attacks in certain situations. Both `HMAC-SHA256` and `HMAC-SHA512` are available in the alternative api.
+
+```js
+// key generation
+
+// callback
+magic.auth.mac(message, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:     'hmacsha384',
+  //   sk:      <Buffer 97 9b 18 78 50 6f bf  ... >,
+  //   payload: <Buffer 41 20 73 63 72 65 61  ... >,
+  //   mac:     <Buffer 2d 15 ab 58 08 9a d7  ... > }
+});
+
+// promise
+magic.auth.mac(message)
+  .then((output) => {
+    console.log(output);
+    // { alg:     'hmacsha384',
+    //   sk:      <Buffer 97 9b 18 78 50 6f bf  ... >,
+    //   payload: <Buffer 41 20 73 63 72 65 61  ... >,
+    //   mac:     <Buffer 2d 15 ab 58 08 9a d7  ... > }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied key
+const key = '49d013...';
+
+// callback
+magic.auth.mac(message, key, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:     'hmacsha384',
+  //   sk:      <Buffer 49 d0 13 6e 72 15 f4  ... >,
+  //   payload: <Buffer 41 20 73 63 72 65 61  ... >,
+  //   mac:     <Buffer f1 9d c0 5a ae 8a f1  ... > }
+});
+
+// promise
+magic.auth.mac(message, key)
+  .then((output) => {
+    console.log(output);
+    // { alg:     'hmacsha384',
+    //   sk:      <Buffer 49 d0 13 6e 72 15 f4  ... >,
+    //   payload: <Buffer 41 20 73 63 72 65 61  ... >,
+    //   mac:     <Buffer f1 9d c0 5a ae 8a f1  ... > }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+Once again verification has a similar interface, and returns without error if the mac is valid.
+
+```js
+// supplied key
+const key = '49d013...';
+const mac = 'f19dc0...';
+
+// callback
+magic.verify.mac(message, key, mac, (err) => {
+  if (err) { return cb(err); }
+  console.log('verified');
+  // verified
+});
+
+// promise
+magic.verify.mac(message, key, mac)
+  .then(() => {
+    console.log('verified');
+    // verified
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+## Alternative API
+
+### magic.alt.auth.RSASSA\_PSS\_SHA{256,384,512} | magic.alt.verify.RSASSA\_PSS\_SHA{256,384,512}
+
+Implements `RSA PKCS#1 v2.1` over `SHA2`, better known as `RSAPSS-SHA`. Available with each of the `SHA256`, `SHA384`, or `SHA512` variants of `SHA2`. 
+
+The protocol is standardized by the [IETF](https://tools.ietf.org/html/rfc3447). The `PSS` acronym stands for probablistic signature scheme, a construction which is theoretically more robust than the older `RSA PKCS#1 v1.5` protocol also available in the alternative api. When possible, this is the preferred RSA variant, although the `ed25519` signature scheme in the core api is preferred above any use of RSA at all. For key generation, the key (private only) is returned in PEM encoding.
+
+```js
+// key generation
+
+// callback
+magic.alt.auth.RSASSA_PSS_SHA256(message, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:       'rsapss-sha256',
+  //   sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+  //   payload:   <Buffer 41 20 73 63 72 65 61 ... >,
+  //   signature: <Buffer 86 a8 d2 d7 67 01 8a ... > }
+});
+
+// promise
+magic.alt.auth.RSASSA_PSS_SHA256(message)
+  .then((output) => {
+    console.log(output);
+    // { alg:       'rsapss-sha256',
+    //   sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+    //   payload:   <Buffer 41 20 73 63 72 65 61 ... >,
+    //   signature: <Buffer 86 a8 d2 d7 67 01 8a ... > }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied key
+const sk = '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----';
+
+// callback
+magic.alt.auth.RSASSA_PSS_SHA256(message, sk, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  // { alg:       'rsapss-sha256',
+  //   sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+  //   payload:   <Buffer 41 20 73 63 72 65 61 ... >,
+  //   signature: <Buffer 86 a8 d2 d7 67 01 8a ... > }
+});
+
+// promise
+magic.alt.auth.RSASSA_PSS_SHA256(message, sk)
+  .then((output) => {
+    console.log(output);
+    // { alg:       'rsapss-sha256',
+    //   sk:        '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----',
+    //   payload:   <Buffer 41 20 73 63 72 65 61 ... >,
+    //   signature: <Buffer 86 a8 d2 d7 67 01 8a ... > }
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+Verification can be done by supplying either a private key (from which the public key will be extracted) or the public key itself.
+
+```js
+// supplied private key
+const sk = '-----BEGIN RSA PRIVATE KEY-----\nMIIEp ... NZ3Yw==\n-----END RSA PRIVATE KEY-----';
+
+// callback
+magic.alt.verify.RSASSA_PSS_SHA256(message, sk, signature, (err) => {
+  if (err) { return cb(err); }
+  console.log('verified');
+  // verified
+});
+
+// promise
+magic.alt.verify.RSASSA_PSS_SHA256(message, sk)
+  .then(() => {
+    console.log('verified');
+    // verified
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+
+// supplied public key
+const pk = '-----BEGIN RSA PUBLIC KEY-----\nMIIBI ... DAQAB\n-----END RSA PUBLIC KEY-----';
+
+// callback
+magic.alt.verify.RSASSA_PSS_SHA256(message, pk, signature, (err) => {
+  if (err) { return cb(err); }
+  console.log('verified');
+  // verified
+});
+
+// promise
+magic.alt.verify.RSASSA_PSS_SHA256(message, pk)
+  .then(() => {
+    console.log('verified');
+    // verified
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+### magic.alt.auth.RSASSA\_PKCS1V1\_5\_SHA{256,384,512} | magic.alt.verify.RSASSA_PKCS1V1\_5\_SHA{256,384,512}
+
+Implements `RSA PKCS#1 v1.5` over `SHA2`, standardized by the [IETF](https://tools.ietf.org/html/rfc2313). Available with each of the `SHA256`, `SHA384`, or `SHA512` variants of `SHA2`. An alternative to `magic.alt.verify.RSASSA_PSS_SHA{256,384,512}`.
+
+### magic.alt.auth.HMAC\_SHA{256,512} | magic.alt.verify.HMAC\_SHA{256,512}
+
+Implements `HMAC-SHA2` using OpenSSL through `crypto`. Available with each of the `SHA256`, `SHA384` (as `magic.auth.mac`), or `SHA512` variants of `SHA2`. An alterative to `magic.auth.mac`.
