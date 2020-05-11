@@ -4,7 +4,7 @@ magic supports the following encryption functions in its core API:
 * [magic.encrypt.pki | magic.decrypt.pki](#magicencryptpki--magicdecryptpki): Assymetric encryption with PKI
 * [magic.encrypt.aead | magic.decrypt.aead](#magicencryptaead--magicdecryptaead): Symmetric encryption using a key
 * [magic.pwdEncrypt.aead | magic.pwdDecrypt.aead](#magicpwdencryptaead--magicpwddecryptaead): Symmetric encryption using a password
-* [magic.EncryptStream | magic.DecryptStream](##magicencryptstream--magicdecryptstream): Symmetric encryption for streams using a key
+* [magic.EncryptStream | magic.DecryptStream](#magicencryptstream--magicdecryptstream): Symmetric encryption for streams using a key
 * [magic.PwdEncryptStream | magic.PwdDecryptStream](#magicpwdencryptstream--magicpwddecryptstream): Symmetric encryption for streams using a password
 
 The alt API also supports the following functions:
@@ -17,7 +17,11 @@ Remember that the alt API should only be used over the core API when required by
 
 ### magic.encrypt.pki | magic.decrypt.pki
 
-Implements `x25519` static Diffie-Hellman key exchange, and employs the resultant shared secret for `xsalsa20poly1305` authenticated encryption using `libsodium.js`. This allows for an efficient, simple symmetric authenticated encryption scheme to be used in an asymmetric setting. A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). As a static Diffie-Hellman exchange, the API is slightly different than most asymmetric encryption schemes - for encryption both the recipient public key and sender private key are required, whereas for decryption the recipient private key and sender public key are required. Usually, only the keys of the recipient are required for encryption, though `x25519-xsalsa20poly1305` has the benefit of being an authenticated scheme as well.
+Implements `x25519` static Diffie-Hellman key exchange, and employs the resultant shared secret for `xsalsa20poly1305` authenticated encryption using `libsodium.js`. This allows for an efficient, simple symmetric authenticated encryption scheme to be used in an asymmetric setting.
+
+A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539).
+
+As a static Diffie-Hellman exchange, the API is slightly different than most asymmetric encryption schemes - for encryption both the recipient public key and sender private key are required, whereas for decryption the recipient private key and sender public key are required. Usually, only the keys of the recipient are required for encryption, though `x25519-xsalsa20poly1305` has the benefit of being an authenticated scheme as well.
 
 ```js
 // key generation
@@ -107,7 +111,9 @@ magic.decrypt.pki(sk, pk, ciphertext, nonce)
 
 ### magic.encrypt.aead | magic.decrypt.aead
 
-Implements `xsalsa20poly1305` authenticated encryption using `libsodium.js`. A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). The scheme is fast, simple, and as an AEAD construction provides each of confidentiality, authentication, and integrity on the message.
+Implements `xsalsa20poly1305` authenticated encryption using `libsodium.js`.
+
+ A very closely related symmetric authenticated encryption scheme (using ChaCha20-Poly1305) has been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). The scheme is fast, simple, and as an AEAD construction provides each of confidentiality, authentication, and integrity on the message.
 
 ```js
 // key generation
@@ -190,7 +196,9 @@ magic.decrypt.aead(sk, ciphertext, nonce)
 ```
 
 ### magic.pwdEncrypt.aead | magic.pwdDecrypt.aead
-Implements the same cryptographic protocols as magic.encrypt.aead/magic.decrypt.aead. The only difference is that pwdEncrypt.aead/pwdDecrypt.aead derive a key from a given password instead of requiring the key as an input. Only use these functions when encryption derived from a password is required. Otherwise, magic.encrypt.aead/magic.decrypt.aead is a more secure choice.
+Implements the same cryptographic protocols as `magic.encrypt.aead/magic.decrypt.aead`. The only difference is that `pwdEncrypt.aead/pwdDecrypt.aead` derive a key from a given password instead of requiring the key as an input.
+
+Only use these functions when encryption derived from a password is required. Otherwise, `magic.encrypt.aead/magic.decrypt.aead` is a more secure choice.
 
 ```js
 // password
@@ -249,7 +257,9 @@ magic.pwdDecrypt.aead(pwd, ciphertext, nonce)
 
 ### magic.EncryptStream | magic.DecryptStream
 
-Implements `xchacha20poly1305` authenticated encryption using `libsodium.js`. The ChaCha20-Poly1305 symmetric authenticated encryption scheme been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). The scheme is fast, simple, and as an AEAD construction provides confidentiality, authentication, and integrity on the message.
+Implements `xchacha20poly1305` authenticated encryption using `libsodium.js`.
+
+The ChaCha20-Poly1305 symmetric authenticated encryption scheme been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). The scheme is fast, simple, and as an AEAD construction provides confidentiality, authentication, and integrity on the message.
 
 ```js
   // key generation
@@ -295,7 +305,9 @@ For decryption, the `encryptStream.key` should be passed to `magic.DecryptStream
 
 ### magic.PwdEncryptStream | magic.PwdDecryptStream
 
-Implements the same cryptographic protocols as magic.EncryptStream/magic.DecryptStream. The only difference is that PwdEncryptStream and PwdDecryptStream derive a key from a given password instead of requiring the key as an input. Only use these functions when encryption derived from a password is required. Otherwise, magic.EncryptStream/magic.DecryptStream is a more secure choice.
+Implements the same cryptographic protocols as `magic.EncryptStream/magic.DecryptStream`. The only difference is that `PwdEncryptStream` and `PwdDecryptStream` derive a key from a given password instead of requiring the key as an input.
+
+Only use these functions when encryption derived from a password is required. Otherwise, `magic.EncryptStream/magic.DecryptStream` is a more secure choice.
 
 ```js
   // key generation
@@ -327,7 +339,9 @@ Implements the same cryptographic protocols as magic.EncryptStream/magic.Decrypt
 
 ### magic.alt.encrypt.AES\_{128,192,256}\_CBC\_HMAC\_SHA{256,384,512} | magic.alt.decrypt.AES\_{128,192,256}\_CBC\_HMAC\_SHA{256,384,512}
 
-Implements `AES{128,192,256}CBC-SHA2` using OpenSSL through `crypto`. Available with a large number of variants; any key size of `AES` - `AES128`, `AES192`, or `AES256`, and any digest size of `SHA2` - `SHA256`, `SHA384`, or `SHA512`. The protocol is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf) and provides authenticated eencryption using the industry standard symmetric encryption and authentication schemes, in an encrypt-than-authenticate construction.
+Implements `AES{128,192,256}CBC-SHA2` using OpenSSL through `crypto`. Available with a large number of variants; any key size of `AES` - `AES128`, `AES192`, or `AES256`, and any digest size of `SHA2` - `SHA256`, `SHA384`, or `SHA512`.
+
+The protocol is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf) and provides authenticated eencryption using the industry standard symmetric encryption and authentication schemes, in an encrypt-than-authenticate construction.
 
 ```js
 // key generation
@@ -421,7 +435,9 @@ magic.alt.decrypt.AES_128_CBC_HMAC_SHA256(sek, sak, iv, ciphertext, mac)
 
   ### magic.alt.encrypt.AES\_{128,192,256}\_GCM | magic.alt.decrypt.AES\_{128,192,256}\_GCM
 
-Implements `AES{128,192,256}GCM` using OpenSSL through `crypto`. AES-GCM is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf) and provides authenticated encryption using the industry standard symmetric encryption scheme with an authenticated block cipher mode, a clean and simple construction.
+Implements `AES{128,192,256}GCM` using OpenSSL through `crypto`.
+
+AES-GCM is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf) and provides authenticated encryption using the industry standard symmetric encryption scheme with an authenticated block cipher mode, a clean and simple construction.
 
 ```js
 // key generation

@@ -1,4 +1,4 @@
-# Utility functions 
+# Utility functions
 
 magic supports the following utility functions in its core API:
 * [magic.util.hash](#magicutilhash): Implements `SHA2-384`
@@ -16,7 +16,9 @@ Remember that the alt API should only be used over the core API when required by
 
 ### magic.util.hash
 
-Implements `SHA2-384` (henceforth just `SHA384`) using OpenSSL through `crypto`. Unlike `SHA256` and `SHA512` - which are available through the alternative api - `SHA384` is resistant to length extension attacks, a capability which may be relevant in some circumstances. The `SHA2` family is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf), and the most commonly used fast, cryptographically secure hash function.
+Implements `SHA2-384` (henceforth just `SHA384`) using OpenSSL through `crypto`.
+
+Unlike `SHA256` and `SHA512` - which are available through the alternative api - `SHA384` is resistant to length extension attacks, a capability which may be relevant in some circumstances. The `SHA2` family is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf), and the most commonly used fast, cryptographically secure hash function.
 
 ```js
 // callback
@@ -44,7 +46,9 @@ magic.util.hash(message)
 
 ### magic.util.rsaKeypairGen
 
-Generates an RSA public/private key pair. The public key is encoded using a SubjectPublicKeyInfo(SPKI) structure. For node 10+, it uses the built-in `generateKeyPair` from `crypto` library. For older node versions, it generates the keypair using OpenSSL directly.
+Generates an RSA public/private key pair. The public key is encoded using a SubjectPublicKeyInfo(SPKI) structure.
+
+For node 10+, it uses the built-in `generateKeyPair` from `crypto` library. For older node versions, it generates the keypair using OpenSSL directly.
 
 ```js
 // callback
@@ -106,7 +110,9 @@ magic.util.rand(length)
 
 ### magic.util.uid
 
-Employs OpenSSL through `crypto` to return a base64url encoded uid. The input is not the length of the returned uid, but rather a security parameter taken as the unencoded byte length of the identifer. The returned string will be roughly a third longer than it. The default security parameter (if one is not provided) is 32 bytes, returning a uid of 43 chars.
+Employs OpenSSL through `crypto` to return a base64url encoded uid.
+
+The input is not the length of the returned uid, but rather a security parameter taken as the unencoded byte length of the identifer. The returned string will be roughly a third longer than it. The default security parameter (if one is not provided) is 32 bytes, returning a uid of 43 chars.
 
 ```js
 // default security parameter
@@ -148,7 +154,7 @@ magic.util.uid(24)
 });
 ```
 
-## Alternative API 
+## Alternative API
 
 ### magic.alt.util.sha{256,512}
 

@@ -15,7 +15,11 @@ Remember that the alt API should only be used over the core API when required by
 
 ### magic.auth.sign | magic.verify.sign
 
-Implements `ed25519` signatures using `libsodium.js`. Efficient and without some of the concerns inherent in `ECDSA`, `ed25519` has been accepted and standardized by the [IETF](https://tools.ietf.org/html/rfc8032). By default, the api expects to be given a secret key as a seed, from which the actual keypair is derived (allowing easier, more concise storage). However, it may be used directly with a keypair, requiring only a boolean flag for the `verify` call.
+Implements `ed25519` signatures using `libsodium.js`.
+
+ By default, the API expects to be given a secret key as a seed, from which the actual keypair is derived (allowing easier, more concise storage). However, it may be used directly with a keypair, requiring only a boolean flag for the `verify` call.
+
+ Efficient and without some of the concerns inherent in `ECDSA`, `ed25519` has been accepted and standardized by the [IETF](https://tools.ietf.org/html/rfc8032).
 
 ```js
 // seed generation
@@ -149,7 +153,9 @@ magic.verify.sign(message, pk, signature, true)
 
 ### magic.auth.mac | magic.verify.mac
 
-Implements `HMAC-SHA384` using OpenSSL through `crypto`. The `HMAC` algorithm is the most common message authentication code construction, standardized by the [IETF](https://tools.ietf.org/html/rfc2104) and [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf). The choice of `SHA384` is due to its widespread availability and to provide a consistent hash function throughout `magic`, as `SHA256` may be susceptible to length extension attacks in certain situations. Both `HMAC-SHA256` and `HMAC-SHA512` are available in the alternative api.
+Implements `HMAC-SHA384` using OpenSSL through `crypto`.
+
+The `HMAC` algorithm is the most common message authentication code construction, standardized by the [IETF](https://tools.ietf.org/html/rfc2104) and [NIST](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf). The choice of `SHA384` is due to its widespread availability and to provide a consistent hash function throughout `magic`, as `SHA256` may be susceptible to length extension attacks in certain situations. Both `HMAC-SHA256` and `HMAC-SHA512` are available in the alternative api.
 
 ```js
 // key generation
@@ -236,7 +242,9 @@ magic.verify.mac(message, key, mac)
 
 ### magic.alt.auth.RSASSA\_PSS\_SHA{256,384,512} | magic.alt.verify.RSASSA\_PSS\_SHA{256,384,512}
 
-Implements `RSA PKCS#1 v2.1` over `SHA2`, better known as `RSAPSS-SHA`. Available with each of the `SHA256`, `SHA384`, or `SHA512` variants of `SHA2`. The protocol is standardized by the [IETF](https://tools.ietf.org/html/rfc3447). The `PSS` acronym stands for probablistic signature scheme, a construction which is theoretically more robust than the older `RSA PKCS#1 v1.5` protocol also available in the alternative api. When possible, this is the preferred RSA variant, although the `ed25519` signature scheme in the core api is preferred above any use of RSA at all. For key generation, the key (private only) is returned in PEM encoding.
+Implements `RSA PKCS#1 v2.1` over `SHA2`, better known as `RSAPSS-SHA`. Available with each of the `SHA256`, `SHA384`, or `SHA512` variants of `SHA2`. 
+
+The protocol is standardized by the [IETF](https://tools.ietf.org/html/rfc3447). The `PSS` acronym stands for probablistic signature scheme, a construction which is theoretically more robust than the older `RSA PKCS#1 v1.5` protocol also available in the alternative api. When possible, this is the preferred RSA variant, although the `ed25519` signature scheme in the core api is preferred above any use of RSA at all. For key generation, the key (private only) is returned in PEM encoding.
 
 ```js
 // key generation
