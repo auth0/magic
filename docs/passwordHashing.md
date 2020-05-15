@@ -25,16 +25,24 @@ const pw = 'ascream...';
 magic.password.hash(password, (err, output) => {
   if (err) { return cb(err); }
   console.log(output);
-  // { alg:  'argon2id',
-  //   hash: '$argon2id$v=19$m=65536,t=2,p=1$yLZ6CoF5exPHbHjvbZ3esQ$yAM5pHM9KnTYDg/9Nr9rgDdQqRpAe8JVky4mJ7escHM' }
+  /*
+   * {
+   *   alg:  'argon2id',
+   *   hash: '$argon2id$v=19$m=65536,t=2,p=1$yLZ6CoF5exPHbHjvbZ3esQ$yAM5pHM9KnTYDg/9Nr9rgDdQqRpAe8JVky4mJ7escHM'
+   * }
+   */
 });
 
 // promise
 magic.password.hash(password)
   .then((output) => {
     console.log(output);
-    // { alg:  'argon2id',
-    //   hash: '$argon2id$v=19$m=65536,t=2,p=1$yLZ6CoF5exPHbHjvbZ3esQ$yAM5pHM9KnTYDg/9Nr9rgDdQqRpAe8JVky4mJ7escHM' }
+    /*
+     * {
+     *   alg:  'argon2id',
+     *   hash: '$argon2id$v=19$m=65536,t=2,p=1$yLZ6CoF5exPHbHjvbZ3esQ$yAM5pHM9KnTYDg/9Nr9rgDdQqRpAe8JVky4mJ7escHM'
+     * }
+     */
   })
   .catch((err) => {
     return reject(err);
@@ -71,4 +79,61 @@ magic.verify.password(password, hash)
 
 ### magic.alt.password.bcrypt | magic.alt.verify.bcrypt
 
-Implements `bcrypt` using [node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js/), wrapping the OpenBSD implementation of the algorithm. An alterative to `magic.util.pwhash`. The security parameter (rounds) is set to 10.
+Implements `bcrypt` using [node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js/), wrapping the OpenBSD implementation of the algorithm. An alternative to `magic.util.pwhash`. The security parameter (rounds) is set to 10.
+
+```js
+const pw = 'ascream...';
+
+// callback
+magic.alt.password.bcrypt(password, (err, output) => {
+  if (err) { return cb(err); }
+  console.log(output);
+  /*
+   * {
+   *   alg: 'bcrypt',
+   *   hash: '$2b$10$PKmNZLV1UXI8JZP8gzJQyemRNc81mIV65fIXbJ6lC8gMQdGScBNVu'
+   * }
+   */
+});
+
+// promise
+magic.alt.password.bcrypt(password)
+  .then((output) => {
+    console.log(output);
+    /*
+     * {
+     *   alg: 'bcrypt',
+     *   hash: '$2b$10$PKmNZLV1UXI8JZP8gzJQyemRNc81mIV65fIXbJ6lC8gMQdGScBNVu'
+     * }
+     */
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
+
+Due to the metadata in the hash output, the hash must be provided in the same encoded format for verification.
+
+```js
+const pw   = 'ascream...';
+const hash = '$2b$10$PKmNZLV1UXI8JZP8gzJQyemRNc81mIV65fIXbJ6lC8gMQdGScBNVu';
+
+// callback
+magic.alt.verify.bcrypt(password, hash, (err) => {
+  if (err) { return cb(err); }
+  console.log('verified');
+  // verified
+});
+
+// promise
+magic.alt.verify.bcrypt(password, hash)
+  .then(() => {
+    console.log('verified');
+    // verified
+  })
+  .catch((err) => {
+    return reject(err);
+  });
+});
+```
