@@ -11,7 +11,7 @@
   "dependencies": {
     "bcrypt": "3.0.6",
     "libsodium-wrappers-sumo": "0.7.6",
-    "nan": "^2.14.0"
+    "nan": "^2.14.1"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha --delay ./test/magic.test.js ./test/magic.test.vectors.js"
