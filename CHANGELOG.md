@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## v4.0.0 - 2020-08-31
+
+### Changes
+- Updates bcrypt to version 5.x. This is a breaking change only in case of a
+  passphrase longer than 255 or a passphrase that includes null byte
+
+### Misc
+- Cleans up code
+- Improves documentation
+
+
 ## v3.1.0 - 2019-12-31
 
 ### Adds
