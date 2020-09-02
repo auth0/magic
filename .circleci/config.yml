@@ -15,16 +15,10 @@ commands:
 workflows:
   main:
     jobs:
-      - unit-tests-node8
       - unit-tests-node10
       - unit-tests-node12
 
 jobs:
-  unit-tests-node8:
-    docker:
-      - image: circleci/node:8
-    steps:
-      - runtests
   unit-tests-node10:
     docker:
       - image: circleci/node:10
