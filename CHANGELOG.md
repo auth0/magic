@@ -2,9 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## v4.0.0 - 2020-08-31
+## v4.0.0 - 2020-09-02
 
 ### Changes
+- Drops support for node 8 due to bcrypt update
 - Updates bcrypt to version 5.x. This is a breaking change only in case of a
   passphrase longer than 255 or a passphrase that includes null byte
 
