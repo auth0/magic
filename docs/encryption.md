@@ -322,7 +322,7 @@ magic.pwdDecrypt.aead(pwd, ciphertext, nonce)
 
 Implements `xchacha20poly1305` authenticated encryption using `libsodium.js` for streams.
 
-The ChaCha20-Poly1305 symmetric authenticated encryption scheme been standardized by the [IETF](https://tools.ietf.org/html/rfc7539). The scheme is fast, simple, and as an AEAD construction provides confidentiality, authentication, and integrity on the message.
+[XChaCha20-Poly1305](https://libsodium.gitbook.io/doc/secret-key_cryptography/aead/chacha20-poly1305/xchacha20-poly1305_construction) is a symmetric authenticated encryption scheme, an improvement to the IETF-standardized [ChaCha20-Poly1305](https://tools.ietf.org/html/rfc7539). XChaCha's improvement over ChaCha is due to the usage of extended 192 bit nonces. The scheme is fast, simple, and as an AEAD construction provides confidentiality, authentication and integrity on the message.
 
 For stream encryption/decryption using a password instead of a key, see
 [magic.PwdEncryptStream | magic.PwdDecryptStream](#magicpwdencryptstream--magicpwddecryptstream)
