@@ -707,19 +707,23 @@ function sign(message, sk, cb) {
       sk  = sodium.crypto_sign_ed25519_sk_to_seed(isk);
   }
 
-  let signature;
-  try {
-    signature = sodium.crypto_sign_detached(payload, isk);
-  } catch(ex) {
-    return done(new Error('Libsodium error: ' + ex));
-  }
-
-  return done(null, convert({
-    alg:       'ed25519',
-    sk:        sk,
-    payload:   payload,
-    signature: signature
-  }));
+  const key = {
+    key: Buffer.concat([
+      Buffer.from('302e020100300506032b657004220420', 'hex'),
+      sk.subarray(0, 32),
+    ]),
+    format: 'der',
+    type: 'pkcs8'
+  };
+  return cryptoSign(undefined, payload, key).then((signature) => {
+    return done(null, convert({
+      alg:       'ed25519',
+      sk:        sk,
+      payload:   payload,
+      signature: signature
+    }));
+  }, (ex) => { throw new Error('Crypto error: ' + ex); })
+  .catch((err) => { return done(err); });
 }
 
 
@@ -754,16 +758,15 @@ function vsign(message, pk, signature, ispk, cb) {
 
   ipk = (ispk) ? pk : sodium.crypto_sign_seed_keypair(pk).publicKey;
 
-  let verified;
-  try {
-    verified = sodium.crypto_sign_verify_detached(received, payload, ipk);
-  } catch(ex) {
-    return done(new Error('Libsodium error: ' + ex));
-  }
-
-  if (!verified) { return done(new Error('Invalid signature')); }
-
-  return done();
+  return cryptoVerify(undefined, payload, {
+    key: Buffer.concat([Buffer.from('302a300506032b6570032100', 'hex'), ipk]),
+    format: 'der',
+    type: 'spki',
+  }, received).then((verified) => {
+    if (!verified) { throw new Error('Invalid signature') }
+    return done();
+  }, (ex) => { throw new Error('Crypto error: ' + ex); })
+  .catch((err) => { return done(err); });
 }
 
 
