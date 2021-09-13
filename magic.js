@@ -157,15 +157,15 @@ function rsaverify(digest, padding) {
    */
   function keying(key) {
     return new Promise((resolve, reject) => {
-      if (key.startsWith('-----BEGIN PUBLIC KEY-----'))     { return resolve(key); }
       if (key.startsWith('-----BEGIN RSA PUBLIC KEY-----')) { return resolve(key); }
+      if (key.startsWith('-----BEGIN RSA PRIVATE KEY-----')) { return resolve(key); }
 
       try {
         const keyObject = crypto.createPublicKey({ key, format: 'pem' })
         if (keyObject.asymmetricKeyType !== 'rsa') {
           return reject(new Error('Invalid key type provided'));
         }
-        return resolve(keyObject.export({ format: 'pem', type: 'spki' }));
+        return resolve(keyObject);
       } catch (err) {
         return reject(new Error('Invalid key formatting'));
       }
