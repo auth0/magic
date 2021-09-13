@@ -17,6 +17,7 @@ workflows:
     jobs:
       - unit-tests-node12
       - unit-tests-node14
+      - unit-tests-node16
 
 jobs:
   unit-tests-node12:
@@ -27,5 +28,10 @@ jobs:
   unit-tests-node14:
     docker:
       - image: circleci/node:14
+    steps:
+      - runtests
+  unit-tests-node16:
+    docker:
+      - image: circleci/node:16
     steps:
       - runtests

@@ -2,7 +2,12 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
 const { Transform } = require('stream');
+const { promisify } = require('util');
 
+const asyncSign = crypto.sign.length > 3;
+const asyncVerify = crypto.verify.length > 4;
+const cryptoSign = asyncSign ? promisify(crypto.sign) : async (...args) => crypto.sign(...args)
+const cryptoVerify = asyncVerify ? promisify(crypto.verify) : async (...args) => crypto.verify(...args)
 
 // Constants
 
@@ -87,7 +92,7 @@ function rsasign(digest, padding) {
     [ payload ] = iparse(message);
 
     return keying(sk).then((isk) => {
-      if (!isk) { return done(new Error('Unable to generate key')); }
+      if (!isk) { throw new new Error('Unable to generate key'); }
 
       // for pss tests, should crypto api change in the future to allow specifying salt
       //let salt;
@@ -96,24 +101,15 @@ function rsasign(digest, padding) {
       //  isk = isk.sk;
       //}
 
-      let signature;
-      try {
-        const alg  = ('rsa-' + digest).toUpperCase();
-        const sign = crypto.createSign(alg);
-        sign.update(message);
-        sign.end();
-
-        signature = sign.sign({ key: isk, padding: algorithm });
-      } catch(ex) {
-        return done(new Error('Crypto error: ' + ex));
-      }
-
-      return done(null, convert({
-        alg:       'rsa' + padding + '-' + digest,
-        sk:        isk,
-        payload:   payload,
-        signature: signature
-      }));
+      const alg = ('rsa-' + digest).toUpperCase();
+      return cryptoSign(alg, payload, { key: isk, padding: algorithm }).then((signature) => {
+        return done(null, convert({
+          alg:       'rsa' + padding + '-' + digest,
+          sk:        isk,
+          payload:   payload,
+          signature: signature
+        }));
+      }, (ex) => { throw new Error('Crypto error: ' + ex); })
     }).catch((err) => { return done(err); });
   }
 }
@@ -205,21 +201,12 @@ function rsaverify(digest, padding) {
     return keying(pk).then((ipk) => {
       if (!ipk) { return done(new Error('Unable to load key')); }
 
-      let verified;
-      try {
-        const alg    = ('rsa-' + digest).toUpperCase();
-        const verify = crypto.createVerify(alg);
-        verify.update(message);
-        verify.end();
+      const alg = ('rsa-' + digest).toUpperCase();
+      return cryptoVerify(alg, Buffer.from(message), { key: ipk, padding: algorithm }, received).then((verified) => {
+        if (!verified) { return done(new Error('Invalid signature')); }
 
-        verified = verify.verify({ key: ipk, padding: algorithm }, received);
-      } catch(ex) {
-        return done(new Error('Crypto error: ' + ex));
-      }
-
-      if (!verified) { return done(new Error('Invalid signature')); }
-
-      return done();
+        return done();
+      }, (ex) => { throw new Error('Crypto error: ' + ex); })
     }).catch((err) => { return done(err); });
   }
 }
