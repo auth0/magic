@@ -15,17 +15,17 @@ commands:
 workflows:
   main:
     jobs:
-      - unit-tests-node10
       - unit-tests-node12
+      - unit-tests-node14
 
 jobs:
-  unit-tests-node10:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - runtests
   unit-tests-node12:
     docker:
       - image: circleci/node:12
+    steps:
+      - runtests
+  unit-tests-node14:
+    docker:
+      - image: circleci/node:14
     steps:
       - runtests

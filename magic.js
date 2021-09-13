@@ -3,8 +3,6 @@ const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
 const { Transform } = require('stream');
 
-const extcrypto = require('./extcrypto');
-
 
 // Constants
 
@@ -60,14 +58,9 @@ function rsasign(digest, padding) {
    * @returns {Callback|Promise}
    */
   function keying(provided) {
-    return new Promise((resolve, reject) => {
-      if (provided) { return resolve(provided); }
+    if (provided) { return Promise.resolve(provided); }
 
-      extcrypto.keygen((err, sk) => {
-        if (err) { return reject(err); }
-        return resolve(sk);
-      });
-    });
+    return rsaKeypairGen().then(({ privateKey }) => privateKey)
   }
 
   /***
@@ -171,12 +164,15 @@ function rsaverify(digest, padding) {
       if (key.startsWith('-----BEGIN PUBLIC KEY-----'))     { return resolve(key); }
       if (key.startsWith('-----BEGIN RSA PUBLIC KEY-----')) { return resolve(key); }
 
-      if (!key.startsWith('-----BEGIN RSA PRIVATE KEY-----')) { return reject(new Error('Invalid key formatting')); }
-
-      extcrypto.extract(key, (err, pkey) => {
-        if (err) { return reject(err); }
-        return resolve(pkey);
-      });
+      try {
+        const keyObject = crypto.createPublicKey({ key, format: 'pem' })
+        if (keyObject.asymmetricKeyType !== 'rsa') {
+          return reject(new Error('Invalid key type provided'));
+        }
+        return resolve(keyObject.export({ format: 'pem', type: 'spki' }));
+      } catch (err) {
+        return reject(new Error('Invalid key formatting'));
+      }
     });
   }
 
@@ -1272,40 +1268,28 @@ module.exports.util.timingSafeCompare = (input, ref) => {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-
-module.exports.util.rsaKeypairGen = (cb) => {
+const rsaKeypairGen = (cb) => {
   const done  = ret(cb)
 
-  if (crypto.generateKeyPair) { // node >= 10
-    return new Promise((resolve, reject) => {
-      crypto.generateKeyPair('rsa', {
-        modulusLength: 2048,
-        publicExponent: 65537,
-        publicKeyEncoding: {
-          type: 'spki',
-          format: 'pem'
-        },
-        privateKeyEncoding: {
-          type: 'pkcs1',
-          format: 'pem'
-        }
-      }, (err, publicKey, privateKey) => {
-        return resolve(done(null, {privateKey, publicKey}));
-      });
-    })
-  } else {
-    return new Promise((resolve, reject) => {
-      extcrypto.keygen((err, privateKey) => {
-        if (err) { return reject(done(new Error(err.message))); }
-
-        extcrypto.extractSPKI(privateKey, (err, publicKey) => {
-          if (err) { return reject(done(new Error(err.message))); }
-          return resolve(done(null, {privateKey, publicKey}));
-        });
-      });
-    })
-  }
+  return new Promise((resolve, reject) => {
+    crypto.generateKeyPair('rsa', {
+      modulusLength: 2048,
+      publicExponent: 65537,
+      publicKeyEncoding: {
+        type: 'spki',
+        format: 'pem'
+      },
+      privateKeyEncoding: {
+        type: 'pkcs1',
+        format: 'pem'
+      }
+    }, (err, publicKey, privateKey) => {
+      return resolve(done(null, {privateKey, publicKey}));
+    });
+  })
 };
+
+module.exports.util.rsaKeypairGen = rsaKeypairGen;
 
 /*****************
  *    Streams    *
