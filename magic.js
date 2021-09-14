@@ -92,7 +92,7 @@ function rsasign(digest, padding) {
     [ payload ] = iparse(message);
 
     return keying(sk).then((isk) => {
-      if (!isk) { throw new new Error('Unable to generate key'); }
+      if (!isk) { throw new Error('Unable to generate key'); }
 
       // for pss tests, should crypto api change in the future to allow specifying salt
       //let salt;
