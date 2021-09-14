@@ -2,9 +2,12 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const sodium = require('libsodium-wrappers-sumo');
 const { Transform } = require('stream');
+const { promisify } = require('util');
 
-const extcrypto = require('./extcrypto');
-
+const asyncSign = crypto.sign.length > 3;
+const asyncVerify = crypto.verify.length > 4;
+const cryptoSign = asyncSign ? promisify(crypto.sign) : async (...args) => crypto.sign(...args)
+const cryptoVerify = asyncVerify ? promisify(crypto.verify) : async (...args) => crypto.verify(...args)
 
 // Constants
 
@@ -60,14 +63,9 @@ function rsasign(digest, padding) {
    * @returns {Callback|Promise}
    */
   function keying(provided) {
-    return new Promise((resolve, reject) => {
-      if (provided) { return resolve(provided); }
+    if (provided) { return Promise.resolve(provided); }
 
-      extcrypto.keygen((err, sk) => {
-        if (err) { return reject(err); }
-        return resolve(sk);
-      });
-    });
+    return rsaKeypairGen().then(({ privateKey }) => privateKey)
   }
 
   /***
@@ -94,7 +92,7 @@ function rsasign(digest, padding) {
     [ payload ] = iparse(message);
 
     return keying(sk).then((isk) => {
-      if (!isk) { return done(new Error('Unable to generate key')); }
+      if (!isk) { throw new Error('Unable to generate key'); }
 
       // for pss tests, should crypto api change in the future to allow specifying salt
       //let salt;
@@ -103,24 +101,15 @@ function rsasign(digest, padding) {
       //  isk = isk.sk;
       //}
 
-      let signature;
-      try {
-        const alg  = ('rsa-' + digest).toUpperCase();
-        const sign = crypto.createSign(alg);
-        sign.update(message);
-        sign.end();
-
-        signature = sign.sign({ key: isk, padding: algorithm });
-      } catch(ex) {
-        return done(new Error('Crypto error: ' + ex));
-      }
-
-      return done(null, convert({
-        alg:       'rsa' + padding + '-' + digest,
-        sk:        isk,
-        payload:   payload,
-        signature: signature
-      }));
+      const alg = ('rsa-' + digest).toUpperCase();
+      return cryptoSign(alg, payload, { key: isk, padding: algorithm }).then((signature) => {
+        return done(null, convert({
+          alg:       'rsa' + padding + '-' + digest,
+          sk:        isk,
+          payload:   payload,
+          signature: signature
+        }));
+      }, (ex) => { throw new Error('Crypto error: ' + ex); })
     }).catch((err) => { return done(err); });
   }
 }
@@ -168,15 +157,18 @@ function rsaverify(digest, padding) {
    */
   function keying(key) {
     return new Promise((resolve, reject) => {
-      if (key.startsWith('-----BEGIN PUBLIC KEY-----'))     { return resolve(key); }
       if (key.startsWith('-----BEGIN RSA PUBLIC KEY-----')) { return resolve(key); }
+      if (key.startsWith('-----BEGIN RSA PRIVATE KEY-----')) { return resolve(key); }
 
-      if (!key.startsWith('-----BEGIN RSA PRIVATE KEY-----')) { return reject(new Error('Invalid key formatting')); }
-
-      extcrypto.extract(key, (err, pkey) => {
-        if (err) { return reject(err); }
-        return resolve(pkey);
-      });
+      try {
+        const keyObject = crypto.createPublicKey({ key, format: 'pem' })
+        if (keyObject.asymmetricKeyType !== 'rsa') {
+          return reject(new Error('Invalid key type provided'));
+        }
+        return resolve(keyObject);
+      } catch (err) {
+        return reject(new Error('Invalid key formatting'));
+      }
     });
   }
 
@@ -209,21 +201,12 @@ function rsaverify(digest, padding) {
     return keying(pk).then((ipk) => {
       if (!ipk) { return done(new Error('Unable to load key')); }
 
-      let verified;
-      try {
-        const alg    = ('rsa-' + digest).toUpperCase();
-        const verify = crypto.createVerify(alg);
-        verify.update(message);
-        verify.end();
+      const alg = ('rsa-' + digest).toUpperCase();
+      return cryptoVerify(alg, Buffer.from(message), { key: ipk, padding: algorithm }, received).then((verified) => {
+        if (!verified) { return done(new Error('Invalid signature')); }
 
-        verified = verify.verify({ key: ipk, padding: algorithm }, received);
-      } catch(ex) {
-        return done(new Error('Crypto error: ' + ex));
-      }
-
-      if (!verified) { return done(new Error('Invalid signature')); }
-
-      return done();
+        return done();
+      }, (ex) => { throw new Error('Crypto error: ' + ex); })
     }).catch((err) => { return done(err); });
   }
 }
@@ -724,19 +707,23 @@ function sign(message, sk, cb) {
       sk  = sodium.crypto_sign_ed25519_sk_to_seed(isk);
   }
 
-  let signature;
-  try {
-    signature = sodium.crypto_sign_detached(payload, isk);
-  } catch(ex) {
-    return done(new Error('Libsodium error: ' + ex));
-  }
-
-  return done(null, convert({
-    alg:       'ed25519',
-    sk:        sk,
-    payload:   payload,
-    signature: signature
-  }));
+  const key = {
+    key: Buffer.concat([
+      Buffer.from('302e020100300506032b657004220420', 'hex'),
+      sk.subarray(0, 32),
+    ]),
+    format: 'der',
+    type: 'pkcs8'
+  };
+  return cryptoSign(undefined, payload, key).then((signature) => {
+    return done(null, convert({
+      alg:       'ed25519',
+      sk:        sk,
+      payload:   payload,
+      signature: signature
+    }));
+  }, (ex) => { throw new Error('Crypto error: ' + ex); })
+  .catch((err) => { return done(err); });
 }
 
 
@@ -771,16 +758,15 @@ function vsign(message, pk, signature, ispk, cb) {
 
   ipk = (ispk) ? pk : sodium.crypto_sign_seed_keypair(pk).publicKey;
 
-  let verified;
-  try {
-    verified = sodium.crypto_sign_verify_detached(received, payload, ipk);
-  } catch(ex) {
-    return done(new Error('Libsodium error: ' + ex));
-  }
-
-  if (!verified) { return done(new Error('Invalid signature')); }
-
-  return done();
+  return cryptoVerify(undefined, payload, {
+    key: Buffer.concat([Buffer.from('302a300506032b6570032100', 'hex'), ipk]),
+    format: 'der',
+    type: 'spki',
+  }, received).then((verified) => {
+    if (!verified) { throw new Error('Invalid signature') }
+    return done();
+  }, (ex) => { throw new Error('Crypto error: ' + ex); })
+  .catch((err) => { return done(err); });
 }
 
 
@@ -1272,40 +1258,28 @@ module.exports.util.timingSafeCompare = (input, ref) => {
  * @param {Function} cb
  * @returns {Callback|Promise}
  */
-
-module.exports.util.rsaKeypairGen = (cb) => {
+const rsaKeypairGen = (cb) => {
   const done  = ret(cb)
 
-  if (crypto.generateKeyPair) { // node >= 10
-    return new Promise((resolve, reject) => {
-      crypto.generateKeyPair('rsa', {
-        modulusLength: 2048,
-        publicExponent: 65537,
-        publicKeyEncoding: {
-          type: 'spki',
-          format: 'pem'
-        },
-        privateKeyEncoding: {
-          type: 'pkcs1',
-          format: 'pem'
-        }
-      }, (err, publicKey, privateKey) => {
-        return resolve(done(null, {privateKey, publicKey}));
-      });
-    })
-  } else {
-    return new Promise((resolve, reject) => {
-      extcrypto.keygen((err, privateKey) => {
-        if (err) { return reject(done(new Error(err.message))); }
-
-        extcrypto.extractSPKI(privateKey, (err, publicKey) => {
-          if (err) { return reject(done(new Error(err.message))); }
-          return resolve(done(null, {privateKey, publicKey}));
-        });
-      });
-    })
-  }
+  return new Promise((resolve, reject) => {
+    crypto.generateKeyPair('rsa', {
+      modulusLength: 2048,
+      publicExponent: 65537,
+      publicKeyEncoding: {
+        type: 'spki',
+        format: 'pem'
+      },
+      privateKeyEncoding: {
+        type: 'pkcs1',
+        format: 'pem'
+      }
+    }, (err, publicKey, privateKey) => {
+      return resolve(done(null, {privateKey, publicKey}));
+    });
+  })
 };
+
+module.exports.util.rsaKeypairGen = rsaKeypairGen;
 
 /*****************
  *    Streams    *

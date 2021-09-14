@@ -56,8 +56,6 @@ magic.util.hash(message)
 
 Generates an RSA public/private key pair. The public key is encoded using a SubjectPublicKeyInfo(SPKI) structure.
 
-For node 10+, it uses the built-in `generateKeyPair` from `crypto` library. For older node versions, it generates the keypair using OpenSSL directly.
-
 ```js
 // callback
 magic.util.rsaKeypairGen((err, keypair) => {
