@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## v5.0.0 - 2021-09-15
+
+### Changes
+- BREAKING CHANGE: Drops support for node 10. Supported versions: =>12
+- Updates the libsodium library to v0.7.9. Previous versions of the library were removing all uncaughtException listeners including ones attached by other code. This is now fixed in the new version.
+
+### Misc
+- Moves ed25519 crypto from libsodium to Node.js crypto module
+- Enables non-blocking RSA sign/verify asynchronous operation when available
+- Improves documentation
+
 ## v4.0.0 - 2020-09-02
 
 ### Changes

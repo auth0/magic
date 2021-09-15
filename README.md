@@ -5,6 +5,8 @@
 
 All public functions support both callbacks and promises (and therefore async/await), allowing easy integration into any preexisting codebase. All constructions requiring secret keys will generate them as necessary if they are not supplied, and return them for future use.
 
+Supported Node versions: >= 12
+
 ## Why use magic
 Most libraries offering a cryptography toolkit allow for a variety of configuration. Usually the reasoning behind this is to empower the developer to configure the cryptography functions as they like. At the same time however this requires developers to be knowledgable of what the different parameters are for and how they affect the security of the function output. Bad choices in parameters can lead to insecure cryptography with disastrous results.
 

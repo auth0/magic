@@ -15,7 +15,7 @@ Remember that the alt API should only be used over the core API when required by
 
 ### magic.auth.sign | magic.verify.sign
 
-Implements `ed25519` signatures using `libsodium.js`.
+Implements `ed25519` signatures.
 
  By default, the API expects to be given a secret key as a seed, from which the actual keypair is derived (allowing easier, more concise storage). However, it may be used directly with a keypair, requiring only a boolean flag for the `verify` call.
 
