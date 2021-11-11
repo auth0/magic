@@ -8,7 +8,8 @@ magic supports the following encryption functions in its core API:
 * [magic.PwdEncryptStream | magic.PwdDecryptStream](#magicpwdencryptstream--magicpwddecryptstream): Symmetric encryption for streams using a password
 
 The alt API also supports the following functions:
-* [magic.alt.encrypt.AES\_{128,192,256}\_CBC\_HMAC\_SHA{256,384,512} | magic.alt.decrypt.AES\_{128,192,256}\_CBC\_HMAC\_SHA{256,384,512}](magicaltencryptaes_128192256_cbc_hmac_sha256384512--magicaltdecryptaes_128192256_cbc_hmac_sha256384512): Implements AES encryption with different key lengths and SHA2 algorithms
+* [magic.alt.encrypt.AES_{128,192,256}\_GCM | magic.alt.decrypt.AES\_{128,192,256}\_GCM](#magicaltencryptaes_128192256_gcm--magicaltdecryptaes_128192256_gcm): Implements AES-GCM authenticated encryption with different key lengths. FIPS 140-2 approved.
+* [magic.alt.encrypt.AES\_{128,192,256}\_CBC\_HMAC\_SHA{256,384,512} | magic.alt.decrypt.AES\_{128,192,256}\_CBC\_HMAC\_SHA{256,384,512}](#magicaltencryptaes_128192256_cbc_hmac_sha256384512--magicaltdecryptaes_128192256_cbc_hmac_sha256384512): Implements AES encryption with different key lengths and SHA2 algorithms
 
 Remember that the alt API should only be used over the core API when required by an external specification or interoperability concerns.
 
@@ -412,7 +413,7 @@ Only use these functions when encryption derived from a password is required. Ot
 
 Implements `AES{128,192,256}GCM` using OpenSSL through `crypto`.
 
-AES-GCM is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf) and provides authenticated encryption using the industry standard symmetric encryption scheme with an authenticated block cipher mode, a clean and simple construction.
+AES-GCM is standardized by [NIST](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf) and provides authenticated encryption using the industry standard symmetric encryption scheme with an authenticated block cipher mode, a clean and simple construction. It is a FIPS 140-2 approved encryption algorithm.
 
 ```js
 // 1. Encrypt a message with a newly generated key
