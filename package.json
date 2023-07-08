@@ -9,7 +9,7 @@
     "url": "https://github.com/auth0/magic.git"
   },
   "dependencies": {
-    "bcrypt": "^5.0.1",
+    "bcrypt": "^5.1.0",
     "libsodium-wrappers-sumo": "^0.7.9"
   },
   "scripts": {
