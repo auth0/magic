@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
-    "libsodium-wrappers-sumo": "^0.7.9"
+    "libsodium-wrappers-sumo": "^0.7.10"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha --delay ./test/magic.test.js ./test/magic.test.vectors.js"
